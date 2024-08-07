@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31410.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoApiGen", "src\AutoApiGen\AutoApiGen.csproj", "{70404BC9-B6F6-4A1B-AB8B-E20C8DAAF12D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BBD05FC9-0D5E-4BAE-B39B-C5C9B83958CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetConsumer", "src\AspNetConsumer\AspNetConsumer\AspNetConsumer.csproj", "{BD19790C-D0C7-4E96-A872-4113E217C272}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{70404BC9-B6F6-4A1B-AB8B-E20C8DAAF12D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70404BC9-B6F6-4A1B-AB8B-E20C8DAAF12D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70404BC9-B6F6-4A1B-AB8B-E20C8DAAF12D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70404BC9-B6F6-4A1B-AB8B-E20C8DAAF12D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD19790C-D0C7-4E96-A872-4113E217C272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD19790C-D0C7-4E96-A872-4113E217C272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD19790C-D0C7-4E96-A872-4113E217C272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD19790C-D0C7-4E96-A872-4113E217C272}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7FCC8154-A67B-4623-A91B-32AA29D47E87}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{70404BC9-B6F6-4A1B-AB8B-E20C8DAAF12D} = {BBD05FC9-0D5E-4BAE-B39B-C5C9B83958CB}
+		{BD19790C-D0C7-4E96-A872-4113E217C272} = {BBD05FC9-0D5E-4BAE-B39B-C5C9B83958CB}
+	EndGlobalSection
+EndGlobal

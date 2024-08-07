@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>true</ImplicitUsings>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
+    <RootNamespace>AutoApiGen</RootNamespace>
+    <Nullable>enable</Nullable>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Templates\ControllerTemplate.txt" />
+    <None Remove="Templates\ApiControllerBase.txt" />
+    <None Remove="Templates\EndpointAttributes.txt" />
+  
+    <EmbeddedResource Include="Templates\Controller.txt" />
+    <EmbeddedResource Include="Templates\ApiControllerBase.txt" />
+    <EmbeddedResource Include="Templates\EndpointAttributes.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0-beta1.24318.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Scriban" Version="5.10.0" IncludeAssets="Build" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
+  </PropertyGroup>
+</Project>

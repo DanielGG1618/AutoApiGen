@@ -1,0 +1,18 @@
+﻿#pragma warning disable CS9113 // Parameter is unread.
+
+using System.Diagnostics.CodeAnalysis;
+
+namespace AutoApiGen.Attributes;
+
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+public abstract class EndpointAttribute([StringSyntax("Route")] string route) : Attribute;
+
+public class GetEndpointAttribute([StringSyntax("Route")] string route) : EndpointAttribute(route);
+public class PostEndpointAttribute([StringSyntax("Route")] string route) : EndpointAttribute(route);
+public class PutEndpointAttribute([StringSyntax("Route")] string route) : EndpointAttribute(route);
+public class DeleteEndpointAttribute([StringSyntax("Route")] string route) : EndpointAttribute(route);
+public class HeadEndpointAttribute([StringSyntax("Route")] string route) : EndpointAttribute(route);
+public class PatchEndpointAttribute([StringSyntax("Route")] string route) : EndpointAttribute(route);
+public class OptionsEndpointAttribute([StringSyntax("Route")] string route) : EndpointAttribute(route);
+
+#pragma warning restore CS9113 // Parameter is unread.
