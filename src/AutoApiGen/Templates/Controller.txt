@@ -14,15 +14,15 @@ using MediatR;
 using AutoApiGen.Models;
 using AutoApiGen.Attributes;
 
-namespace {{ controller.namespace }};
+namespace {{ namespace }};
 
-{{ if controller.base_route != "" -}}
-    [Route("{{ controller.base_route }}")]
+{{ if base_route != "" -}}
+    [Route("{{ base_route }}")]
 {{- end }}
-public class {{ controller.name }}Controller(ISender mediator) 
+public class {{ name }}Controller(ISender mediator) 
     : ApiControllerBase(mediator)
 {    
-    {{- for method in controller.methods -}}
+    {{- for method in methods -}}
     {{ if method.comment -}}
         /// <summary>
         /// {{ method.comment }}
