@@ -19,7 +19,7 @@ namespace {{ controller.namespace }};
 {{ if controller.base_route != "" -}}
     [Route("{{ controller.base_route }}")]
 {{- end }}
-public class {{ controller.name }}(ISender mediator) 
+public class {{ controller.name }}Controller(ISender mediator) 
     : ApiControllerBase(mediator)
 {    
     {{- for method in controller.methods -}}

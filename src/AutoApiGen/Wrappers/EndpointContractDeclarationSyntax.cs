@@ -76,9 +76,8 @@ internal class EndpointContractDeclarationSyntax
     }
 
     public string GetControllerName() =>
-        BaseRoute.WithCapitalFirstLetter() + "Controller";
+        BaseRoute.WithCapitalFirstLetter();
 
     private EndpointContractDeclarationSyntax(TypeDeclarationSyntax type, EndpointAttributeSyntax attribute) =>
         (_type, _attribute) = (type, attribute);
-
 }

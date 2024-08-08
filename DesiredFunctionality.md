@@ -29,6 +29,8 @@ public class GetStudentHandler : IQueryHandler<GetStudentQuery, Student>
 
 ## Generates
 ```csharp
+record CreateStudentRequest(string Name); 
+
 [Route("students")]
 public class StudentsController(IMediator mediator) 
     : ApiController(mediator)

@@ -25,4 +25,4 @@ app.MapControllers();
 
 app.Run();
 
-//var a = new ContestsController();
+//var a = new AspNetConsumer.Controllers.ContestsController();
