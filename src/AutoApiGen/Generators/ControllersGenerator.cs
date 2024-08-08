@@ -40,41 +40,33 @@ internal class ControllersGenerator : IIncrementalGenerator
         var controllers = new Dictionary<string, ControllerData>();
         
         foreach (var endpoint in endpoints)
-        { 
-            var httpMethod = endpoint.GetHttpMethod();
-            var route = endpoint.GetRelationalRoute();
-            var methodName = endpoint.GetMethodName();
-            var requestType = endpoint.GetRequestType();
-            var responseType = endpoint.GetResponseType();
-
-            var @namespace = $"{endpoint.GetRootNamespace()}.Controllers";
-            var baseRoute = endpoint.BaseRoute;
+        {
             var controllerName = endpoint.GetControllerName();
             
             var method = new MethodData(
-                HttpMethod: httpMethod,
-                Route: route,
+                HttpMethod: endpoint.GetHttpMethod(),
+                Route: endpoint.GetRelationalRoute(),
                 Attributes: [],
-                Name: methodName,
+                Name: endpoint.GetMethodName(),
                 Parameters: [],
-                RequestType: requestType,
-                ResponseType: responseType
+                RequestType: endpoint.GetRequestType(),
+                ResponseType: endpoint.GetResponseType()
             );
 
             controllers[controllerName] = controllers.TryGetValue(controllerName, out var controller)
                 ? controller with { Methods = [method, ..controller.Methods] }
                 : new ControllerData(
-                    @namespace,
-                    baseRoute,
+                    Namespace: $"{endpoint.GetRootNamespace()}.Controllers",
+                    endpoint.BaseRoute,
                     controllerName,
                     [method]
                 );
         }
-        
+
         foreach (var controller in controllers.Values)
         {
             context.AddSource(
-                $"{controller.Name}.g.cs",
+                $"{controller.Name}Controller.g.cs",
                 SourceCodeGenerator.Generate(controller, templatesProviders)
             );
         }

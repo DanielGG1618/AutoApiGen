@@ -22,7 +22,7 @@ namespace System.Runtime.CompilerServices
 
         // ReSharper disable once UnusedMember.Global
         public bool IsOptional { get; init; }
-    
+ 
         public CompilerFeatureRequiredAttribute(string featureName) 
             => FeatureName = featureName;
     }
