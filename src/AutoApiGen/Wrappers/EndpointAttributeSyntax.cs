@@ -1,5 +1,4 @@
-﻿using AutoApiGen.Extensions;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AutoApiGen.Wrappers;
 
@@ -15,8 +14,8 @@ public class EndpointAttributeSyntax
         IsValid(attribute)
             ? new(
                 route: Route.Wrap(
-                    attribute.ArgumentList?.Arguments
-                        .First().Expression is LiteralExpressionSyntax literalExpression
+                    attribute.ArgumentList?.Arguments[0].Expression 
+                        is LiteralExpressionSyntax literalExpression
                         ? literalExpression.Token.ValueText
                         : ""
                 ),
