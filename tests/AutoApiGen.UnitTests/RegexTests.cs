@@ -42,6 +42,26 @@ public class RegexTests
     }
 
     [Fact]
+    public void ShouldMatchNameAndDefaultValue_WhenInputContainsNameAndDefaultValue()
+    {
+        //Arrange
+        const string input = "{parameter=5}";
+        const string expectedName = "parameter";
+        const string expectedDefault = "5";
+        
+        //Act
+        var match = Regexes.RawParameterRoutePartRegex.Match(input);
+        var name = match.Groups["name"].Value;
+        var type = match.Groups["type"].Value;
+        var defaultValue = match.Groups["default"].Value;
+        
+        //Assert
+        name.Should().Be(expectedName);
+        type.Should().BeNullOrEmpty();
+        defaultValue.Should().Be(expectedDefault);
+    }
+    
+    [Fact]
     public void Test3()
     {
         //Arrange
@@ -110,6 +130,20 @@ public class RegexTests
         type.Should().Be(expectedType);
     }
 
+    
+    [Fact]
+    public void ShouldNotMatch_WhenInputContainsDefaultValueWithOptionalIndicator()
+    {
+        //Arrange
+        const string input = "{parameter=5}";
+        
+        //Act
+        var match = Regexes.OptionalParameterRoutePartRegex.Match(input);
+        
+        //Assert
+        match.Success.Should().Be(false);
+    }
+    
     [Fact]
     public void Test7()
     {
