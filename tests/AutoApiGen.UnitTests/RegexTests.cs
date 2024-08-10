@@ -1,9 +1,9 @@
 ﻿namespace AutoApiGen.UnitTests;
 
-public class RegexTests
+public class RawParameterRoutePartRegexTests
 {
     [Fact]
-    public void Test1()
+    public void ShouldMatchNameOnly_WhenInputContainsNameWithoutTypeOrDefaultValue()
     {
         //Arrange
         const string input = "{parameter}";
@@ -22,7 +22,7 @@ public class RegexTests
     }
 
     [Fact]
-    public void Test2()
+    public void ShouldMatchNameAndType_WhenInputContainsNameAndType()
     {
         //Arrange
         const string input = "{parameter:int}";
@@ -62,7 +62,7 @@ public class RegexTests
     }
     
     [Fact]
-    public void Test3()
+    public void ShouldMatchNameTypeAndDefaultValue_WhenInputContainsNameTypeAndDefaultValue()
     {
         //Arrange
         const string input = "{parameter:int=5}";
@@ -81,9 +81,12 @@ public class RegexTests
         type.Should().Be(expectedType);
         defaultValue.Should().Be(expectedDefault);
     }
+}
 
+public class OptionalParameterRoutePartRegexTests
+{
     [Fact]
-    public void Test4()
+    public void ShouldNotMatch_WhenInputDoesNotContainOptionalIndicator()
     {
         //Arrange
         const string input = "{parameter}";
@@ -96,7 +99,7 @@ public class RegexTests
     }
 
     [Fact]
-    public void Test5()
+    public void ShouldMatchName_WhenInputContainsNameWithOptionalIndicator()
     {
         //Arrange
         const string input = "{parameter?}";
@@ -113,7 +116,7 @@ public class RegexTests
     }
 
     [Fact]
-    public void Test6()
+    public void ShouldMatchNameAndType_WhenInputContainsNameAndTypeWithOptionalIndicator()
     {
         //Arrange
         const string input = "{parameter:int?}";
@@ -145,7 +148,7 @@ public class RegexTests
     }
     
     [Fact]
-    public void Test7()
+    public void ShouldNotMatch_WhenInputContainsDefaultValueAndTypeWithOptionalIndicator()
     {
         //Arrange
         const string input = "{parameter:int=5}";
@@ -156,9 +159,12 @@ public class RegexTests
         //Assert
         match.Success.Should().Be(false);
     }
+}
 
+public class CatchAllParameterRoutePartRegexTests
+{
     [Fact]
-    public void Test8()
+    public void ShouldNotMatch_WhenInputDoesNotContainCatchAllIndicator()
     {
         //Arrange
         const string input = "{parameter}";
@@ -171,7 +177,7 @@ public class RegexTests
     }
 
     [Fact]
-    public void Test9()
+    public void ShouldMatchName_WhenInputContainsNameWithCatchAllIndicator()
     {
         //Arrange
         const string input = "{*parameter}";
@@ -190,7 +196,7 @@ public class RegexTests
     }
 
     [Fact]
-    public void Test10()
+    public void ShouldMatchNameAndType_WhenInputContainsNameAndTypeWithCatchAllIndicator()
     {
         //Arrange 
         const string input = "{*parameter:int}";
@@ -210,7 +216,7 @@ public class RegexTests
     }
 
     [Fact]
-    public void Test11()
+    public void ShouldMatchNameTypeAndDefaultValue_WhenInputContainsNameTypeAndDefaultValueWithCatchAllIndicator()
     {
         const string input = "{*parameter:int=5}";
         const string expectedName = "parameter";
@@ -230,7 +236,7 @@ public class RegexTests
     }
 
     [Fact]
-    public void Test12()
+    public void ShouldNotMatch_WhenInputContainsOptionalIndicatorWithCatchAll()
     {
         //Arrange
         const string input = "{*parameter:int?}";
