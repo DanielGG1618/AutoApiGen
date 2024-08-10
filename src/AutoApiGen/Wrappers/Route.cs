@@ -1,4 +1,6 @@
-﻿namespace AutoApiGen.Wrappers;
+﻿using System.Collections.Immutable;
+
+namespace AutoApiGen.Wrappers;
 
 public class Route
 {

@@ -1,4 +1,5 @@
-﻿using AutoApiGen.Extensions;
+﻿using System.Collections.Immutable;
+using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

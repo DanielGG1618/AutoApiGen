@@ -1,4 +1,5 @@
-﻿using AutoApiGen.TemplatesProcessing;
+﻿using System.Collections.Immutable;
+using AutoApiGen.TemplatesProcessing;
 using Microsoft.CodeAnalysis;
 
 namespace AutoApiGen.Generators;

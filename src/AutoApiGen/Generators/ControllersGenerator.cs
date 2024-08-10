@@ -1,4 +1,5 @@
-﻿using AutoApiGen.DataObjects;
+﻿using System.Collections.Immutable;
+using AutoApiGen.DataObjects;
 using AutoApiGen.Extensions;
 using AutoApiGen.TemplatesProcessing;
 using AutoApiGen.Wrappers;

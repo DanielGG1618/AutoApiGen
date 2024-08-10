@@ -1,4 +1,6 @@
-﻿namespace AutoApiGen.DataObjects;
+﻿using System.Collections.Immutable;
+
+namespace AutoApiGen.DataObjects;
 
 internal readonly record struct MethodData(
     string HttpMethod,
