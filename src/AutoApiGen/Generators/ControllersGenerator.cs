@@ -34,16 +34,16 @@ internal class ControllersGenerator : IIncrementalGenerator
         (Compilation, ImmutableArray<EndpointContractDeclarationSyntax>) compilationDetails
     )
     {
-        var templatesProviders = new EmbeddedResourceTemplatesProvider();
         var (compilation, endpoints) = compilationDetails;
-        var rootNamespace = compilation.AssemblyName;
         
+        var templatesProviders = new EmbeddedResourceTemplatesProvider();
         var controllers = new Dictionary<string, ControllerData>();
+        
+        var rootNamespace = compilation.AssemblyName;
+        var controllersNamespace = $"{rootNamespace}.Controllers";
         
         foreach (var endpoint in endpoints)
         {
-            var controllerName = endpoint.GetControllerName();
-            
             var method = new MethodData(
                 HttpMethod: endpoint.GetHttpMethod(),
                 Route: endpoint.GetRelationalRoute(),
@@ -54,10 +54,13 @@ internal class ControllersGenerator : IIncrementalGenerator
                 ResponseType: endpoint.GetResponseType()
             );
 
-            controllers[controllerName] = controllers.TryGetValue(controllerName, out var controller)
-                ? controller with { Methods = [method, ..controller.Methods] }
-                : new ControllerData(
-                    Namespace: $"{rootNamespace}.Controllers",
+            var controllerName = endpoint.GetControllerName();
+
+            if (controllers.TryGetValue(controllerName, out var controller))
+                controller.Methods.Add(method);
+            else
+                controllers[controllerName] = new ControllerData(
+                    controllersNamespace,
                     endpoint.BaseRoute,
                     controllerName,
                     [method]

@@ -1,6 +1,6 @@
 ﻿namespace AutoApiGen.DataObjects;
 
-internal record MethodData(
+internal readonly record struct MethodData(
     string HttpMethod,
     string Route,
     IImmutableList<string> Attributes,

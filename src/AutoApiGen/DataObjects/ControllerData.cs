@@ -1,8 +1,8 @@
 ﻿namespace AutoApiGen.DataObjects;
 
-internal record ControllerData(
+internal readonly record struct ControllerData(
     string Namespace,
     string BaseRoute,
     string Name,
-    IImmutableList<MethodData> Methods
+    List<MethodData> Methods
 );
