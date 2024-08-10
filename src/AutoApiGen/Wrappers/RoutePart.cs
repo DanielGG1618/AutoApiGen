@@ -1,4 +1,6 @@
-﻿namespace AutoApiGen.Wrappers;
+﻿using AutoApiGen.Exceptions;
+
+namespace AutoApiGen.Wrappers;
 
 /*[Closed]*/
 public abstract record RoutePart
@@ -8,10 +10,7 @@ public abstract record RoutePart
     public sealed record OptionalParameterRoutePart(string Name, string? Type = null) : RoutePart;
     public sealed record CatchAllParameterRoutePart(string Name, string? Type = null, string? Default = null) : RoutePart;
 
-    public static IImmutableList<RoutePart> Parse(IEnumerable<string> parts) =>
-        parts.Select(Parse).ToImmutableArray();
-
-    private static RoutePart Parse(string part) => part switch
+    public static RoutePart Parse(string part) => part switch
     {
         not ['{', .., '}'] => new LiteralRoutePart(part),
 
@@ -37,4 +36,23 @@ public abstract record RoutePart
 
         _ => throw new ArgumentException("Invalid syntax", nameof(part))
     };
+    
+    public static string Format(RoutePart part) => part switch
+    {
+        LiteralRoutePart(var value) => value,
+        
+        RawParameterRoutePart(var name, var type, var defaultValue) =>
+            $$"""{{{name}}{{FormatType(type)}}{{FormatDefault(defaultValue)}}}""",
+        
+        OptionalParameterRoutePart(var name, var type) => 
+            $$"""{{{name}}{{FormatType(type)}}}""",
+        
+        CatchAllParameterRoutePart(var name, var type, var defaultValue) =>    
+            $$"""{{{name}}{{FormatType(type)}}{{FormatDefault(defaultValue)}}}""",
+        
+        _ => throw new ThisIsUnionException()
+    };
+
+    private static string FormatType(string? type) => type is null ? "" : $":{type}";
+    private static string FormatDefault(string? defaultValue) => defaultValue is null ? "" : $"={defaultValue}";
 }
