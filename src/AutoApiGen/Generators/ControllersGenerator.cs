@@ -45,14 +45,22 @@ internal class ControllersGenerator : IIncrementalGenerator
         
         foreach (var endpoint in endpoints)
         {
+            var actionName = endpoint.GetActionName();
+            var requestType = endpoint.GetRequestType(); //TODO extract params from here to request data object
+            
+            var request = new RequestData(
+                $"{actionName}Request",
+                Parameters: []
+            );
+            
             var method = new MethodData(
-                HttpMethod: endpoint.GetHttpMethod(),
-                Route: endpoint.GetRelationalRoute(),
+                endpoint.GetHttpMethod(),
+                endpoint.GetRelationalRoute(),
                 Attributes: [],
-                Name: endpoint.GetMethodName(),
+                actionName,
                 Parameters: [],
-                RequestType: endpoint.GetRequestType(),
-                ResponseType: endpoint.GetResponseType()
+                request.Name,
+                endpoint.GetResponseType()
             );
 
             var controllerName = endpoint.GetControllerName();
@@ -69,11 +77,9 @@ internal class ControllersGenerator : IIncrementalGenerator
         }
 
         foreach (var controller in controllers.Values)
-        {
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
                 SourceCodeGenerator.Generate(controller, templatesProviders)
             );
-        }
     }
 }
