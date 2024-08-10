@@ -21,4 +21,13 @@ internal static class DiagnosticDescriptors
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true
     );
+    
+    public static DiagnosticDescriptor UnusedRouteParameter { get; } = new(
+        id: "AAG0018",
+        title: "Unused route parameter",
+        messageFormat: "Route parameter '{0}' is not represented in the request",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
 }
