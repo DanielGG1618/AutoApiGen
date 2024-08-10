@@ -49,7 +49,7 @@ public abstract record RoutePart
         CatchAllParameterRoutePart(var name, var type, var defaultValue) =>    
             $$"""{{{name}}{{FormatType(type)}}{{FormatDefault(defaultValue)}}}""",
         
-        _ => throw new ThisIsUnionException()
+        _ => throw new ThisIsUnionException(nameof(RoutePart))
     };
 
     private static string FormatType(string? type) => type is null ? "" : $":{type}";
