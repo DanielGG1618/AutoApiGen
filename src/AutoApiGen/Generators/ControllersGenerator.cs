@@ -36,6 +36,7 @@ internal class ControllersGenerator : IIncrementalGenerator
     {
         var templatesProviders = new EmbeddedResourceTemplatesProvider();
         var (compilation, endpoints) = compilationDetails;
+        var rootNamespace = compilation.AssemblyName;
         
         var controllers = new Dictionary<string, ControllerData>();
         
@@ -56,7 +57,7 @@ internal class ControllersGenerator : IIncrementalGenerator
             controllers[controllerName] = controllers.TryGetValue(controllerName, out var controller)
                 ? controller with { Methods = [method, ..controller.Methods] }
                 : new ControllerData(
-                    Namespace: $"{endpoint.GetRootNamespace()}.Controllers",
+                    Namespace: $"{rootNamespace}.Controllers",
                     endpoint.BaseRoute,
                     controllerName,
                     [method]

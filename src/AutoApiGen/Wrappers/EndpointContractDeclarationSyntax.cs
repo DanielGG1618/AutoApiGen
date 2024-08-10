@@ -57,23 +57,6 @@ internal class EndpointContractDeclarationSyntax
                 ?? throw new InvalidOperationException("Response type is not specified")
             )
         );
-    
-    public string GetRootNamespace()
-    {
-        var current = _type.Parent;
-        
-        while (current is not NamespaceDeclarationSyntax and not FileScopedNamespaceDeclarationSyntax)
-            current = current?.Parent;
-
-        var @namespace = current switch
-        {
-            NamespaceDeclarationSyntax namespaceDeclaration => namespaceDeclaration.Name.ToString(),
-            FileScopedNamespaceDeclarationSyntax namespaceDeclaration => namespaceDeclaration.Name.ToString(),
-            _ => throw new InvalidOperationException("Root namespace not found")
-        };
-
-        return @namespace.Split('.')[0];
-    }
 
     public string GetControllerName() =>
         BaseRoute.WithCapitalFirstLetter();
