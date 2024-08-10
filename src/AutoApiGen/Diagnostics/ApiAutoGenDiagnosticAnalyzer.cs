@@ -1,6 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using AutoApiGen.Extensions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using static AutoApiGen.StaticData;
 
 namespace AutoApiGen.Diagnostics;
 
@@ -9,29 +12,27 @@ internal class ApiAutoGenDiagnosticAnalyzer : DiagnosticAnalyzer
 {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
     [
-        DiagnosticDescriptors.LiteralExpressionRequired,
-        DiagnosticDescriptors.ForDebug
+        DiagnosticDescriptors.UnusedRouteParameter
     ];
 
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.ReportDiagnostics);
         context.EnableConcurrentExecution();
-        context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.RecordDeclaration);
-        context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.ClassDeclaration);
+        
+        context.RegisterSyntaxNodeAction(AnalyzeEndpointContractDeclarations, SyntaxKind.ClassDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeEndpointContractDeclarations, SyntaxKind.RecordDeclaration);
     }
 
-    private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeEndpointContractDeclarations(SyntaxNodeAnalysisContext context)
     {
-        /*if (context.Node is not TypeDeclarationSyntax type)
+        if (context.Node is not TypeDeclarationSyntax type)
+            return;
+
+        if (!type.HasAttributeWithNameFrom(EndpointAttributeNames))
             return;
         
-        var diagnostic = Diagnostic.Create(
-            DiagnosticDescriptors.ForDebug,
-            type.Identifier.GetLocation(),
-            type.BaseList?.Types.Select(baseType => (baseType.Type as SimpleNameSyntax)?.Identifier.Text).FirstOrDefault() ?? "null"
-        );
-
-        context.ReportDiagnostic(diagnostic);*/
+        //TODO: Implement the logic to analyze the endpoint contract
+        // context.ReportDiagnostic(diagnostic);
     }
 }
