@@ -2,7 +2,6 @@
 
 namespace AutoApiGen.Wrappers;
 
-/*[Closed]*/
 public abstract record RoutePart
 {
     public sealed record LiteralRoutePart(string Value) : RoutePart;
