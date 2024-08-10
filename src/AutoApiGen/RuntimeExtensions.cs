@@ -36,3 +36,36 @@ namespace System.Diagnostics.CodeAnalysis
     // ReSharper disable once UnusedType.Global
     public sealed class SetsRequiredMembersAttribute : Attribute;
 }
+
+#nullable disable
+namespace System
+{
+    // ReSharper disable once UnusedType.Global
+    public readonly struct Index
+    {
+        private readonly int _value;
+
+        public Index(int value, bool fromEnd = false) =>
+            _value = value switch
+            {
+                < 0 => throw new ArgumentOutOfRangeException(nameof(value), "Index must be non-negative."),
+                _ => fromEnd ? ~value : value
+            };
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public int Value => _value < 0 ? ~_value : _value;
+        // ReSharper disable once MemberCanBePrivate.Global
+        public bool IsFromEnd => _value < 0;
+        
+        public int GetOffset(int length) =>
+            length < 0 ? throw new ArgumentOutOfRangeException(nameof(length), "Length must be non-negative.")
+            : IsFromEnd ? length - Value : Value;
+
+        public static implicit operator Index(int value) => new(value);
+
+        public override bool Equals(object obj) => obj is Index index && _value == index._value;
+        public override int GetHashCode() => _value;
+        public override string ToString() => IsFromEnd ? $"^{Value}" : Value.ToString();
+    }
+}
+#nullable enable

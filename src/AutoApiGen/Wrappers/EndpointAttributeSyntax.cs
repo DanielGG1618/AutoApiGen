@@ -6,7 +6,7 @@ namespace AutoApiGen.Wrappers;
 public class EndpointAttributeSyntax
 {
     private readonly string _name;
-    private readonly RouteString _route;
+    private readonly Route _route;
 
     public string BaseRoute =>
         _route.BaseRoute;
@@ -14,7 +14,7 @@ public class EndpointAttributeSyntax
     public static EndpointAttributeSyntax Wrap(AttributeSyntax attribute) =>
         IsValid(attribute)
             ? new(
-                route: RouteString.Wrap(
+                route: Route.Wrap(
                     attribute.ArgumentList?.Arguments
                         .First().Expression is LiteralExpressionSyntax literalExpression
                         ? literalExpression.Token.ValueText
@@ -33,6 +33,6 @@ public class EndpointAttributeSyntax
     public string GetHttpMethod() =>
         _name.Remove(_name.Length - "Endpoint".Length);
 
-    private EndpointAttributeSyntax(RouteString route, string name) =>
+    private EndpointAttributeSyntax(Route route, string name) =>
         (_route, _name) = (route, name);
 }
