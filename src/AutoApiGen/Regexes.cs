@@ -4,7 +4,7 @@ namespace AutoApiGen;
 
 public class Regexes
 {
-    public static readonly Regex RawParameterRoutePartRegex = new(
+    public static Regex RawParameterRoutePartRegex { get; } = new(
         """
         ^{
             (?<name>[a-zA-Z_]\w*)
@@ -14,8 +14,8 @@ public class Regexes
         """,
         RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace
     );
-    
-    public static readonly Regex OptionalParameterRoutePartRegex = new(
+
+    public static Regex OptionalParameterRoutePartRegex { get; } = new(
         """
         ^{
             (?<name>[a-zA-Z_]\w*)
@@ -25,8 +25,8 @@ public class Regexes
         """,
         RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace
     );
-    
-    public static readonly Regex CatchAllParameterRoutePartRegex = new(
+
+    public static Regex CatchAllParameterRoutePartRegex { get; } = new(
         """
         ^{
             \*

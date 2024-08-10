@@ -68,4 +68,3 @@ namespace System
         public override string ToString() => IsFromEnd ? $"^{Value}" : Value.ToString();
     }
 }
-#nullable enable

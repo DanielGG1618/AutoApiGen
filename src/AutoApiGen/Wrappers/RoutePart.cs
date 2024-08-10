@@ -17,7 +17,7 @@ public abstract record RoutePart
             new RawParameterRoutePart(
                 match.Groups["name"].Value,
                 match.Groups["type"].Value is { Length: > 0 } type ? type : null,
-                match.Groups["default"].Value is { Length: > 0 } defaultValue ? defaultValue : null
+                match.Groups["default"].Value is { Length: > 0 } @default ? @default : null
             ),
 
         ['{', .., '?', '}'] when Regexes.OptionalParameterRoutePartRegex.Match(part) is { Success: true } match =>
@@ -30,7 +30,7 @@ public abstract record RoutePart
             new CatchAllParameterRoutePart(
                 match.Groups["name"].Value,
                 match.Groups["type"].Value is { Length: > 0 } type ? type : null,
-                match.Groups["default"].Value is { Length: > 0 } defaultValue ? defaultValue : null
+                match.Groups["default"].Value is { Length: > 0 } @default ? @default : null
             ),
 
         _ => throw new ArgumentException("Invalid syntax", nameof(part))
@@ -40,18 +40,18 @@ public abstract record RoutePart
     {
         LiteralRoutePart(var value) => value,
         
-        RawParameterRoutePart(var name, var type, var defaultValue) =>
-            $$"""{{{name}}{{FormatType(type)}}{{FormatDefault(defaultValue)}}}""",
+        RawParameterRoutePart(var name, var type, var @default) =>
+            name + FormatType(type) + FormatDefault(@default),
         
-        OptionalParameterRoutePart(var name, var type) => 
-            $$"""{{{name}}{{FormatType(type)}}}""",
+        OptionalParameterRoutePart(var name, var type) =>
+            name + FormatType(type),
         
-        CatchAllParameterRoutePart(var name, var type, var defaultValue) =>    
-            $$"""{{{name}}{{FormatType(type)}}{{FormatDefault(defaultValue)}}}""",
+        CatchAllParameterRoutePart(var name, var type, var @default) => 
+            name + FormatType(type) + FormatDefault(@default),
         
         _ => throw new ThisIsUnionException(nameof(RoutePart))
     };
 
     private static string FormatType(string? type) => type is null ? "" : $":{type}";
-    private static string FormatDefault(string? defaultValue) => defaultValue is null ? "" : $"={defaultValue}";
+    private static string FormatDefault(string? @default) => @default is null ? "" : $"={@default}";
 }
