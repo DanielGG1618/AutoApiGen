@@ -80,10 +80,11 @@ internal class ControllersGenerator : IIncrementalGenerator
             );
         }
 
+        var template = templatesProviders.Get();
         foreach (var controller in controllers.Values)
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
-                SourceCodeGenerator.Generate(controller, templatesProviders)
+                TemplatesRenderer.Render(template, with: controller)
             );
     }
 }
