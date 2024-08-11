@@ -13,6 +13,15 @@ internal static class DiagnosticDescriptors
         isEnabledByDefault: true
     );
 
+    public static DiagnosticDescriptor InvalidRoutePartSyntax { get; } = new(
+        id: "AAG0002",
+        title: "Invalid route part syntax",
+        messageFormat: "Route part '{0}' is invalid",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true
+    );
+
     public static DiagnosticDescriptor ForDebug { get; } =  new(
         id: "AAG9000",
         title: "Created for debug only",

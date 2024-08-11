@@ -1,4 +1,5 @@
-﻿using AutoApiGen.Exceptions;
+﻿using System.Diagnostics.Contracts;
+using AutoApiGen.Exceptions;
 
 namespace AutoApiGen.Wrappers;
 
@@ -9,6 +10,7 @@ public abstract record RoutePart
     public sealed record OptionalParameterRoutePart(string Name, string? Type = null) : RoutePart;
     public sealed record CatchAllParameterRoutePart(string Name, string? Type = null, string? Default = null) : RoutePart;
 
+    [Pure]
     public static RoutePart Parse(string part) => part switch
     {
         not ['{', .., '}'] => new LiteralRoutePart(part),
@@ -33,9 +35,10 @@ public abstract record RoutePart
                 match.Groups["default"].Value is { Length: > 0 } @default ? @default : null
             ),
 
-        _ => throw new ArgumentException("Invalid syntax", nameof(part))
+        _ => throw new ArgumentException("Invalid route part syntax", nameof(part))
     };
     
+    [Pure]
     public static string Format(RoutePart part) => part switch
     {
         LiteralRoutePart(var value) => value,
