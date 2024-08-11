@@ -67,14 +67,17 @@ internal class ControllersGenerator : IIncrementalGenerator
             var controllerName = endpoint.GetControllerName();
 
             if (controllers.TryGetValue(controllerName, out var controller))
+            {
                 controller.Methods.Add(method);
-            else
-                controllers[controllerName] = new ControllerData(
-                    controllersNamespace,
-                    endpoint.BaseRoute,
-                    controllerName,
-                    [method]
-                );
+                continue;
+            }
+            
+            controllers[controllerName] = new ControllerData(
+                controllersNamespace,
+                endpoint.BaseRoute,
+                controllerName,
+                [method]
+            );
         }
 
         foreach (var controller in controllers.Values)
