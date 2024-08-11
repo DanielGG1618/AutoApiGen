@@ -5,4 +5,4 @@ internal readonly record struct ControllerData(
     string BaseRoute,
     string Name,
     List<MethodData> Methods
-);
+) : ITemplateData;

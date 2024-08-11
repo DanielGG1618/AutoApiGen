@@ -11,4 +11,4 @@ internal readonly record struct MethodData(
     string RequestType,
     string ContractType,
     string ResponseType
-);
+) : ITemplateData;
