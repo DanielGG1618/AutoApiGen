@@ -45,7 +45,7 @@ internal class EndpointContractDeclarationSyntax
                 ? _type.Name().Remove(_type.Name().Length - matchingSuffix.Length)
                 : _type.Name();
 
-    public string GetRequestType() =>
+    public string GetContractType() =>
         _type.GetFullName();
     
     public string GetResponseType() =>

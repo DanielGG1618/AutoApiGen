@@ -20,12 +20,9 @@ internal static class SourceCodeGenerator
     {
         var scriptObject = new ScriptObject();
         scriptObject.Import(body);
-        
-        var functions = new ScribanFunctions();
 
         var context = new TemplateContext();
         context.PushGlobal(scriptObject);
-        context.PushGlobal(functions);
 
         return context;
     }

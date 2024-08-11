@@ -37,11 +37,12 @@ public class {{ name }}Controller(ISender mediator)
     {{- for param in method.parameters -}}
         {{ param.attributes }} {{ param.type }} {{ param.name }},
     {{ end }}
-        {{ method.request_type }} request,
+        //{{ method.request_type }} request,
+        {{ method.contract_type }} contract,
         CancellationToken cancellationToken
     ) 
     {
-        var result = await Mediator.Send(request, cancellationToken);
+        var result = await Mediator.Send(contract, cancellationToken);
         return Ok(result);
     }
     {{ end }}

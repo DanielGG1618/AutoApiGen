@@ -46,7 +46,7 @@ internal class ControllersGenerator : IIncrementalGenerator
         foreach (var endpoint in endpoints)
         {
             var actionName = endpoint.GetActionName();
-            var requestType = endpoint.GetRequestType(); //TODO extract params from here to request data object
+            var contractType = endpoint.GetContractType(); //TODO extract params from here to request data object
             
             var request = new RequestData(
                 $"{actionName}Request",
@@ -60,6 +60,7 @@ internal class ControllersGenerator : IIncrementalGenerator
                 actionName,
                 Parameters: [],
                 request.Name,
+                contractType,
                 endpoint.GetResponseType()
             );
 

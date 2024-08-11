@@ -9,5 +9,6 @@ internal readonly record struct MethodData(
     string Name,
     IImmutableList<ParameterData> Parameters,
     string RequestType,
+    string ContractType,
     string ResponseType
 );
