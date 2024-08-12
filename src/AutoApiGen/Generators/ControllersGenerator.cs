@@ -37,7 +37,9 @@ internal class ControllersGenerator : IIncrementalGenerator
     {
         var (compilation, endpoints) = compilationDetails;
         
-        var templatesProviders = new EmbeddedResourceTemplatesProvider();
+        var templatesProvider = new EmbeddedResourceTemplatesProvider();
+        var templatesRenderer = new TemplatesRenderer(templatesProvider);
+        
         var controllers = new Dictionary<string, ControllerData>();
         
         var rootNamespace = compilation.AssemblyName;
@@ -46,7 +48,7 @@ internal class ControllersGenerator : IIncrementalGenerator
         foreach (var endpoint in endpoints)
         {
             var actionName = endpoint.GetActionName();
-            var requestType = endpoint.GetRequestType(); //TODO extract params from here to request data object
+            var contractType = endpoint.GetContractType(); //TODO extract params from here to request data object
             
             var request = new RequestData(
                 $"{actionName}Request",
@@ -60,26 +62,32 @@ internal class ControllersGenerator : IIncrementalGenerator
                 actionName,
                 Parameters: [],
                 request.Name,
+                contractType,
                 endpoint.GetResponseType()
             );
 
             var controllerName = endpoint.GetControllerName();
 
             if (controllers.TryGetValue(controllerName, out var controller))
+            {
                 controller.Methods.Add(method);
-            else
-                controllers[controllerName] = new ControllerData(
-                    controllersNamespace,
-                    endpoint.BaseRoute,
-                    controllerName,
-                    [method]
-                );
+                continue;
+            }
+            
+            controllers[controllerName] = new ControllerData(
+                controllersNamespace,
+                endpoint.BaseRoute,
+                controllerName,
+                [method]
+            );
         }
 
         foreach (var controller in controllers.Values)
+        {
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
-                SourceCodeGenerator.Generate(controller, templatesProviders)
+                templatesRenderer.Render(controller)
             );
+        }
     }
 }

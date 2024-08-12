@@ -6,4 +6,4 @@ internal readonly record struct ParameterData(
     IImmutableList<string> Attributes,
     string Type,
     string Name
-);
+) : ITemplateData;

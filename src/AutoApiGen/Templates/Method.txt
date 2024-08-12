@@ -1,0 +1,22 @@
+﻿{{ if comment -}}
+    /// <summary>
+    /// {{ comment }}
+    /// </summary>
+{{- end }}
+[Http{{ http_method }}
+    {{- if route != "" -}}
+        ("{{ route }}")
+    {{- end -}}
+]
+public async Task<IActionResult> {{ name }}(
+{{- for param in parameters -}}
+    {{ param.attributes }} {{ param.type }} {{ param.name }},
+{{ end }}
+    //{{ request_type }} request,
+    CancellationToken cancellationToken
+) 
+{
+    var contract = default({{ contract_type }});//new {{ contract_type }}(..);
+    var result = await Mediator.Send(contract, cancellationToken);
+    return Ok(result);
+}

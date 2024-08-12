@@ -11,7 +11,7 @@ public class StaticCodeGenerator : IIncrementalGenerator
     {
         var provider = context.SyntaxProvider.CreateSyntaxProvider(
             predicate: static (_, _) => false,
-            transform: static (_, _) => string.Empty
+            transform: static (_, _) => ""
         );
 
         var compilationDetails = context.CompilationProvider.Combine(provider.Collect());
