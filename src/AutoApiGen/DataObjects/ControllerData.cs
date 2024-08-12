@@ -4,5 +4,6 @@ internal readonly record struct ControllerData(
     string Namespace,
     string BaseRoute,
     string Name,
-    List<MethodData> Methods
+    List<MethodData> Methods,
+    List<RequestData> Requests
 ) : ITemplateData;

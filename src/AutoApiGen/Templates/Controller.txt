@@ -16,7 +16,12 @@ using AutoApiGen.Attributes;
 
 namespace {{ namespace }};
 
-{{ if base_route != "" -}}
+{{ for request in requests -}}
+    {{ request | render_request }} 
+    
+{{ end }}
+
+{{- if base_route != "" -}}
     [Route("{{ base_route }}")]
 {{- end }}
 public class {{ name }}Controller(ISender mediator) 

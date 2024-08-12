@@ -47,17 +47,6 @@ internal class EndpointContractDeclarationSyntax
             : EndpointContractSuffixes.SingleOrDefault(suffix => _type.Name().EndsWith(suffix)) is {} matchingSuffix
                 ? _type.Name().Remove(_type.Name().Length - matchingSuffix.Length)
                 : _type.Name();
-    
-    public string GetRequestFullName()
-    {
-        var typeFullName = _type.GetFullName();
-        
-        return _type.Parent is TypeDeclarationSyntax parent
-            ? parent.GetFullName()
-            : EndpointContractSuffixes.SingleOrDefault(suffix => typeFullName.EndsWith(suffix)) is {} matchingSuffix
-                ? typeFullName.Remove(typeFullName.Length - matchingSuffix.Length)
-                : typeFullName;
-    }
 
     public string GetContractType() =>
         _type.GetFullName();

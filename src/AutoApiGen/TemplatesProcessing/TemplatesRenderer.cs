@@ -20,6 +20,7 @@ internal class TemplatesRenderer(ITemplatesProvider templatesProvider) : ScriptO
         var scriptObject = new ScriptObject();
         scriptObject.Import(data);
         //scriptObject.Import("render_controller", Render<ControllerData>);
+        scriptObject.Import("render_request", Render<RequestData>);
         scriptObject.Import("render_method", Render<MethodData>);
         scriptObject.Import("render_parameter", Render<ParameterData>);
 

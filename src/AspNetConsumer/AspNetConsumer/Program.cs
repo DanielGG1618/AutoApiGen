@@ -25,5 +25,4 @@ app.MapControllers();
 
 app.Run();
 
-// var a = new AspNetConsumer.Controllers.ContestsController();
-// var r = new AspNetConsumer.Features.Contests.CreateContestRequest("Hello world");
+ // var a = new AspNetConsumer.Controllers.ContestsController();
