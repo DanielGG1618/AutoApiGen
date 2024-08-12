@@ -13,6 +13,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\Controller.txt" />
     <EmbeddedResource Include="Templates\Method.txt" />
+    <EmbeddedResource Include="Templates\Parameter.txt" />
     <EmbeddedResource Include="Templates\ApiControllerBase.txt" />
     <EmbeddedResource Include="Templates\EndpointAttributes.txt" />
   </ItemGroup>

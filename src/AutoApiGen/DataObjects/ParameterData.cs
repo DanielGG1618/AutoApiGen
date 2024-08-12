@@ -3,7 +3,7 @@
 namespace AutoApiGen.DataObjects;
 
 internal readonly record struct ParameterData(
-    IImmutableList<string> Attributes,
+    string Attributes,
     string Type,
     string Name
 ) : ITemplateData;
