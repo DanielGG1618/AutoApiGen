@@ -41,33 +41,35 @@ internal class ControllersGenerator : IIncrementalGenerator
         var templatesRenderer = new TemplatesRenderer(templatesProvider);
         
         var controllers = new Dictionary<string, ControllerData>();
+        var requests = new Dictionary<string, RequestData>();
         
         var rootNamespace = compilation.AssemblyName;
         var controllersNamespace = $"{rootNamespace}.Controllers";
         
         foreach (var endpoint in endpoints)
         {
-            var actionName = endpoint.GetActionName();
+            var requestName = endpoint.GetRequestName();
             var contractType = endpoint.GetContractType(); //TODO extract params from here to request data object
-            
-            var request = new RequestData(
-                $"{actionName}Request",
-                Parameters: []
-            );
-            
+
             var method = new MethodData(
                 endpoint.GetHttpMethod(),
                 endpoint.GetRelationalRoute(),
                 Attributes: [],
-                actionName,
-                Parameters: [],
-                request.Name,
+                Name: requestName,
+                Parameters: [new ParameterData("", "int", "hello")],
+                $"{requestName}Request",
                 contractType,
                 endpoint.GetResponseType()
             );
 
             var controllerName = endpoint.GetControllerName();
 
+            requests[$"{controllerName}.{requestName}"] = new RequestData(
+                $"{rootNamespace}.{controllerName}.Requests",
+                requestName,
+                Parameters: []
+            );
+            
             if (controllers.TryGetValue(controllerName, out var controller))
             {
                 controller.Methods.Add(method);
@@ -83,11 +85,15 @@ internal class ControllersGenerator : IIncrementalGenerator
         }
 
         foreach (var controller in controllers.Values)
-        {
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
                 templatesRenderer.Render(controller)
             );
-        }
+        
+        //foreach (var request in requests.Values)
+        //    context.AddSource(
+        //        $"{request.Name}Request.g.cs",
+        //        templatesRenderer.Render(request)
+        //    );
     }
 }

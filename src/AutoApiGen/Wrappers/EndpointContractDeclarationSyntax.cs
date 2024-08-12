@@ -38,7 +38,7 @@ internal class EndpointContractDeclarationSyntax
     public string GetHttpMethod() =>
         _attribute.GetHttpMethod();
 
-    public string GetActionName() =>
+    public string GetRequestName() =>
         _type.Parent is TypeDeclarationSyntax parent 
             ? parent.Name()
             : EndpointContractSuffixes.SingleOrDefault(suffix => _type.Name().EndsWith(suffix)) is {} matchingSuffix
