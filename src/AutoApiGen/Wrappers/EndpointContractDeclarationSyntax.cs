@@ -66,6 +66,9 @@ internal class EndpointContractDeclarationSyntax
 
     public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameters() => 
         _attribute.GetRouteParameter();
+  
+    public IEnumerable<ParameterSyntax> GetParameters() =>
+        _type.GetConstructorParameters();
 
     private EndpointContractDeclarationSyntax(TypeDeclarationSyntax type, EndpointAttributeSyntax attribute) =>
         (_type, _attribute) = (type, attribute);

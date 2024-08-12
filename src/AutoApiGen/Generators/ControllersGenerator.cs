@@ -49,7 +49,6 @@ internal class ControllersGenerator : IIncrementalGenerator
         foreach (var endpoint in endpoints)
         {
             var requestName = endpoint.GetRequestName();
-            var contractType = endpoint.GetContractType();
             var routeParameters = endpoint.GetRouteParameters()
                 .Select(parameter =>
                     new ParameterData(
@@ -60,6 +59,8 @@ internal class ControllersGenerator : IIncrementalGenerator
                     )
                 ).ToImmutableArray();
 
+            var routeParametersNames = routeParameters.Select(parameter => parameter.Name).ToImmutableHashSet();
+
             var method = new MethodData(
                 endpoint.GetHttpMethod(),
                 endpoint.GetRelationalRoute(),
@@ -67,17 +68,27 @@ internal class ControllersGenerator : IIncrementalGenerator
                 Name: requestName,
                 routeParameters,
                 $"{requestName}Request",
-                contractType,
+                endpoint.GetContractType(),
                 endpoint.GetResponseType()
             );
+            var requestParameters = endpoint.GetParameters()
+                .Where(parameter =>
+                    !routeParametersNames.Contains(parameter.Name())
+                ).Select(parameter =>
+                    new ParameterData(
+                        Attributes: "",
+                        parameter.Type?.ToFullString() ?? "string",
+                        parameter.Name(),
+                        parameter.Default?.Value.ToFullString()
+                    )
+                ).ToImmutableArray();
 
             var controllerName = endpoint.GetControllerName();
-
             
             requests[$"{controllerName}.{requestName}"] = new RequestData(
                 endpoint.GetNamespace(),
                 requestName,
-                Parameters: []
+                requestParameters
             );
             
             if (controllers.TryGetValue(controllerName, out var controller))
