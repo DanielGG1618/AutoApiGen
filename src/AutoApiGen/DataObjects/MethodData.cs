@@ -5,9 +5,9 @@ namespace AutoApiGen.DataObjects;
 internal readonly record struct MethodData(
     string HttpMethod,
     string Route,
-    IImmutableList<string> Attributes,
+    ImmutableArray<string> Attributes,
     string Name,
-    IImmutableList<ParameterData> Parameters,
+    ImmutableArray<ParameterData> Parameters,
     string RequestType,
     string ContractType,
     string ResponseType

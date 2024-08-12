@@ -4,7 +4,7 @@ namespace AutoApiGen.Wrappers;
 
 public class Route
 {
-    private readonly IImmutableList<RoutePart> _parts;
+    private readonly ImmutableArray<RoutePart> _parts;
 
     public static Route Wrap(string value) => new
     (
@@ -21,6 +21,6 @@ public class Route
     public IEnumerable<RoutePart.ParameterRoutePart> GetParameters() =>
         _parts.OfType<RoutePart.ParameterRoutePart>();
     
-    private Route(IImmutableList<RoutePart> parts) => 
+    private Route(ImmutableArray<RoutePart> parts) => 
         _parts = parts;
 }
