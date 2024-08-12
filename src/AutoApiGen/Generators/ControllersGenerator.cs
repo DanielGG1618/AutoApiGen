@@ -65,7 +65,7 @@ internal class ControllersGenerator : IIncrementalGenerator
             var controllerName = endpoint.GetControllerName();
 
             requests[$"{controllerName}.{requestName}"] = new RequestData(
-                $"{rootNamespace}.{controllerName}.Requests",
+                endpoint.GetNamespace(),
                 requestName,
                 Parameters: []
             );
@@ -90,10 +90,10 @@ internal class ControllersGenerator : IIncrementalGenerator
                 templatesRenderer.Render(controller)
             );
         
-        //foreach (var request in requests.Values)
-        //    context.AddSource(
-        //        $"{request.Name}Request.g.cs",
-        //        templatesRenderer.Render(request)
-        //    );
+        foreach (var request in requests.Values)
+            context.AddSource(
+                $"{request.Name}Request.g.cs",
+                templatesRenderer.Render(request)
+            );
     }
 }
