@@ -7,17 +7,18 @@ namespace AutoApiGen.TemplatesProcessing;
 internal class TemplatesRenderer(ITemplatesProvider templatesProvider) : ScriptObject
 {
     private readonly ITemplatesProvider _templatesProvider = templatesProvider;
-    
-    public string RenderTemplate(Template template, object with) =>
-        template.Render(CreateContext(with));
 
-    private string Render<T>(T templateData) where T : ITemplateData => 
-        _templatesProvider.GetFor<T>().Render(CreateContext(templateData));
+    public string Render<T>(T templateData) where T : ITemplateData => 
+        _templatesProvider.GetFor<T>().Render(CreateContextFor(templateData));
 
-    private TemplateContext CreateContext(object obj)
+    // Future optimizations:
+    //  - cache the context for each type
+    //  - cache the template for each type
+    //  - import only necessary functions
+    private TemplateContext CreateContextFor(ITemplateData data)
     {
         var scriptObject = new ScriptObject();
-        scriptObject.Import(obj);
+        scriptObject.Import(data);
         //scriptObject.Import("render_controller", Render<ControllerData>);
         scriptObject.Import("render_method", Render<MethodData>);
         scriptObject.Import("render_parameter", Render<ParameterData>);

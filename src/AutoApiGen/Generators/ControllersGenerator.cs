@@ -37,7 +37,9 @@ internal class ControllersGenerator : IIncrementalGenerator
     {
         var (compilation, endpoints) = compilationDetails;
         
-        var templatesProviders = new EmbeddedResourceTemplatesProvider();
+        var templatesProvider = new EmbeddedResourceTemplatesProvider();
+        var templatesRenderer = new TemplatesRenderer(templatesProvider);
+        
         var controllers = new Dictionary<string, ControllerData>();
         
         var rootNamespace = compilation.AssemblyName;
@@ -80,13 +82,11 @@ internal class ControllersGenerator : IIncrementalGenerator
             );
         }
 
-        var template = templatesProviders.GetFor<ControllerData>();
-        var templatesRenderer = new TemplatesRenderer(new EmbeddedResourceTemplatesProvider());
         foreach (var controller in controllers.Values)
         {
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
-                templatesRenderer.RenderTemplate(template, with: controller)
+                templatesRenderer.Render(controller)
             );
         }
     }
