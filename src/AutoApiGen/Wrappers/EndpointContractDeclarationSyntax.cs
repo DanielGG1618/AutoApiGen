@@ -35,6 +35,9 @@ internal class EndpointContractDeclarationSyntax
             }
         ) is true;
 
+    public string GetNamespace() =>
+        _type.GetNamespace();
+    
     public string GetHttpMethod() =>
         _attribute.GetHttpMethod();
 

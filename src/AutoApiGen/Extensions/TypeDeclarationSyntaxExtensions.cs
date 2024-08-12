@@ -37,22 +37,39 @@ internal static class TypeDeclarationSyntaxExtensions
     public static string GetFullName(this TypeDeclarationSyntax type)
     {
         var pathParts = new List<string>(capacity: 4);
-        
-        for (var current = type.Parent; current is not null and not CompilationUnitSyntax; current = current.Parent)
-        {
+
+        for (var current = type.Parent; current is not (null or CompilationUnitSyntax); current = current.Parent)
             pathParts.Add(current switch
                 {
                     NamespaceDeclarationSyntax @namespace => @namespace.Name.ToString(),
                     FileScopedNamespaceDeclarationSyntax @namespace => @namespace.Name.ToString(),
-                    TypeDeclarationSyntax parentType => parentType.Identifier.Text,
+                    TypeDeclarationSyntax parentType => parentType.Name(),
                     _ => throw new ArgumentOutOfRangeException()
                 }
             );
-        }
         
         pathParts.Reverse();
-        pathParts.Add(type.Identifier.Text);
+        pathParts.Add(type.Name());
         
         return string.Join(separator: ".", pathParts);
+    }
+    
+    public static string GetNamespace(this TypeDeclarationSyntax type)
+    {
+        var namespaces = new List<string>();
+
+        for (var current = type.Parent; current is not (null or CompilationUnitSyntax); current = current.Parent)
+            switch (current)
+            {
+                case NamespaceDeclarationSyntax @namespace:
+                    namespaces.Add(@namespace.Name.ToString());
+                    break;
+                case FileScopedNamespaceDeclarationSyntax @namespace:
+                    namespaces.Add(@namespace.Name.ToString());
+                    break;
+            }
+
+        namespaces.Reverse();
+        return string.Join(".", namespaces);
     }
 }
