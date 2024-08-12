@@ -2,7 +2,7 @@
 
 namespace AutoApiGen.Extensions;
 
-public static class ParameterSyntaxExtensions
+internal static class ParameterSyntaxExtensions
 {
     public static string Name(this ParameterSyntax parameter) =>
         parameter.Identifier.Text;

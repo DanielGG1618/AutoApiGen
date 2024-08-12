@@ -18,7 +18,6 @@ namespace {{ namespace }};
 
 {{ for request in requests -}}
     {{ request | render_request }} 
-    
 {{ end }}
 
 {{- if base_route != "" -}}

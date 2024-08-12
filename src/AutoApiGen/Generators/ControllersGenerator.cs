@@ -3,6 +3,7 @@ using AutoApiGen.Extensions;
 using AutoApiGen.TemplatesProcessing;
 using AutoApiGen.Wrappers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static AutoApiGen.StaticData;
 
@@ -40,14 +41,23 @@ internal class ControllersGenerator : IIncrementalGenerator
         var templatesProvider = new EmbeddedResourceTemplatesProvider();
         var templatesRenderer = new TemplatesRenderer(templatesProvider);
         
-        var controllers = new ControllerDataBuilder(rootNamespace, endpoints).Build();
+        var controllers = new ControllerDataBuilder(endpoints, rootNamespace).Build();
         
         foreach (var controller in controllers)
         {
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
-                templatesRenderer.Render(controller)
+                Formatted(templatesRenderer.Render(controller))
             );
         }
     }
+
+    private static string Formatted(string code) => 
+        CSharpSyntaxTree
+            .ParseText(code)
+            .GetRoot()
+            .NormalizeWhitespace()
+            .SyntaxTree
+            .GetText()
+            .ToString();
 }

@@ -6,16 +6,16 @@ using AutoApiGen.Wrappers;
 namespace AutoApiGen;
 
 internal class ControllerDataBuilder(
-    string? rootNamespace,
-    ImmutableArray<EndpointContractDeclarationSyntax> endpoints
+    ImmutableArray<EndpointContractDeclarationSyntax> endpoints,
+    string? rootNamespace
 )
 {
+    private readonly ImmutableArray<EndpointContractDeclarationSyntax> _endpoints = endpoints;
     private readonly string _controllersNamespace =
         rootNamespace is null 
             ? "Controllers" 
             : $"{rootNamespace}.Controllers";
 
-    private readonly ImmutableArray<EndpointContractDeclarationSyntax> _endpoints = endpoints;
     
     private readonly Dictionary<string, ControllerData> _controllers = [];
 
@@ -32,14 +32,13 @@ internal class ControllerDataBuilder(
         var routeParameters = endpoint.GetRouteParameters().Select(ParameterData.FromRoute).ToImmutableArray();
         var requestName = endpoint.GetRequestName();
 
-        AddRequestToCorrespondingController(
-            endpoint.BaseRoute,
-            method: CreateMethodData(endpoint, routeParameters, requestName),
-            request: CreateRequestData(endpoint, routeParameters, requestName)
-        );
+        var request = CreateRequestData(endpoint, routeParameters, requestName);
+        var method = CreateMethodData(endpoint, routeParameters, request);
+        
+        AddRequestToCorrespondingController(endpoint.BaseRoute, request, method);
     }
 
-    private void AddRequestToCorrespondingController(string baseRoute, MethodData method, RequestData request)
+    private void AddRequestToCorrespondingController(string baseRoute, RequestData request, MethodData method)
     {
         var controllerName = baseRoute.WithCapitalFirstLetter();
         
@@ -62,15 +61,17 @@ internal class ControllerDataBuilder(
     private static MethodData CreateMethodData(
         EndpointContractDeclarationSyntax endpoint,
         ImmutableArray<ParameterData> routeParameters,
-        string requestName
+        RequestData request
     ) => new(
         endpoint.GetHttpMethod(),
         endpoint.GetRelationalRoute(),
-        Attributes: [],
-        Name: requestName,
+        Attributes: "",
+        Name: request.Name,
         routeParameters,
-        $"{requestName}Request",
+        $"{request.Name}Request",
+        request.Parameters.Select(p => p.Name).ToImmutableArray(),
         endpoint.GetContractType(),
+        endpoint.GetParameters().Select(p => p.Name()).ToImmutableArray(),
         endpoint.GetResponseType()
     );
 

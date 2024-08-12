@@ -24,5 +24,3 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
-
- // var a = new AspNetConsumer.Controllers.ContestsController();
