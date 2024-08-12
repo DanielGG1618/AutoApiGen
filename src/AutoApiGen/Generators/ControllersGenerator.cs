@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using AutoApiGen.DataObjects;
 using AutoApiGen.Extensions;
 using AutoApiGen.TemplatesProcessing;
 using AutoApiGen.Wrappers;
@@ -36,80 +35,14 @@ internal class ControllersGenerator : IIncrementalGenerator
     )
     {
         var (compilation, endpoints) = compilationDetails;
-
+        var rootNamespace = compilation.AssemblyName;
+        
         var templatesProvider = new EmbeddedResourceTemplatesProvider();
         var templatesRenderer = new TemplatesRenderer(templatesProvider);
-
-        var controllers = new Dictionary<string, ControllerData>();
         
-        var rootNamespace = compilation.AssemblyName;
-        var controllersNamespace = $"{rootNamespace}.Controllers";
-
-        foreach (var endpoint in endpoints)
-        {
-            var requestName = endpoint.GetRequestName();
-            var routeParameters = endpoint.GetRouteParameters()
-                .Select(parameter =>
-                    new ParameterData(
-                        Attributes: "[FromRoute]",
-                        parameter.Type ?? "string",
-                        parameter.Name,
-                        parameter.Default
-                    )
-                ).ToImmutableArray();
-
-            var routeParametersNames = routeParameters.Select(parameter => parameter.Name).ToImmutableHashSet();
-
-            var method = new MethodData(
-                endpoint.GetHttpMethod(),
-                endpoint.GetRelationalRoute(),
-                Attributes: [],
-                Name: requestName,
-                routeParameters,
-                $"{requestName}Request",
-                endpoint.GetContractType(),
-                endpoint.GetResponseType()
-            );
-            
-            var requestParameters = endpoint.GetParameters()
-                .Where(parameter => !routeParametersNames.Contains(parameter.Name()))
-                .Select(parameter =>
-                    new ParameterData(
-                        Attributes: "",
-                        parameter.Type?.ToFullString() ?? "string",
-                        parameter.Name(),
-                        parameter.Default?.Value.ToFullString()
-                    )
-                ).ToImmutableArray();
-
-            var controllerName = endpoint.GetControllerName();
-            
-            var request = new RequestData(
-                requestName,
-                requestParameters
-            );
-
-            if (controllers.TryGetValue(controllerName, out var controller))
-            {
-                controller.Methods.Add(method);
-                controller.Requests.Add(request);
-            }   
-            else
-            {
-                controllers.Add(
-                    controllerName,
-                    new ControllerData(
-                        controllersNamespace,
-                        endpoint.BaseRoute,
-                        controllerName,
-                        [method],
-                        [request]
-                    )
-                );
-            }
-        }
-
-        foreach (var controller in controllers.Values)
+        var controllers = new ControllerDataBuilder(rootNamespace).BuildFrom(endpoints);
+        
+        foreach (var controller in controllers)
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
                 templatesRenderer.Render(controller)

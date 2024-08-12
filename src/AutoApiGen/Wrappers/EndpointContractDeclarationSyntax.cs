@@ -61,9 +61,6 @@ internal class EndpointContractDeclarationSyntax
             )
         );
 
-    public string GetControllerName() =>
-        BaseRoute.WithCapitalFirstLetter();
-
     public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameters() => 
         _attribute.GetRouteParameter();
   
