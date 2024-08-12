@@ -9,8 +9,8 @@
     {{- end -}}
 ]
 public async Task<IActionResult> {{ name }}(
-{{- for param in parameters -}}
-    {{ param.attributes }} {{ param.type }} {{ param.name }},
+{{ for parameter in parameters -}}
+    {{ parameter | render_parameter }},
 {{ end }}
     //{{ request_type }} request,
     CancellationToken cancellationToken
