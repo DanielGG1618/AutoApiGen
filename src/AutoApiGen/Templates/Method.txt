@@ -9,10 +9,10 @@
     {{- end -}}
 ]
 public async Task<IActionResult> {{ name }}(
+    {{ request_type }} request,
 {{ for parameter in parameters -}}
     {{ parameter | render_parameter }},
 {{ end }}
-    //{{ request_type }} request,
     CancellationToken cancellationToken = default
 ) 
 {

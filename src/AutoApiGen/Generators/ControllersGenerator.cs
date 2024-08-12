@@ -20,7 +20,7 @@ internal class ControllersGenerator : IIncrementalGenerator
                 && type.HasAttributeWithNameFrom(EndpointAttributeNames, out var attribute)
                 && EndpointAttributeSyntax.IsValid(attribute)
                 && EndpointContractDeclarationSyntax.IsValid(type),
-            
+
             transform: static (syntaxContext, _) =>
                 EndpointContractDeclarationSyntax.Wrap((TypeDeclarationSyntax)syntaxContext.Node)
         );
@@ -36,16 +36,16 @@ internal class ControllersGenerator : IIncrementalGenerator
     )
     {
         var (compilation, endpoints) = compilationDetails;
-        
+
         var templatesProvider = new EmbeddedResourceTemplatesProvider();
         var templatesRenderer = new TemplatesRenderer(templatesProvider);
-        
+
         var controllers = new Dictionary<string, ControllerData>();
         var requests = new Dictionary<string, RequestData>();
-        
+
         var rootNamespace = compilation.AssemblyName;
         var controllersNamespace = $"{rootNamespace}.Controllers";
-        
+
         foreach (var endpoint in endpoints)
         {
             var requestName = endpoint.GetRequestName();
@@ -67,14 +67,14 @@ internal class ControllersGenerator : IIncrementalGenerator
                 Attributes: [],
                 Name: requestName,
                 routeParameters,
-                $"{requestName}Request",
+                $"{endpoint.GetRequestFullName()}Request",
                 endpoint.GetContractType(),
                 endpoint.GetResponseType()
             );
+            
             var requestParameters = endpoint.GetParameters()
-                .Where(parameter =>
-                    !routeParametersNames.Contains(parameter.Name())
-                ).Select(parameter =>
+                .Where(parameter => !routeParametersNames.Contains(parameter.Name()))
+                .Select(parameter =>
                     new ParameterData(
                         Attributes: "",
                         parameter.Type?.ToFullString() ?? "string",
@@ -90,19 +90,17 @@ internal class ControllersGenerator : IIncrementalGenerator
                 requestName,
                 requestParameters
             );
-            
+
             if (controllers.TryGetValue(controllerName, out var controller))
-            {
                 controller.Methods.Add(method);
-                continue;
-            }
-            
-            controllers[controllerName] = new ControllerData(
-                controllersNamespace,
-                endpoint.BaseRoute,
-                controllerName,
-                [method]
-            );
+            else
+                controllers[controllerName] =
+                    new(
+                        controllersNamespace,
+                        endpoint.BaseRoute,
+                        controllerName,
+                        [method]
+                    );
         }
 
         foreach (var controller in controllers.Values)
@@ -110,7 +108,7 @@ internal class ControllersGenerator : IIncrementalGenerator
                 $"{controller.Name}Controller.g.cs",
                 templatesRenderer.Render(controller)
             );
-        
+
         foreach (var request in requests.Values)
             context.AddSource(
                 $"{request.Name}Request.g.cs",
