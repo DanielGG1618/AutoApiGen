@@ -1,8 +1,9 @@
-﻿using Scriban;
+﻿using AutoApiGen.DataObjects;
+using Scriban;
 
 namespace AutoApiGen.TemplatesProcessing;
 
 internal interface ITemplatesProvider
 {
-    Template Get();
+    Template GetFor<T>() where T : ITemplateData;
 }

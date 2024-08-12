@@ -22,28 +22,7 @@ namespace {{ namespace }};
 public class {{ name }}Controller(ISender mediator) 
     : ApiControllerBase(mediator)
 {    
-    {{- for method in methods -}}
-    {{ if method.comment -}}
-        /// <summary>
-        /// {{ method.comment }}
-        /// </summary>
-    {{- end }}
-    [Http{{ method.http_method }}
-        {{- if method.route != "" -}}
-            ("{{ method.route }}")
-        {{- end -}}
-    ]
-    public async Task<IActionResult> {{ method.name }}(
-    {{- for param in method.parameters -}}
-        {{ param.attributes }} {{ param.type }} {{ param.name }},
-    {{ end }}
-        //{{ method.request_type }} request,
-        {{ method.contract_type }} contract,
-        CancellationToken cancellationToken
-    ) 
-    {
-        var result = await Mediator.Send(contract, cancellationToken);
-        return Ok(result);
-    }
+    {{ for method in methods }}
+        {{ method | render_method }}
     {{ end }}
 }

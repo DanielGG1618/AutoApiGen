@@ -1,9 +1,17 @@
-﻿using Scriban;
+﻿using AutoApiGen.DataObjects;
+using Scriban;
 
 namespace AutoApiGen.TemplatesProcessing;
 
 internal class EmbeddedResourceTemplatesProvider : ITemplatesProvider
 {
-    public Template Get() =>
-        Template.Parse(EmbeddedResource.GetContent("Templates.Controller.txt"));
+    public Template GetFor<T>() where T : ITemplateData =>
+        Template.Parse(
+            EmbeddedResource.GetContent(
+                $"Templates.{GetTemplateNameFor<T>()}.txt"
+            )
+        );
+
+    private static string GetTemplateNameFor<T>() where T : ITemplateData => 
+        typeof(T).Name.Remove(typeof(T).Name.Length - "Data".Length);
 }
