@@ -49,14 +49,23 @@ internal class ControllersGenerator : IIncrementalGenerator
         foreach (var endpoint in endpoints)
         {
             var requestName = endpoint.GetRequestName();
-            var contractType = endpoint.GetContractType(); //TODO extract params from here to request data object
+            var contractType = endpoint.GetContractType();
+            var routeParameters = endpoint.GetRouteParameters()
+                .Select(parameter =>
+                    new ParameterData(
+                        Attributes: "[FromRoute]",
+                        parameter.Type ?? "string",
+                        parameter.Name,
+                        parameter.Default
+                    )
+                ).ToImmutableArray();
 
             var method = new MethodData(
                 endpoint.GetHttpMethod(),
                 endpoint.GetRelationalRoute(),
                 Attributes: [],
                 Name: requestName,
-                Parameters: [new ParameterData("", "int", "hello")],
+                routeParameters,
                 $"{requestName}Request",
                 contractType,
                 endpoint.GetResponseType()
@@ -64,6 +73,7 @@ internal class ControllersGenerator : IIncrementalGenerator
 
             var controllerName = endpoint.GetControllerName();
 
+            
             requests[$"{controllerName}.{requestName}"] = new RequestData(
                 endpoint.GetNamespace(),
                 requestName,

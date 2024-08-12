@@ -9,12 +9,6 @@ internal class EndpointContractDeclarationSyntax
     private readonly TypeDeclarationSyntax _type;
     private readonly EndpointAttributeSyntax _attribute;   
     
-    public string BaseRoute => 
-        _attribute.BaseRoute;
-    
-    public string GetRelationalRoute() => 
-        _attribute.GetRelationalRoute();
-
     public static EndpointContractDeclarationSyntax Wrap(TypeDeclarationSyntax type) =>
         IsValid(type)
             ? new EndpointContractDeclarationSyntax(
@@ -34,7 +28,13 @@ internal class EndpointContractDeclarationSyntax
                 Identifier.Text: "IRequest" or "ICommand" or "IQuery"
             }
         ) is true;
-
+    
+    public string BaseRoute => 
+        _attribute.BaseRoute;
+    
+    public string GetRelationalRoute() => 
+        _attribute.GetRelationalRoute();
+    
     public string GetNamespace() =>
         _type.GetNamespace();
     
@@ -63,6 +63,9 @@ internal class EndpointContractDeclarationSyntax
 
     public string GetControllerName() =>
         BaseRoute.WithCapitalFirstLetter();
+
+    public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameters() => 
+        _attribute.GetRouteParameter();
 
     private EndpointContractDeclarationSyntax(TypeDeclarationSyntax type, EndpointAttributeSyntax attribute) =>
         (_type, _attribute) = (type, attribute);

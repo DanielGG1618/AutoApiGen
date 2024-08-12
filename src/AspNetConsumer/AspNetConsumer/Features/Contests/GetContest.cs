@@ -5,7 +5,7 @@ namespace AspNetConsumer.Features.Contests;
 
 public static class GetContest
 {
-    [GetEndpoint("contests/{id}")]
+    [GetEndpoint("contests/{Id}")]
     public record Query(int Id) : IRequest<Contest>;
     
     public class Handler : IRequestHandler<Query, Contest>
