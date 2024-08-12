@@ -24,7 +24,7 @@ internal class ControllerDataBuilder(
         foreach (var endpoint in _endpoints)
             IncludeRequestFrom(endpoint);
 
-        return [.._controllers.Values];
+        return _controllers.Values.ToImmutableArray();
     }
 
     private void IncludeRequestFrom(EndpointContractDeclarationSyntax endpoint)
