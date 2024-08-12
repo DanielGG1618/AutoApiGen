@@ -13,7 +13,7 @@ public async Task<IActionResult> {{ name }}(
     {{ parameter | render_parameter }},
 {{ end }}
     //{{ request_type }} request,
-    CancellationToken cancellationToken
+    CancellationToken cancellationToken = default
 ) 
 {
     var contract = default({{ contract_type }});//new {{ contract_type }}(..);
