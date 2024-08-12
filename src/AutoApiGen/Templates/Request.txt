@@ -1,0 +1,3 @@
+﻿namespace {{ namespace }};
+
+public record {{ name }}Request({{ for parameter in parameters }} {{parameter | render_parameter }}, {{ end }});
