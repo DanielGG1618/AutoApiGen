@@ -9,14 +9,20 @@
     {{- end -}}
 ]
 public async Task<IActionResult> {{ name }}(
-{{- for param in parameters -}}
-    {{ param.attributes }} {{ param.type }} {{ param.name }},
+    {{ request_type }} request,
+{{ for parameter in parameters -}}
+    {{ parameter | render_parameter }},
 {{ end }}
-    //{{ request_type }} request,
-    CancellationToken cancellationToken
+    CancellationToken cancellationToken = default
 ) 
 {
-    var contract = default({{ contract_type }});//new {{ contract_type }}(..);
+    {{ render_deconstruction request_parameter_names "request" }} 
+    
+    var contract = new {{ contract_type }}(
+        {{- for parameter_name in contract_parameter_names -}}
+            {{ parameter_name }}: {{ parameter_name }}{{ if !for.last }}, {{ end }} 
+        {{- end -}}
+    );
     var result = await Mediator.Send(contract, cancellationToken);
     return Ok(result);
 }

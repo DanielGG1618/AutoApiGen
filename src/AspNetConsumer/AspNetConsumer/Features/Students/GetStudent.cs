@@ -3,7 +3,7 @@ using MediatR;
 
 namespace AspNetConsumer.Features.Students;
 
-[GetEndpoint("students/{id}")] 
+[GetEndpoint("students/{Id}")] 
 public record GetStudentQuery(string Id, string Name) : IRequest<Student>;
 
 public class GetStudentHandler : IRequestHandler<GetStudentQuery, Student>

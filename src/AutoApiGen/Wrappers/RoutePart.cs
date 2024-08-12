@@ -6,9 +6,17 @@ namespace AutoApiGen.Wrappers;
 public abstract record RoutePart
 {
     public sealed record LiteralRoutePart(string Value) : RoutePart;
-    public sealed record RawParameterRoutePart(string Name, string? Type = null, string? Default = null) : RoutePart;
-    public sealed record OptionalParameterRoutePart(string Name, string? Type = null) : RoutePart;
-    public sealed record CatchAllParameterRoutePart(string Name, string? Type = null, string? Default = null) : RoutePart;
+
+    public abstract record ParameterRoutePart(string Name, string? Type, string? Default) : RoutePart;
+
+    public sealed record RawParameterRoutePart(string Name, string? Type = null, string? Default = null)
+        : ParameterRoutePart(Name, Type, Default);
+
+    public sealed record OptionalParameterRoutePart(string Name, string? Type = null)
+        : ParameterRoutePart(Name, Type, null);
+
+    public sealed record CatchAllParameterRoutePart(string Name, string? Type = null, string? Default = null)
+        : ParameterRoutePart(Name, Type, Default);
 
     [Pure]
     public static RoutePart Parse(string part) => part switch
@@ -37,21 +45,21 @@ public abstract record RoutePart
 
         _ => throw new ArgumentException("Invalid route part syntax", nameof(part))
     };
-    
+
     [Pure]
     public static string Format(RoutePart part) => part switch
     {
         LiteralRoutePart(var value) => value,
-        
+
         RawParameterRoutePart(var name, var type, var @default) =>
-            name + FormatType(type) + FormatDefault(@default),
-        
+            $"{{{name}{FormatType(type)}{FormatDefault(@default)}}}",
+
         OptionalParameterRoutePart(var name, var type) =>
-            name + FormatType(type),
-        
-        CatchAllParameterRoutePart(var name, var type, var @default) => 
-            name + FormatType(type) + FormatDefault(@default),
-        
+            $"{{{name}{FormatType(type)}}}",
+
+        CatchAllParameterRoutePart(var name, var type, var @default) =>
+            $"{{{name}{FormatType(type)}{FormatDefault(@default)}}}",
+
         _ => throw new ThisIsUnionException(nameof(RoutePart))
     };
 

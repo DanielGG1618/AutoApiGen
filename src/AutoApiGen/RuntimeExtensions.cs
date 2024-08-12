@@ -10,12 +10,12 @@ namespace System.Runtime.CompilerServices
     [EditorBrowsable(EditorBrowsableState.Never)]
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     // ReSharper disable once UnusedType.Global
-    public sealed class RequiredMemberAttribute : Attribute;
+    internal sealed class RequiredMemberAttribute : Attribute;
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
     // ReSharper disable once UnusedType.Global
-    public sealed class CompilerFeatureRequiredAttribute : Attribute
+    internal  sealed class CompilerFeatureRequiredAttribute : Attribute
     {
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public string FeatureName { get; }
@@ -34,14 +34,14 @@ namespace System.Diagnostics.CodeAnalysis
     [EditorBrowsable(EditorBrowsableState.Never)]
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
     // ReSharper disable once UnusedType.Global
-    public sealed class SetsRequiredMembersAttribute : Attribute;
+    internal  sealed class SetsRequiredMembersAttribute : Attribute;
 }
 
 #nullable disable
 namespace System
 {
     // ReSharper disable once UnusedType.Global
-    public readonly struct Index
+    internal  readonly struct Index
     {
         private readonly int _value;
 

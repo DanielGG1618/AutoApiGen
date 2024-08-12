@@ -9,12 +9,6 @@ internal class EndpointContractDeclarationSyntax
     private readonly TypeDeclarationSyntax _type;
     private readonly EndpointAttributeSyntax _attribute;   
     
-    public string BaseRoute => 
-        _attribute.BaseRoute;
-    
-    public string GetRelationalRoute() => 
-        _attribute.GetRelationalRoute();
-
     public static EndpointContractDeclarationSyntax Wrap(TypeDeclarationSyntax type) =>
         IsValid(type)
             ? new EndpointContractDeclarationSyntax(
@@ -34,11 +28,20 @@ internal class EndpointContractDeclarationSyntax
                 Identifier.Text: "IRequest" or "ICommand" or "IQuery"
             }
         ) is true;
-
+    
+    public string BaseRoute => 
+        _attribute.BaseRoute;
+    
+    public string GetRelationalRoute() => 
+        _attribute.GetRelationalRoute();
+    
+    public string GetNamespace() =>
+        _type.GetNamespace();
+    
     public string GetHttpMethod() =>
         _attribute.GetHttpMethod();
 
-    public string GetActionName() =>
+    public string GetRequestName() =>
         _type.Parent is TypeDeclarationSyntax parent 
             ? parent.Name()
             : EndpointContractSuffixes.SingleOrDefault(suffix => _type.Name().EndsWith(suffix)) is {} matchingSuffix
@@ -58,8 +61,11 @@ internal class EndpointContractDeclarationSyntax
             )
         );
 
-    public string GetControllerName() =>
-        BaseRoute.WithCapitalFirstLetter();
+    public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameters() => 
+        _attribute.GetRouteParameter();
+  
+    public IEnumerable<ParameterSyntax> GetParameters() =>
+        _type.GetConstructorParameters();
 
     private EndpointContractDeclarationSyntax(TypeDeclarationSyntax type, EndpointAttributeSyntax attribute) =>
         (_type, _attribute) = (type, attribute);

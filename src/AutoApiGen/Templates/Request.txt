@@ -1,0 +1,5 @@
+﻿public record {{ name }}Request(
+{{- for parameter in parameters }}
+    {{ parameter | render_parameter -}}{{ if !for.last }},{{ end }}
+{{- end }}
+);

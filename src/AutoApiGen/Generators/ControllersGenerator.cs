@@ -1,9 +1,9 @@
 ﻿using System.Collections.Immutable;
-using AutoApiGen.DataObjects;
 using AutoApiGen.Extensions;
 using AutoApiGen.TemplatesProcessing;
 using AutoApiGen.Wrappers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static AutoApiGen.StaticData;
 
@@ -20,7 +20,7 @@ internal class ControllersGenerator : IIncrementalGenerator
                 && type.HasAttributeWithNameFrom(EndpointAttributeNames, out var attribute)
                 && EndpointAttributeSyntax.IsValid(attribute)
                 && EndpointContractDeclarationSyntax.IsValid(type),
-            
+
             transform: static (syntaxContext, _) =>
                 EndpointContractDeclarationSyntax.Wrap((TypeDeclarationSyntax)syntaxContext.Node)
         );
@@ -36,58 +36,28 @@ internal class ControllersGenerator : IIncrementalGenerator
     )
     {
         var (compilation, endpoints) = compilationDetails;
+        var rootNamespace = compilation.AssemblyName;
         
         var templatesProvider = new EmbeddedResourceTemplatesProvider();
         var templatesRenderer = new TemplatesRenderer(templatesProvider);
         
-        var controllers = new Dictionary<string, ControllerData>();
+        var controllers = new ControllerDataBuilder(endpoints, rootNamespace).Build();
         
-        var rootNamespace = compilation.AssemblyName;
-        var controllersNamespace = $"{rootNamespace}.Controllers";
-        
-        foreach (var endpoint in endpoints)
-        {
-            var actionName = endpoint.GetActionName();
-            var contractType = endpoint.GetContractType(); //TODO extract params from here to request data object
-            
-            var request = new RequestData(
-                $"{actionName}Request",
-                Parameters: []
-            );
-            
-            var method = new MethodData(
-                endpoint.GetHttpMethod(),
-                endpoint.GetRelationalRoute(),
-                Attributes: [],
-                actionName,
-                Parameters: [],
-                request.Name,
-                contractType,
-                endpoint.GetResponseType()
-            );
-
-            var controllerName = endpoint.GetControllerName();
-
-            if (controllers.TryGetValue(controllerName, out var controller))
-            {
-                controller.Methods.Add(method);
-                continue;
-            }
-            
-            controllers[controllerName] = new ControllerData(
-                controllersNamespace,
-                endpoint.BaseRoute,
-                controllerName,
-                [method]
-            );
-        }
-
-        foreach (var controller in controllers.Values)
+        foreach (var controller in controllers)
         {
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
-                templatesRenderer.Render(controller)
+                Formatted(templatesRenderer.Render(controller))
             );
         }
     }
+
+    private static string Formatted(string code) => 
+        CSharpSyntaxTree
+            .ParseText(code)
+            .GetRoot()
+            .NormalizeWhitespace()
+            .SyntaxTree
+            .GetText()
+            .ToString();
 }

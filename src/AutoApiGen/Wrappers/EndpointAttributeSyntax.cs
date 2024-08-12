@@ -32,6 +32,9 @@ public class EndpointAttributeSyntax
     public string GetHttpMethod() =>
         _name.Remove(_name.Length - "Endpoint".Length);
 
+    public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameter() =>
+        _route.GetParameters();
+
     private EndpointAttributeSyntax(Route route, string name) =>
         (_route, _name) = (route, name);
 }
