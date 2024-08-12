@@ -72,4 +72,12 @@ internal static class TypeDeclarationSyntaxExtensions
         namespaces.Reverse();
         return string.Join(".", namespaces);
     }
+
+    public static IEnumerable<ParameterSyntax> GetConstructorParameters(this TypeDeclarationSyntax type) =>
+        type switch
+        {
+            RecordDeclarationSyntax record => record.ParameterList?.Parameters,
+            _ => type.Members.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.ParameterList.Parameters
+        }
+        ?? [];
 }
