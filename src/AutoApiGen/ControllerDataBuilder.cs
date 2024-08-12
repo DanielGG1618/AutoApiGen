@@ -5,18 +5,23 @@ using AutoApiGen.Wrappers;
 
 namespace AutoApiGen;
 
-internal class ControllerDataBuilder(string? rootNamespace)
+internal class ControllerDataBuilder(
+    string? rootNamespace,
+    ImmutableArray<EndpointContractDeclarationSyntax> endpoints
+)
 {
     private readonly string _controllersNamespace =
         rootNamespace is null 
             ? "Controllers" 
             : $"{rootNamespace}.Controllers";
+
+    private readonly ImmutableArray<EndpointContractDeclarationSyntax> _endpoints = endpoints;
     
     private readonly Dictionary<string, ControllerData> _controllers = [];
 
-    public ImmutableArray<ControllerData> BuildFrom(IImmutableList<EndpointContractDeclarationSyntax> endpoints)
+    public ImmutableArray<ControllerData> Build()
     {
-        foreach (var endpoint in endpoints)
+        foreach (var endpoint in _endpoints)
             IncludeRequestFrom(endpoint);
 
         return [.._controllers.Values];

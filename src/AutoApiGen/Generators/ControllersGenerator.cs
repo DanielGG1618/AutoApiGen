@@ -40,12 +40,14 @@ internal class ControllersGenerator : IIncrementalGenerator
         var templatesProvider = new EmbeddedResourceTemplatesProvider();
         var templatesRenderer = new TemplatesRenderer(templatesProvider);
         
-        var controllers = new ControllerDataBuilder(rootNamespace).BuildFrom(endpoints);
+        var controllers = new ControllerDataBuilder(rootNamespace, endpoints).Build();
         
         foreach (var controller in controllers)
+        {
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
                 templatesRenderer.Render(controller)
             );
+        }
     }
 }
