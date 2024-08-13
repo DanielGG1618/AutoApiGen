@@ -1,4 +1,5 @@
 using AspNetConsumer;
+using AspNetConsumer.Features.Students;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,9 @@ builder.Services
 
 builder.Services
     .AddControllers();
+
+builder.Services
+    .AddSingleton<StudentsRepo>();
 
 builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining<IApiMarker>());
 
