@@ -8,8 +8,8 @@ internal readonly record struct MethodData(
     string Attributes,
     string Name,
     ImmutableArray<ParameterData> Parameters,
-    string RequestType,
-    ImmutableArray<string> RequestParameterNames,
+    string? RequestType,
+    ImmutableArray<string>? RequestParameterNames,
     string ContractType,
     ImmutableArray<string> ContractParameterNames,
     string ResponseType

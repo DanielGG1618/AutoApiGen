@@ -30,9 +30,9 @@ internal class TemplatesRenderer(ITemplatesProvider templatesProvider) : ScriptO
         return new TemplateContext(scriptObject);
     }
 
-    private static string RenderDeconstruction(IImmutableList<string> names, string source) => names switch
+    private static string RenderDeconstruction(IImmutableList<string>? names, string source) => names switch
     {
-        [] => "",
+        null or [] => "",
         [var single] => $"var {single} = {source}.{single};",
         _ => $"({string.Join(", ", names)}) = {source};"
     };

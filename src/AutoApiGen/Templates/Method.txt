@@ -9,7 +9,7 @@
     {{- end -}}
 ]
 public async Task<IActionResult> {{ name }}(
-    {{ request_type }} request,
+    {{ if request_type -}} [FromBody] {{ request_type }} request, {{ end }}
 {{ for parameter in parameters -}}
     {{ parameter | render_parameter }},
 {{ end }}
