@@ -9,8 +9,6 @@
     <IsRoslynComponent>true</IsRoslynComponent>
     <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <Version>0.0.1-prerelease</Version>
-    <Title>AutoApiGen</Title>
   </PropertyGroup>
   
   <ItemGroup>
@@ -29,11 +27,11 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Title>AutoApiGen</Title>
     <Authors>Daniel Gevorgyan</Authors>
     <RepositoryUrl>https://github.com/DanielGG1618/AutoApiGen</RepositoryUrl>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
   
   <ItemGroup>
