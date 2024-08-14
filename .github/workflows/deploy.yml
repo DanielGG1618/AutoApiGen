@@ -30,8 +30,7 @@ jobs:
       run: dotnet pack ${{ env.AUTOAPIGEN_CSPROJ }} --no-restore --no-build --configuration Release --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }} 
     
     - name: Add Source
-      # --store-password-in-clear-text
-      run: dotnet nuget add source --name "github" --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+      run: dotnet nuget add source --name "github" --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" --store-password-in-clear-text "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
    
     - name: Push
       run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg --source "github"      
