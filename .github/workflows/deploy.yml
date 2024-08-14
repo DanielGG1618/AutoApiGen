@@ -1,11 +1,12 @@
 name: Deploy to GitHub Packages
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+        paths:
+            - "src/**"
 env:
   AUTOAPIGEN_CSPROJ: ${{ github.workspace }}/src/AutoApiGen/AutoApiGen.csproj
   PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/output
