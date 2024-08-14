@@ -21,16 +21,17 @@ jobs:
       with:
         dotnet-version: 2.0
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ${{ env.AUTOAPIGEN_CSPROJ }}
       
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build ${{ env.AUTOAPIGEN_CSPROJ }} --no-restore --configuration Release
     
     - name: Pack
-      run: dotnet pack --no-restore --no-build --configuration Release --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }} 
+      run: dotnet pack ${{ env.AUTOAPIGEN_CSPROJ }} --no-restore --no-build --configuration Release --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }} 
     
     - name: Add Source
-      run: dotnet nuget add source --username DanielGG1618 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/DanielGG1618/index.json"
+      # --store-password-in-clear-text
+      run: dotnet nuget add source --name "github" --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
    
     - name: Push
-      run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+      run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg --source "github"      
