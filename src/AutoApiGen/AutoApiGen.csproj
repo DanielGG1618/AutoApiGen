@@ -9,6 +9,8 @@
     <IsRoslynComponent>true</IsRoslynComponent>
     <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <Version>0.0.1-prerelease</Version>
+    <Title>AutoApiGen</Title>
   </PropertyGroup>
   
   <ItemGroup>
@@ -26,6 +28,18 @@
     <EmbeddedResource Include="Templates\EndpointAttributes.txt" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Authors>Daniel Gevorgyan</Authors>
+    <RepositoryUrl>https://github.com/DanielGG1618/AutoApiGen</RepositoryUrl>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0-beta1.24318.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" PrivateAssets="all" />
