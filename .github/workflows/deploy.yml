@@ -31,6 +31,9 @@ jobs:
     
     - name: Add Source
       run: dotnet nuget add source --name "github" --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" --store-password-in-clear-text "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
+    - name: Set API key for GitHub package source
+      run: dotnet nuget setApiKey "${{ secrets.GITHUB_TOKEN }}" --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
    
     - name: Push
       run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg --source "github"      
