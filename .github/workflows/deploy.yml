@@ -31,14 +31,15 @@ jobs:
       with:
         node-version: 20.8.1
 
-    - name: Install Semantiv Release dependencies
+    - name: Install Semantic Release Plugins
       run: npm install -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/exec
 
-    - name: Capture Semantic Release Output
+    - name: Capture Semantic Release Version
       run: |
         output=$(npx semantic-release --dry-run)
         echo "$output"
-        echo "VERSION=$output" >> $GITHUB_ENV
+        version=$(echo "$output" | grep -oP 'Release note for version \K[0-9]+\.[0-9]+\.[0-9]+')
+        echo "VERSION=$version" >> $GITHUB_ENV
       shell: bash
     
     - name: Setup .NET
