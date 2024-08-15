@@ -15,7 +15,7 @@ module.exports = {
     [
       "@semantic-release/exec",
       {
-        verifyReleaseCmd: "echo version=${nextRelease.version} >> $GITHUB_ENV",
+        verifyReleaseCmd: "echo VERSION=${nextRelease.version} >> $GITHUB_ENV",
         publish: `dotnet nuget push ${process.env.ARTIFACTS_DIRECTORY}/*.nupkg --source "github" --skip-duplicate` 
       }
     ]
