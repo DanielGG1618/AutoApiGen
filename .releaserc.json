@@ -1,0 +1,17 @@
+{
+  "branches":
+  [
+    "main",
+    "semantic-release-setup"
+  ],
+  "plugins":
+  [
+    "@semantic-release/changelog",
+    "@semantic-release/git",
+    "@semantic-release/github",
+    [
+       "@semantic-release/exec",
+       { "verifyReleaseCmd": "echo RELEASE_VERSION=\${nextRelease.version} >> $GITHUB_ENV" }
+    ]
+  ]
+}
