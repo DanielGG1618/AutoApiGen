@@ -16,6 +16,7 @@ permissions:
 env:
   AUTOAPIGEN_CSPROJ: ${{ github.workspace }}/src/AutoApiGen/AutoApiGen.csproj
   ARTIFACTS_DIRECTORY: ${{ github.workspace }}/artifacts
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   deploy:
