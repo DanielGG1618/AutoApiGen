@@ -1,4 +1,4 @@
-﻿namespace AutoApiGen.UnitTests.RoutePartRegexTests;
+﻿namespace AutoApiGen.Tests.RoutePartRegexTests;
 
 public class OptionalParameterRoutePartRegexTests
 {

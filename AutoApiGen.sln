@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsumer", "tests\TestC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C6D39602-8D7D-4B41-BBF7-B79A8D50C440}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoApiGen.UnitTests", "tests\AutoApiGen.UnitTests\AutoApiGen.UnitTests.csproj", "{4F2B5C78-51AD-4678-AAB3-C7FAF8F00D83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoApiGen.Tests", "tests\AutoApiGen.Tests\AutoApiGen.Tests.csproj", "{4F2B5C78-51AD-4678-AAB3-C7FAF8F00D83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
