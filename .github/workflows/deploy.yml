@@ -38,7 +38,7 @@ jobs:
       run: |
         output=$(npx semantic-release --dry-run)
         echo "$output"
-        version=$(echo "$output" | grep -oP 'Release note for version \K[0-9]+\.[0-9]+\.[0-9]+')
+        version=$(echo "$output" | grep -oP '(?<=Release note for version )\d+\.\d+\.\d+')
         echo "VERSION=$version" >> $GITHUB_ENV
       shell: bash
     
