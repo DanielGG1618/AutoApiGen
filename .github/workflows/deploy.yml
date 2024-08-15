@@ -23,21 +23,36 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 2.0
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+
+    - name: Capture Semantic Release Output
+      run: |
+        output=$(npx semantic-release --dry-run)
+        echo "$output"
+        echo "VERSION=$output" >> $GITHUB_ENV
+      shell: bash
+      
     - name: Restore dependencies
       run: dotnet restore ${{ env.AUTOAPIGEN_CSPROJ }}
-      
+
     - name: Build
-      run: dotnet build ${{ env.AUTOAPIGEN_CSPROJ }} --no-restore --configuration Release
+      run: dotnet build ${{ env.AUTOAPIGEN_CSPROJ }} -p:Version={{ env.Version }} -p:AssemblyVersion={{ env.Version }} --configuration Release --no-restore
     
     - name: Pack
-      run: dotnet pack ${{ env.AUTOAPIGEN_CSPROJ }} --no-restore --no-build --configuration Release --output ${{ env.ARTIFACTS_DIRECTORY }} 
+      run: dotnet pack ${{ env.AUTOAPIGEN_CSPROJ }} --output ${{ env.ARTIFACTS_DIRECTORY }} -p:Version=${{ env.VERSION }} -p:AssemblyVersion={{ env.Version }} --configuration Release --no-restore --no-build
     
     - name: Add Source
       run: dotnet nuget add source --name "github" --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" --store-password-in-clear-text "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
 
-    - name: Push to GitHub Packages
-      run: dotnet nuget push ${{ env.ARTIFACTS_DIRECTORY }}/*.nupkg --source "github" --skip-duplicate
+    - name: Run Semantic Release
+      run: npx -p semantic-release@13.1.1 -p @semantic-release/changelog@1.0.0 -p @semantic-release/git@3.0.0 -p @semantic-release/exec@2.0.0 semantic-release
+
+    #- name: Push to GitHub Packages
+    #  run: dotnet nuget push ${{ env.ARTIFACTS_DIRECTORY }}/*.nupkg --source "github" --skip-duplicate
