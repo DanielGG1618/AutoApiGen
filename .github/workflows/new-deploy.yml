@@ -1,0 +1,43 @@
+name: Deploy to GitHub Packages
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+            - semantic-release-setup #delete this when merging
+        paths:
+            - "src/**"
+
+permissions:
+  packages: write
+  repository-projects: write
+
+env:
+  AUTOAPIGEN_CSPROJ: ${{ github.workspace }}/src/AutoApiGen/AutoApiGen.csproj
+  ARTIFACTS_DIRECTORY: ${{ github.workspace }}/artifacts
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 2.0
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.AUTOAPIGEN_CSPROJ }}
+      
+    - name: Build
+      run: dotnet build ${{ env.AUTOAPIGEN_CSPROJ }} --no-restore --configuration Release
+    
+    - name: Pack
+      run: dotnet pack ${{ env.AUTOAPIGEN_CSPROJ }} --no-restore --no-build --configuration Release --output ${{ env.ARTIFACTS_DIRECTORY }} 
+    
+    - name: Add Source
+      run: dotnet nuget add source --name "github" --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" --store-password-in-clear-text "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
+    - name: Push to GitHub Packages
+      run: dotnet nuget push ${{ env.ARTIFACTS_DIRECTORY }}/*.nupkg --source "github" --skip-duplicate
