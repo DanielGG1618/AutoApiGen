@@ -1,3 +1,3 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("AutoApiGen.UnitTests")]
+[assembly: InternalsVisibleTo("AutoApiGen.Tests")]

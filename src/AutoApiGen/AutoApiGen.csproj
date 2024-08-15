@@ -29,6 +29,8 @@
   <PropertyGroup>
     <Title>AutoApiGen</Title>
     <Authors>Daniel Gevorgyan</Authors>
+    <Description>Source generator for generating API endpoints from MediatR requeststs</Description>
+    <PackageDescription>Source generator for generating API endpoints from MediatR requeststs</PackageDescription>
     <RepositoryUrl>https://github.com/DanielGG1618/AutoApiGen</RepositoryUrl>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <IncludeBuildOutput>false</IncludeBuildOutput>

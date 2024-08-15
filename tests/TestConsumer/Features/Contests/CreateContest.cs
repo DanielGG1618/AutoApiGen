@@ -1,7 +1,7 @@
 ﻿using AutoApiGen.Attributes;
 using MediatR;
 
-namespace AspNetConsumer.Features.Contests;
+namespace TestConsumer.Features.Contests;
 
 public static class CreateContest
 {

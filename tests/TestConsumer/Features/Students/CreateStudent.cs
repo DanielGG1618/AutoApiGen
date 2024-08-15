@@ -1,7 +1,7 @@
 ﻿using AutoApiGen.Attributes;
 using MediatR;
 
-namespace AspNetConsumer.Features.Students;
+namespace TestConsumer.Features.Students;
 
 public record Student(string Name);
 

@@ -1,7 +1,7 @@
 ﻿using AutoApiGen.Attributes;
 using MediatR;
 
-namespace AspNetConsumer.Features.Students;
+namespace TestConsumer.Features.Students;
 
 [GetEndpoint("students/{Name}")] 
 public record GetStudentQuery(string Name) : IRequest<Student?>;

@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\AutoApiGen\AutoApiGen.csproj"
+      <ProjectReference Include="..\..\src\AutoApiGen\AutoApiGen.csproj"
                         OutputItemType="Analyzer"/>
     </ItemGroup>
 

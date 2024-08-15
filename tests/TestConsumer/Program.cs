@@ -1,5 +1,5 @@
-using AspNetConsumer;
-using AspNetConsumer.Features.Students;
+using TestConsumer;
+using TestConsumer.Features.Students;
 
 var builder = WebApplication.CreateBuilder(args);
 
