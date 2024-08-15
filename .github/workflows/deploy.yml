@@ -34,14 +34,9 @@ jobs:
     - name: Install Semantic Release Plugins
       run: npm install -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/exec
 
-    - name: Capture Semantic Release Version
-      run: |
-        output=$(npx semantic-release --dry-run)
-        echo "$output"
-        version=$(echo "$output" | grep -oP '(?<=Release note for version )\d+\.\d+\.\d+')
-        echo "VERSION=$version" >> $GITHUB_ENV
-      shell: bash
-    
+    - name: Fetch Semantic Release Version
+      run: npx semantic-release --dry-run
+        
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
