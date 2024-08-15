@@ -19,7 +19,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  deploy:
+  fetch-version:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,11 +36,21 @@ jobs:
 
     - name: Fetch Semantic Release Version
       run: npx semantic-release --dry-run
-        
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: fetch-version
+
+    if: ${{ needs.fetch-version.outputs.version != "" }}
+    env:
+      VERSION: ${{ needs.fetch-version.outputs.version }}
+    
+    steps:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 2.0
+      if: ${{ env.VERSION != "" }}
       
     - name: Restore dependencies
       run: dotnet restore ${{ env.AUTOAPIGEN_CSPROJ }}
