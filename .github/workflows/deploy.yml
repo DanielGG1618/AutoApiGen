@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: fetch-version
 
-    if: ${{ needs.fetch-version.outputs.version != "" }}
+    if: ${{ needs.fetch-version.outputs.version != '' }}
     env:
       VERSION: ${{ needs.fetch-version.outputs.version }}
     
@@ -50,7 +50,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 2.0
-      if: ${{ env.VERSION != "" }}
       
     - name: Restore dependencies
       run: dotnet restore ${{ env.AUTOAPIGEN_CSPROJ }}
