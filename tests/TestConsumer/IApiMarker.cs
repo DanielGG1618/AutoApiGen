@@ -1,3 +1,3 @@
-﻿namespace AspNetConsumer;
+﻿namespace TestConsumer;
 
 public interface IApiMarker;

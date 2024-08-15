@@ -1,4 +1,4 @@
-﻿namespace AspNetConsumer.Features.Students;
+﻿namespace TestConsumer.Features.Students;
 
 public class StudentsRepo
 {
