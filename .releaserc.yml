@@ -1,3 +1,7 @@
+branches:
+  - 'main'
+  - 'semantic-release-setup'
+
 plugins:
   - '@semantic-release/changelog'
   - '@semantic-release/git'
