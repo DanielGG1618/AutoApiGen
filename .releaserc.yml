@@ -7,4 +7,4 @@ plugins:
   - '@semantic-release/git'
   - '@semantic-release/github'
   - - '@semantic-release/exec'
-    - verifyReleaseCmd: 'echo VERSION=${nextRelease.version} >> $GITHUB_ENV'
+    - verifyReleaseCmd: 'echo version=${nextRelease.version} >> $GITHUB_OUTPUT'
