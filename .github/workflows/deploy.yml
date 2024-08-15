@@ -31,6 +31,8 @@ jobs:
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
+      with:
+        node-version: 20.8.1
 
     - name: Capture Semantic Release Output
       run: |
@@ -53,6 +55,4 @@ jobs:
 
     - name: Run Semantic Release
       run: npx -p semantic-release@13.1.1 -p @semantic-release/changelog@1.0.0 -p @semantic-release/git@3.0.0 -p @semantic-release/exec@2.0.0 semantic-release
-
-    #- name: Push to GitHub Packages
-    #  run: dotnet nuget push ${{ env.ARTIFACTS_DIRECTORY }}/*.nupkg --source "github" --skip-duplicate
+      
