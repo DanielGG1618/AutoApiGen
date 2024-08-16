@@ -46,4 +46,9 @@
     <PackageReference Include="Scriban" Version="5.10.0" IncludeAssets="Build" PrivateAssets="all" />
   </ItemGroup>
   
+  <ItemGroup>
+    <ProjectReference Include="..\..\tests\Analyzer\Analyzer.csproj"
+                      OutputItemType="Analyzer" />
+  </ItemGroup>
+  
 </Project>
