@@ -1,9 +1,4 @@
-﻿{{ if comment -}}
-    /// <summary>
-    /// {{ comment }}
-    /// </summary>
-{{- end }}
-[global::Microsoft.AspNetCore.Mvc.Http{{ http_method }}
+﻿[global::Microsoft.AspNetCore.Mvc.Http{{ http_method }}
     {{- if route != "" -}}
         ("{{ route }}")
     {{- end -}}
