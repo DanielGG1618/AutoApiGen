@@ -1,15 +1,21 @@
 module.exports = {
-  branches: [ "main" ],
+  branches: [ 
+    "main",
+    {
+      name: "pre-release",
+      prerelease: true
+    }
+  ],
   plugins: [
     "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
     "@semantic-release/changelog",
-    "@semantic-release/git",
     [
       "@semantic-release/github",
       {
         "assets": [{
             "path": `${process.env.ARTIFACTS_DIRECTORY}/*.nupkg`,
-            "label": "AutoApiGen" 
+            "label": "AutoApiGen.nupkg" 
         }]
       }
     ],
