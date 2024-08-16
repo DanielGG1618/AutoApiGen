@@ -11,12 +11,12 @@ internal class ControllerDataBuilder(
 )
 {
     private readonly ImmutableArray<EndpointContractDeclarationSyntax> _endpoints = endpoints;
+
     private readonly string _controllersNamespace =
-        rootNamespace is null 
-            ? "Controllers" 
+        rootNamespace is null
+            ? "Controllers"
             : $"{rootNamespace}.Controllers";
 
-    
     private readonly Dictionary<string, ControllerData> _controllers = [];
 
     public ImmutableArray<ControllerData> Build()
@@ -34,14 +34,14 @@ internal class ControllerDataBuilder(
 
         var request = CreateRequestData(endpoint, routeParameters, requestName);
         var method = CreateMethodData(endpoint, routeParameters, request);
-        
+
         AddRequestToCorrespondingController(endpoint.BaseRoute, request, method);
     }
 
     private void AddRequestToCorrespondingController(string baseRoute, RequestData? request, MethodData method)
     {
         var controllerName = baseRoute.WithCapitalFirstLetter();
-        
+
         if (_controllers.TryGetValue(controllerName, out var controller))
         {
             if (request.HasValue)
@@ -71,7 +71,7 @@ internal class ControllerDataBuilder(
         Name: request?.Name ?? endpoint.GetRequestName(),
         Parameters: routeParameters,
         RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
-        request?.Parameters.Select(p => p.Name)?.ToImmutableArray(),
+        request?.Parameters.Select(p => p.Name).ToImmutableArray(),
         endpoint.GetContractType(),
         [..endpoint.GetParameters().Select(p => p.Name())],
         endpoint.GetResponseType()
