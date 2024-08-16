@@ -2,7 +2,7 @@
 
 namespace AutoApiGen.Extensions;
 
-public static class AttributeSyntaxExtensions
+internal static class AttributeSyntaxExtensions
 {
     public static bool ContainsAttributeWithNameFrom(
         this IEnumerable<AttributeSyntax> attributes,
