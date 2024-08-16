@@ -12,11 +12,14 @@ internal static class StaticData
         "PatchEndpoint",
         "OptionsEndpoint",
     };
-    
+
     public static string[] EndpointContractSuffixes { get; } =
     [
+        "Request",
         "Command",
         "Query",
         "Handler"
     ];
+    
+    public const string DefaultMediatorPackageName = "global::MediatR";
 }

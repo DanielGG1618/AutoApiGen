@@ -1,27 +1,36 @@
 ﻿using System.Collections.Immutable;
+using AutoApiGen.DataObjects;
 using AutoApiGen.TemplatesProcessing;
 using Microsoft.CodeAnalysis;
 
 namespace AutoApiGen.Generators;
 
 [Generator]
-public class StaticCodeGenerator : IIncrementalGenerator
+internal class StaticCodeGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var provider = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: static (_, _) => false,
-            transform: static (_, _) => ""
-        );
+        var mediatorPackageNameProvider = context.SyntaxProvider.CreateMediatorPackageNameProvider();
 
-        var compilationDetails = context.CompilationProvider.Combine(provider.Collect());
-
-        context.RegisterSourceOutput(compilationDetails, Execute);
+        context.RegisterSourceOutput(mediatorPackageNameProvider, Execute);
     }
 
-    private static void Execute(SourceProductionContext context, (Compilation, ImmutableArray<string>) details)
+    private static void Execute(SourceProductionContext context, ImmutableArray<string?> mediatorPackageNameContainer)
     {
-        context.AddSource("ApiController.g.cs", EmbeddedResource.GetContent("Templates.ApiControllerBase.txt"));
-        context.AddSource("EndpointAttributes.g.cs", EmbeddedResource.GetContent("Templates.EndpointAttributes.txt"));
+        var mediatorPackageName = mediatorPackageNameContainer is [{} singleValue]
+            ? singleValue : StaticData.DefaultMediatorPackageName;
+
+        var templatesProvider = new EmbeddedResourceTemplatesProvider();
+        var templatesRenderer = new TemplatesRenderer(templatesProvider);
+
+        context.AddSource(
+            "ApiController.g.cs",
+            templatesRenderer.Render(new ApiControllerBaseData(mediatorPackageName))
+        );
+ 
+        context.AddSource(
+            "EndpointAttributes.g.cs",
+            EmbeddedResource.GetContent("Templates.EndpointAttributes.txt")
+        );
     }
 }

@@ -7,16 +7,19 @@ namespace AutoApiGen;
 
 internal class ControllerDataBuilder(
     ImmutableArray<EndpointContractDeclarationSyntax> endpoints,
-    string? rootNamespace
+    string? rootNamespace,
+    string mediatorPackageName
 )
 {
     private readonly ImmutableArray<EndpointContractDeclarationSyntax> _endpoints = endpoints;
-    private readonly string _controllersNamespace =
-        rootNamespace is null 
-            ? "Controllers" 
-            : $"{rootNamespace}.Controllers";
 
+    private readonly string _controllersNamespace =
+        rootNamespace is null
+            ? "Controllers"
+            : $"{rootNamespace}.Controllers";
     
+    private readonly string _mediatorPackageName = mediatorPackageName;
+
     private readonly Dictionary<string, ControllerData> _controllers = [];
 
     public ImmutableArray<ControllerData> Build()
@@ -34,14 +37,14 @@ internal class ControllerDataBuilder(
 
         var request = CreateRequestData(endpoint, routeParameters, requestName);
         var method = CreateMethodData(endpoint, routeParameters, request);
-        
+
         AddRequestToCorrespondingController(endpoint.BaseRoute, request, method);
     }
 
     private void AddRequestToCorrespondingController(string baseRoute, RequestData? request, MethodData method)
     {
         var controllerName = baseRoute.WithCapitalFirstLetter();
-        
+
         if (_controllers.TryGetValue(controllerName, out var controller))
         {
             if (request.HasValue)
@@ -52,6 +55,7 @@ internal class ControllerDataBuilder(
         }
 
         _controllers[controllerName] = new ControllerData(
+            _mediatorPackageName,
             _controllersNamespace,
             baseRoute,
             controllerName,
@@ -71,7 +75,7 @@ internal class ControllerDataBuilder(
         Name: request?.Name ?? endpoint.GetRequestName(),
         Parameters: routeParameters,
         RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
-        request?.Parameters.Select(p => p.Name)?.ToImmutableArray(),
+        request?.Parameters.Select(p => p.Name).ToImmutableArray(),
         endpoint.GetContractType(),
         [..endpoint.GetParameters().Select(p => p.Name())],
         endpoint.GetResponseType()
@@ -84,12 +88,11 @@ internal class ControllerDataBuilder(
     )
     {
         var routeParametersNames = routeParameters.Select(p => p.Name).ToImmutableHashSet();
-        var parameters = endpoint.GetParameters()
-            .Where(parameter => !routeParametersNames.Contains(parameter.Name()))
-            .Select(ParameterData.FromSyntax)
-            .ToImmutableArray();
 
-        return parameters.Length > 0
+        return endpoint.GetParameters()
+                .Where(parameter => !routeParametersNames.Contains(parameter.Name()))
+                .Select(ParameterData.FromSyntax).ToImmutableArray()
+            is { Length: > 0 } parameters
             ? new RequestData(
                 requestName,
                 parameters

@@ -1,0 +1,1 @@
+﻿[assembly: AutoApiGen.SetMediatorPackage("global::Mediator")]

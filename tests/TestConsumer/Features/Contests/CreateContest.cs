@@ -1,5 +1,7 @@
-﻿using AutoApiGen.Attributes;
-using MediatR;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AutoApiGen.Attributes;
+using Mediator;
 
 namespace TestConsumer.Features.Contests;
 
@@ -10,7 +12,7 @@ public static class CreateContest
     
     public class Handler : IRequestHandler<Command, Contest>
     {
-        public Task<Contest> Handle(Command request, CancellationToken cancellationToken) => 
-            Task.FromResult(new Contest(request.Id, request.Name));
+        public ValueTask<Contest> Handle(Command request, CancellationToken cancellationToken) => 
+            ValueTask.FromResult(new Contest(request.Id, request.Name));
     }
 }

@@ -7,8 +7,8 @@ namespace AutoApiGen.Wrappers;
 internal class EndpointContractDeclarationSyntax
 {
     private readonly TypeDeclarationSyntax _type;
-    private readonly EndpointAttributeSyntax _attribute;   
-    
+    private readonly EndpointAttributeSyntax _attribute;
+
     public static EndpointContractDeclarationSyntax Wrap(TypeDeclarationSyntax type) =>
         IsValid(type)
             ? new EndpointContractDeclarationSyntax(
@@ -28,21 +28,21 @@ internal class EndpointContractDeclarationSyntax
                 Identifier.Text: "IRequest" or "ICommand" or "IQuery"
             }
         ) is true;
-    
-    public string BaseRoute => 
+
+    public string BaseRoute =>
         _attribute.BaseRoute;
-    
-    public string GetRelationalRoute() => 
+
+    public string GetRelationalRoute() =>
         _attribute.GetRelationalRoute();
-    
+
     public string GetNamespace() =>
         _type.GetNamespace();
-    
+
     public string GetHttpMethod() =>
         _attribute.GetHttpMethod();
 
     public string GetRequestName() =>
-        _type.Parent is TypeDeclarationSyntax parent 
+        _type.Parent is TypeDeclarationSyntax parent
             ? parent.Name()
             : EndpointContractSuffixes.SingleOrDefault(suffix => _type.Name().EndsWith(suffix)) is {} matchingSuffix
                 ? _type.Name().Remove(_type.Name().Length - matchingSuffix.Length)
@@ -50,7 +50,7 @@ internal class EndpointContractDeclarationSyntax
 
     public string GetContractType() =>
         _type.GetFullName();
-    
+
     public string GetResponseType() =>
         _type.GetGenericTypeParametersOfInterface("IRequest").SingleOrDefault()
         ?? (
@@ -61,9 +61,9 @@ internal class EndpointContractDeclarationSyntax
             )
         );
 
-    public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameters() => 
+    public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameters() =>
         _attribute.GetRouteParameter();
-  
+
     public IEnumerable<ParameterSyntax> GetParameters() =>
         _type.GetConstructorParameters();
 

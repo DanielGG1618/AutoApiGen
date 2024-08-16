@@ -1,4 +1,6 @@
-﻿namespace TestConsumer.Features.Students;
+﻿using System.Collections.Generic;
+
+namespace TestConsumer.Features.Students;
 
 public class StudentsRepo
 {

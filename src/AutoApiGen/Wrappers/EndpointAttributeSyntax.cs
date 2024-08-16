@@ -14,7 +14,7 @@ public class EndpointAttributeSyntax
         IsValid(attribute)
             ? new(
                 route: Route.Wrap(
-                    attribute.ArgumentList?.Arguments[0].Expression 
+                    attribute.ArgumentList?.Arguments[0].Expression
                         is LiteralExpressionSyntax literalExpression
                         ? literalExpression.Token.ValueText
                         : ""
@@ -22,13 +22,13 @@ public class EndpointAttributeSyntax
                 name: attribute.Name.ToString()
             )
             : throw new InvalidOperationException("Provided attribute is not valid Endpoint Attribute");
-    
+
     public static bool IsValid(AttributeSyntax attribute) =>
         StaticData.EndpointAttributeNames.Contains(attribute.Name.ToString());
-    
-    public string GetRelationalRoute() => 
+
+    public string GetRelationalRoute() =>
         _route.GetRelationalRoute();
-    
+
     public string GetHttpMethod() =>
         _name.Remove(_name.Length - "Endpoint".Length);
 

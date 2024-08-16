@@ -1,17 +1,19 @@
-﻿using AutoApiGen.Attributes;
-using MediatR;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AutoApiGen.Attributes;
+using Mediator;
 
 namespace TestConsumer.Features.Students;
 
 [GetEndpoint("students/{Name}")] 
-public record GetStudentQuery(string Name) : IRequest<Student?>;
+public record GetStudentQuery(string Name) : IQuery<Student?>;
 
-public class GetStudentHandler(StudentsRepo repo) : IRequestHandler<GetStudentQuery, Student?>
+public class GetStudentHandler(StudentsRepo repo) : IQueryHandler<GetStudentQuery, Student?>
 {
-    public Task<Student?> Handle(GetStudentQuery query, CancellationToken cancellationToken)
+    public ValueTask<Student?> Handle(GetStudentQuery query, CancellationToken cancellationToken)
     {
         var name = query.Name;
 
-        return Task.FromResult(repo.Get(name));
+        return ValueTask.FromResult(repo.Get(name));
     }
 }
