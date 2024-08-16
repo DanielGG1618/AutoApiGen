@@ -1,18 +1,36 @@
 ﻿using System.Collections.Immutable;
+using AutoApiGen.DataObjects;
 using AutoApiGen.TemplatesProcessing;
 using Microsoft.CodeAnalysis;
 
 namespace AutoApiGen.Generators;
 
 [Generator]
-public class StaticCodeGenerator : IIncrementalGenerator
+internal class StaticCodeGenerator : IIncrementalGenerator
 {
-    public void Initialize(IncrementalGeneratorInitializationContext context) => 
-        context.RegisterSourceOutput(context.CompilationProvider, Execute);
-
-    private static void Execute(SourceProductionContext context, Compilation details)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        context.AddSource("ApiController.g.cs", EmbeddedResource.GetContent("Templates.ApiControllerBase.txt"));
-        context.AddSource("EndpointAttributes.g.cs", EmbeddedResource.GetContent("Templates.EndpointAttributes.txt"));
+        var mediatorPackageNameProvider = context.SyntaxProvider.CreateMediatorPackageNameProvider();
+
+        context.RegisterSourceOutput(mediatorPackageNameProvider, Execute);
+    }
+
+    private static void Execute(SourceProductionContext context, ImmutableArray<string?> mediatorPackageNameContainer)
+    {
+        var mediatorPackageName = mediatorPackageNameContainer is [{} singleValue]
+            ? singleValue : StaticData.DefaultMediatorPackageName;
+
+        var templatesProvider = new EmbeddedResourceTemplatesProvider();
+        var templatesRenderer = new TemplatesRenderer(templatesProvider);
+
+        context.AddSource(
+            "ApiController.g.cs",
+            templatesRenderer.Render(new ApiControllerBaseData(mediatorPackageName))
+        );
+ 
+        context.AddSource(
+            "EndpointAttributes.g.cs",
+            EmbeddedResource.GetContent("Templates.EndpointAttributes.txt")
+        );
     }
 }

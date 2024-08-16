@@ -15,8 +15,11 @@ internal static class StaticData
 
     public static string[] EndpointContractSuffixes { get; } =
     [
+        "Request",
         "Command",
         "Query",
         "Handler"
     ];
+    
+    public const string DefaultMediatorPackageName = "global::MediatR";
 }

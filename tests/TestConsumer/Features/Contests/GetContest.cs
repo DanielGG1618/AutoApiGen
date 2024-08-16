@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using AutoApiGen.Attributes;
-using MediatR;
+using Mediator;
 
 namespace TestConsumer.Features.Contests;
 
@@ -12,11 +12,11 @@ public static class GetContest
     
     public class Handler : IRequestHandler<Query, Contest>
     {
-        public Task<Contest> Handle(Query query, CancellationToken cancellationToken)
+        public ValueTask<Contest> Handle(Query query, CancellationToken cancellationToken)
         {
             var id = query.Id;
 
-            return Task.FromResult(new Contest(id, "Contest"));
+            return ValueTask.FromResult(new Contest(id, "Contest"));
         }
     }
 }

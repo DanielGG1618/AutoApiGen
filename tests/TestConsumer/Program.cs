@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TestConsumer;
 using TestConsumer.Features.Students;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +15,7 @@ builder.Services
 builder.Services
     .AddSingleton<StudentsRepo>();
 
-builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining<IApiMarker>());
+builder.Services.AddMediator();
 
 var app = builder.Build();
 

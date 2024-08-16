@@ -1,18 +1,18 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using AutoApiGen.Attributes;
-using MediatR;
+using Mediator;
 
 namespace TestConsumer.Features.Students;
 
 public record Student(string Name);
 
 [PostEndpoint("students")] 
-public record CreateStudentCommand(string Name) : IRequest<Student>;
+public record CreateStudentCommand(string Name) : ICommand<Student>;
 
-public class CreateStudentHandler(StudentsRepo repo) : IRequestHandler<CreateStudentCommand, Student>
+public class CreateStudentHandler(StudentsRepo repo) : ICommandHandler<CreateStudentCommand, Student>
 {
-    public Task<Student> Handle(CreateStudentCommand command, CancellationToken cancellationToken)
+    public ValueTask<Student> Handle(CreateStudentCommand command, CancellationToken cancellationToken)
     {
         var name = command.Name;
 
@@ -20,6 +20,6 @@ public class CreateStudentHandler(StudentsRepo repo) : IRequestHandler<CreateStu
         
         repo.Add(student);
         
-        return Task.FromResult(student);
+        return ValueTask.FromResult(student);
     }
 }

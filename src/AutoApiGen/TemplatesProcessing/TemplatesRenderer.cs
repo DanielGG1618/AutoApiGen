@@ -5,7 +5,7 @@ using Scriban.Runtime;
 
 namespace AutoApiGen.TemplatesProcessing;
 
-internal class TemplatesRenderer(ITemplatesProvider templatesProvider) : ScriptObject
+internal class TemplatesRenderer(ITemplatesProvider templatesProvider)
 {
     private readonly ITemplatesProvider _templatesProvider = templatesProvider;
 

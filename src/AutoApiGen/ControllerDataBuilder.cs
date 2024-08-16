@@ -7,7 +7,8 @@ namespace AutoApiGen;
 
 internal class ControllerDataBuilder(
     ImmutableArray<EndpointContractDeclarationSyntax> endpoints,
-    string? rootNamespace
+    string? rootNamespace,
+    string mediatorPackageName
 )
 {
     private readonly ImmutableArray<EndpointContractDeclarationSyntax> _endpoints = endpoints;
@@ -16,6 +17,8 @@ internal class ControllerDataBuilder(
         rootNamespace is null
             ? "Controllers"
             : $"{rootNamespace}.Controllers";
+    
+    private readonly string _mediatorPackageName = mediatorPackageName;
 
     private readonly Dictionary<string, ControllerData> _controllers = [];
 
@@ -52,6 +55,7 @@ internal class ControllerDataBuilder(
         }
 
         _controllers[controllerName] = new ControllerData(
+            _mediatorPackageName,
             _controllersNamespace,
             baseRoute,
             controllerName,

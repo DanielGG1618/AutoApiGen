@@ -50,7 +50,7 @@ internal static class TypeDeclarationSyntaxExtensions
         pathParts.Reverse();
         pathParts.Add(type.Name());
 
-        return string.Join(separator: ".", pathParts);
+        return "global::" + string.Join(separator: ".", pathParts);
     }
 
     public static string GetNamespace(this TypeDeclarationSyntax type)
@@ -69,7 +69,7 @@ internal static class TypeDeclarationSyntaxExtensions
             }
 
         namespaces.Reverse();
-        return string.Join(".", namespaces);
+        return "global::" + string.Join(".", namespaces);
     }
 
     public static IEnumerable<ParameterSyntax> GetConstructorParameters(this TypeDeclarationSyntax type) =>
