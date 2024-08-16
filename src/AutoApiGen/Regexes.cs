@@ -2,7 +2,7 @@
 
 namespace AutoApiGen;
 
-public class Regexes
+internal class Regexes
 {
     public static Regex RawParameterRoutePartRegex { get; } = new(
         """

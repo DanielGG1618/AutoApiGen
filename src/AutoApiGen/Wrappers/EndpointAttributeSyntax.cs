@@ -2,7 +2,7 @@
 
 namespace AutoApiGen.Wrappers;
 
-public class EndpointAttributeSyntax
+internal class EndpointAttributeSyntax
 {
     private readonly string _name;
     private readonly Route _route;

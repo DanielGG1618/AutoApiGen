@@ -2,7 +2,7 @@
 
 namespace AutoApiGen.Wrappers;
 
-public class Route
+internal class Route
 {
     private readonly ImmutableArray<RoutePart> _parts;
 

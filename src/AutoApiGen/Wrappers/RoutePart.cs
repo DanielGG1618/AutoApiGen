@@ -3,7 +3,7 @@ using AutoApiGen.Exceptions;
 
 namespace AutoApiGen.Wrappers;
 
-public abstract record RoutePart
+internal abstract record RoutePart
 {
     public sealed record LiteralRoutePart(string Value) : RoutePart;
 

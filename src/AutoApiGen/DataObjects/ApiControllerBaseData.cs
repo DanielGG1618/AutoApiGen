@@ -1,5 +1,5 @@
 ﻿namespace AutoApiGen.DataObjects;
 
-public readonly record struct ApiControllerBaseData(
+internal readonly record struct ApiControllerBaseData(
     string MediatorPackageName
 ) : ITemplateData;
