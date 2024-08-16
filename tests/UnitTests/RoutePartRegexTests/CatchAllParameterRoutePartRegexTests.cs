@@ -1,4 +1,6 @@
-﻿namespace AutoApiGen.Tests.RoutePartRegexTests;
+﻿using AutoApiGen;
+
+namespace UnitTests.RoutePartRegexTests;
 
 public class CatchAllParameterRoutePartRegexTests
 {

@@ -3,11 +3,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>true</ImplicitUsings>
-    <RootNamespace>AutoApiGen</RootNamespace>
     <Nullable>enable</Nullable>
     <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
     <IsRoslynComponent>true</IsRoslynComponent>
-    <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
   
