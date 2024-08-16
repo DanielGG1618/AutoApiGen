@@ -9,10 +9,10 @@ public class CatchAllParameterRoutePartRegexTests
     {
         //Arrange
         const string input = "{parameter}";
-        
+
         //Act
         var match = Regexes.CatchAllParameterRoutePartRegex.Match(input);
-        
+
         //Assert
         match.Success.Should().Be(false);
     }
@@ -23,7 +23,7 @@ public class CatchAllParameterRoutePartRegexTests
         //Arrange
         const string input = "{*parameter}";
         const string expectedName = "parameter";
-        
+
         //Act
         var match = Regexes.CatchAllParameterRoutePartRegex.Match(input);
         var name = match.Groups["name"].Value;
@@ -43,7 +43,7 @@ public class CatchAllParameterRoutePartRegexTests
         const string input = "{*parameter:int}";
         const string expectedName = "parameter";
         const string expectedType = "int";
-        
+
         //Act
         var match = Regexes.CatchAllParameterRoutePartRegex.Match(input);
         var name = match.Groups["name"].Value;
@@ -63,7 +63,7 @@ public class CatchAllParameterRoutePartRegexTests
         const string expectedName = "parameter";
         const string expectedType = "int";
         const string expectedDefault = "5";
-        
+
         //Act
         var match = Regexes.CatchAllParameterRoutePartRegex.Match(input);
         var name = match.Groups["name"].Value;
@@ -81,10 +81,10 @@ public class CatchAllParameterRoutePartRegexTests
     {
         //Arrange
         const string input = "{*parameter:int?}";
-        
+
         //Act
         var match = Regexes.CatchAllParameterRoutePartRegex.Match(input);
-        
+
         //Assert
         match.Success.Should().Be(false);
     }

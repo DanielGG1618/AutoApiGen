@@ -14,8 +14,7 @@ internal static class TypeDeclarationSyntaxExtensions
         this TypeDeclarationSyntax type,
         ISet<string> names
     ) => type.Attributes().ContainsAttributeWithNameFrom(names);
-    
-    
+
     public static bool HasAttributeWithNameFrom(
         this TypeDeclarationSyntax type,
         ISet<string> names,
@@ -33,7 +32,7 @@ internal static class TypeDeclarationSyntaxExtensions
              .SelectMany(baseType => ((GenericNameSyntax)baseType.Type).TypeArgumentList.Arguments)
              .Select(typeArgument => typeArgument.ToString())
          ?? [];
-    
+
     public static string GetFullName(this TypeDeclarationSyntax type)
     {
         var pathParts = new List<string>(capacity: 4);
@@ -47,13 +46,13 @@ internal static class TypeDeclarationSyntaxExtensions
                     _ => throw new ArgumentOutOfRangeException()
                 }
             );
-        
+
         pathParts.Reverse();
         pathParts.Add(type.Name());
-        
+
         return string.Join(separator: ".", pathParts);
     }
-    
+
     public static string GetNamespace(this TypeDeclarationSyntax type)
     {
         var namespaces = new List<string>();

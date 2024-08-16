@@ -12,7 +12,7 @@ public class Route
             .Select(RoutePart.Parse)
             .ToImmutableArray()
     );
-    
+
     public string BaseRoute => _parts[0] is RoutePart.LiteralRoutePart(var value) ? value : "TODO";
 
     public string GetRelationalRoute() =>
@@ -20,7 +20,7 @@ public class Route
 
     public IEnumerable<RoutePart.ParameterRoutePart> GetParameters() =>
         _parts.OfType<RoutePart.ParameterRoutePart>();
-    
-    private Route(ImmutableArray<RoutePart> parts) => 
+
+    private Route(ImmutableArray<RoutePart> parts) =>
         _parts = parts;
 }

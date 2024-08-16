@@ -84,12 +84,11 @@ internal class ControllerDataBuilder(
     )
     {
         var routeParametersNames = routeParameters.Select(p => p.Name).ToImmutableHashSet();
-        var parameters = endpoint.GetParameters()
-            .Where(parameter => !routeParametersNames.Contains(parameter.Name()))
-            .Select(ParameterData.FromSyntax)
-            .ToImmutableArray();
 
-        return parameters.Length > 0
+        return endpoint.GetParameters()
+                .Where(parameter => !routeParametersNames.Contains(parameter.Name()))
+                .Select(ParameterData.FromSyntax).ToImmutableArray()
+            is { Length: > 0 } parameters
             ? new RequestData(
                 requestName,
                 parameters

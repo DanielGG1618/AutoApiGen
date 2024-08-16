@@ -12,7 +12,7 @@ internal static class StaticData
         "PatchEndpoint",
         "OptionsEndpoint",
     };
-    
+
     public static string[] EndpointContractSuffixes { get; } =
     [
         "Command",

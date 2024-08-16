@@ -41,7 +41,7 @@ namespace System.Diagnostics.CodeAnalysis
 namespace System
 {
     // ReSharper disable once UnusedType.Global
-    internal  readonly struct Index
+    internal readonly struct Index
     {
         private readonly int _value;
 
@@ -54,9 +54,10 @@ namespace System
 
         // ReSharper disable once MemberCanBePrivate.Global
         public int Value => _value < 0 ? ~_value : _value;
+
         // ReSharper disable once MemberCanBePrivate.Global
         public bool IsFromEnd => _value < 0;
-        
+
         public int GetOffset(int length) =>
             length < 0 ? throw new ArgumentOutOfRangeException(nameof(length), "Length must be non-negative.")
             : IsFromEnd ? length - Value : Value;

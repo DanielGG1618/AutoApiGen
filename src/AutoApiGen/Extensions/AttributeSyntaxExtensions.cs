@@ -8,8 +8,7 @@ public static class AttributeSyntaxExtensions
         this IEnumerable<AttributeSyntax> attributes,
         ISet<string> names
     ) => attributes.Any(attribute => names.Contains(attribute.Name.ToString()));
-
-
+    
     public static bool ContainsAttributeWithNameFrom(
         this IEnumerable<AttributeSyntax> attributes,
         ISet<string> names,

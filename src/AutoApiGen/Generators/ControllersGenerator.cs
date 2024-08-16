@@ -37,12 +37,12 @@ internal class ControllersGenerator : IIncrementalGenerator
     {
         var (compilation, endpoints) = compilationDetails;
         var rootNamespace = compilation.AssemblyName;
-        
+
         var templatesProvider = new EmbeddedResourceTemplatesProvider();
         var templatesRenderer = new TemplatesRenderer(templatesProvider);
-        
+
         var controllers = new ControllerDataBuilder(endpoints, rootNamespace).Build();
-        
+
         foreach (var controller in controllers)
         {
             context.AddSource(
@@ -52,7 +52,7 @@ internal class ControllersGenerator : IIncrementalGenerator
         }
     }
 
-    private static string Formatted(string code) => 
+    private static string Formatted(string code) =>
         CSharpSyntaxTree
             .ParseText(code)
             .GetRoot()

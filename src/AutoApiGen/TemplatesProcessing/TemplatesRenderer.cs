@@ -9,7 +9,7 @@ internal class TemplatesRenderer(ITemplatesProvider templatesProvider) : ScriptO
 {
     private readonly ITemplatesProvider _templatesProvider = templatesProvider;
 
-    public string Render<T>(T templateData) where T : ITemplateData => 
+    public string Render<T>(T templateData) where T : ITemplateData =>
         _templatesProvider.GetFor<T>().Render(CreateContextFor(templateData));
 
     // Future optimizations:
@@ -26,7 +26,7 @@ internal class TemplatesRenderer(ITemplatesProvider templatesProvider) : ScriptO
         scriptObject.Import("render_parameter", Render<ParameterData>);
 
         scriptObject.Import("render_deconstruction", RenderDeconstruction);
-        
+
         return new TemplateContext(scriptObject);
     }
 
