@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
 
 namespace AutoApiGen.Models;
 
-[ApiController]
-public abstract class ApiControllerBase(ISender mediator) : ControllerBase
+[global::Microsoft.AspNetCore.Mvc.ApiController]
+public abstract class ApiControllerBase(IMediator mediator) : global::Microsoft.AspNetCore.Mvc.ControllerBase
 {
-    protected readonly ISender Mediator = mediator;
+    protected readonly IMediator Mediator = mediator;
 }

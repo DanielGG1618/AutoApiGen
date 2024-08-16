@@ -12,7 +12,7 @@ internal readonly record struct ParameterData(
 ) : ITemplateData
 {
     public static ParameterData FromRoute(RoutePart.ParameterRoutePart parameter) => new(
-        Attributes: "[FromRoute]",
+        Attributes: "[global::Microsoft.AspNetCore.Mvc.FromRoute]",
         parameter.Type ?? "string",
         parameter.Name,
         parameter.Default

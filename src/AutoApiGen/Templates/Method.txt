@@ -3,17 +3,17 @@
     /// {{ comment }}
     /// </summary>
 {{- end }}
-[Http{{ http_method }}
+[global::Microsoft.AspNetCore.Mvc.Http{{ http_method }}
     {{- if route != "" -}}
         ("{{ route }}")
     {{- end -}}
 ]
-public async Task<IActionResult> {{ name }}(
-    {{ if request_type -}} [FromBody] {{ request_type }} request, {{ end }}
+public async global::System.Threading.Tasks.Task<global::Microsoft.AspNetCore.Mvc.IActionResult> {{ name }}(
+    {{ if request_type -}} [global::Microsoft.AspNetCore.Mvc.FromBody] {{ request_type }} request, {{ end }}
 {{ for parameter in parameters -}}
     {{ parameter | render_parameter }},
 {{ end }}
-    CancellationToken cancellationToken = default
+    global::System.Threading.CancellationToken cancellationToken = default
 ) 
 {
     {{ render_deconstruction request_parameter_names "request" }} 
