@@ -1,4 +1,4 @@
-﻿using AutoApiGen.DataObjects;
+﻿using AutoApiGen.Templates;
 using Scriban;
 
 namespace AutoApiGen.TemplatesProcessing;

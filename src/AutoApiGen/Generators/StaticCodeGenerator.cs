@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using AutoApiGen.DataObjects;
+using AutoApiGen.Templates;
 using AutoApiGen.TemplatesProcessing;
 using Microsoft.CodeAnalysis;
 

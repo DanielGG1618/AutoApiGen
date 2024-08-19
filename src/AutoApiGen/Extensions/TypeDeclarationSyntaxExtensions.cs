@@ -7,19 +7,19 @@ internal static class TypeDeclarationSyntaxExtensions
     public static string Name(this TypeDeclarationSyntax type) =>
         type.Identifier.Text;
 
-    public static IEnumerable<AttributeSyntax> Attributes(this TypeDeclarationSyntax type) =>
+    public static IEnumerable<AttributeSyntax> GetAttributes(this TypeDeclarationSyntax type) =>
         type.AttributeLists.SelectMany(list => list.Attributes);
 
     public static bool HasAttributeWithNameFrom(
         this TypeDeclarationSyntax type,
         ISet<string> names
-    ) => type.Attributes().ContainsAttributeWithNameFrom(names);
+    ) => type.GetAttributes().ContainsAttributeWithNameFrom(names);
 
     public static bool HasAttributeWithNameFrom(
         this TypeDeclarationSyntax type,
         ISet<string> names,
         out AttributeSyntax attribute
-    ) => type.Attributes().ContainsAttributeWithNameFrom(names, out attribute);
+    ) => type.GetAttributes().ContainsAttributeWithNameFrom(names, out attribute);
 
     public static IEnumerable<string> GetGenericTypeParametersOfInterface(
         this TypeDeclarationSyntax type,
@@ -72,7 +72,7 @@ internal static class TypeDeclarationSyntaxExtensions
         return "global::" + string.Join(".", namespaces);
     }
 
-    public static IEnumerable<ParameterSyntax> GetConstructorParameters(this TypeDeclarationSyntax type) =>
+    public static IReadOnlyList<ParameterSyntax> GetConstructorParameters(this TypeDeclarationSyntax type) =>
         type switch
         {
             RecordDeclarationSyntax record => record.ParameterList?.Parameters,

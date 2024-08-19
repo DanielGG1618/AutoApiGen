@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using AutoApiGen.DataObjects;
+using AutoApiGen.Templates;
 using Scriban;
 using Scriban.Runtime;
 

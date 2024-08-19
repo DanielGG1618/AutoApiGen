@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
-using AutoApiGen.DataObjects;
 using AutoApiGen.Extensions;
+using AutoApiGen.Templates;
 using AutoApiGen.Wrappers;
 
 namespace AutoApiGen;

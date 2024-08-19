@@ -1,8 +1,9 @@
 ﻿using AutoApiGen.Extensions;
+using AutoApiGen.Models;
 using AutoApiGen.Wrappers;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace AutoApiGen.DataObjects;
+namespace AutoApiGen.Templates;
 
 internal readonly record struct ParameterData(
     string Attributes,
