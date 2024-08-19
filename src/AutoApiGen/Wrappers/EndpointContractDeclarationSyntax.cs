@@ -29,7 +29,7 @@ internal class EndpointContractDeclarationSyntax
             }
         ) is true;
 
-    public string BaseRoute =>
+    public string? BaseRoute =>
         _attribute.BaseRoute;
 
     public string GetRelationalRoute() =>
@@ -62,7 +62,7 @@ internal class EndpointContractDeclarationSyntax
         );
 
     public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameters() =>
-        _attribute.GetRouteParameter();
+        _attribute.GetRouteParameters();
 
     public IEnumerable<ParameterSyntax> GetParameters() =>
         _type.GetConstructorParameters();

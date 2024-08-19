@@ -4,24 +4,24 @@ namespace AutoApiGen.Wrappers;
 
 internal class EndpointAttributeSyntax
 {
-    private readonly string _name;
     private readonly Route _route;
+    private readonly string _name;
 
-    public string BaseRoute =>
+    public string? BaseRoute =>
         _route.BaseRoute;
 
     public static EndpointAttributeSyntax Wrap(AttributeSyntax attribute) =>
         IsValid(attribute)
             ? new(
-                route: Route.Wrap(
+                Route.Parse(
                     attribute.ArgumentList?.Arguments[0].Expression
                         is LiteralExpressionSyntax literalExpression
                         ? literalExpression.Token.ValueText
                         : ""
                 ),
-                name: attribute.Name.ToString()
+                attribute.Name.ToString()
             )
-            : throw new InvalidOperationException("Provided attribute is not valid Endpoint Attribute");
+            : throw new ArgumentException("Provided attribute is not valid Endpoint Attribute");
 
     public static bool IsValid(AttributeSyntax attribute) =>
         StaticData.EndpointAttributeNames.Contains(attribute.Name.ToString());
@@ -32,7 +32,7 @@ internal class EndpointAttributeSyntax
     public string GetHttpMethod() =>
         _name.Remove(_name.Length - "Endpoint".Length);
 
-    public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameter() =>
+    public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameters() =>
         _route.GetParameters();
 
     private EndpointAttributeSyntax(Route route, string name) =>

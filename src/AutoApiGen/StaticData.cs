@@ -22,4 +22,5 @@ internal static class StaticData
     ];
     
     public const string DefaultMediatorPackageName = "global::MediatR";
+    public const string EmptyBaseRouteControllerName = "Root";
 }

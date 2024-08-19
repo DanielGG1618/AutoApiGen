@@ -41,9 +41,9 @@ internal class ControllerDataBuilder(
         AddRequestToCorrespondingController(endpoint.BaseRoute, request, method);
     }
 
-    private void AddRequestToCorrespondingController(string baseRoute, RequestData? request, MethodData method)
+    private void AddRequestToCorrespondingController(string? baseRoute, RequestData? request, MethodData method)
     {
-        var controllerName = baseRoute.WithCapitalFirstLetter();
+        var controllerName = baseRoute?.WithCapitalFirstLetter() ?? StaticData.EmptyBaseRouteControllerName;
 
         if (_controllers.TryGetValue(controllerName, out var controller))
         {
