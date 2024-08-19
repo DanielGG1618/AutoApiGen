@@ -23,7 +23,7 @@ internal class ControllersGenerator : IIncrementalGenerator
 
     private static void Execute(
         SourceProductionContext context,
-        ((Compilation, ImmutableArray<EndpointContractDeclarationSyntax>), ImmutableArray<string?>) compilationDetails
+        ((Compilation, ImmutableArray<EndpointContractModel>), ImmutableArray<string?>) compilationDetails
     )
     {
         var ((compilation, endpoints), mediatorPackageNameContainer) = compilationDetails;

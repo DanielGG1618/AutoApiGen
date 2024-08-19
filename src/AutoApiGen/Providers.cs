@@ -22,16 +22,16 @@ internal static class Providers
                 ? expression.Token.ValueText : null
     ).Collect();
     
-    public static IncrementalValueProvider<ImmutableArray<EndpointContractDeclarationSyntax>> CreateEndpointsProvider(
+    public static IncrementalValueProvider<ImmutableArray<EndpointContractModel>> CreateEndpointsProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
         predicate: static (node, _) =>
             node is TypeDeclarationSyntax { AttributeLists.Count: > 0 } type
             && type.HasAttributeWithNameFrom(EndpointAttributeNames, out var attribute)
-            && EndpointAttributeSyntax.IsValid(attribute)
-            && EndpointContractDeclarationSyntax.IsValid(type),
+            && EndpointAttributeModel.IsValid(attribute)
+            && EndpointContractModel.IsValid(type),
 
         transform: static (syntaxContext, _) =>
-            EndpointContractDeclarationSyntax.Wrap((TypeDeclarationSyntax)syntaxContext.Node)
+            EndpointContractModel.Create((TypeDeclarationSyntax)syntaxContext.Node)
     ).Collect();
 }

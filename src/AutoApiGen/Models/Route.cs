@@ -1,8 +1,8 @@
 ﻿using System.Collections.Immutable;
 
-namespace AutoApiGen.Wrappers;
+namespace AutoApiGen.Models;
 
-internal class Route
+internal readonly record struct Route
 {
     private readonly ImmutableArray<RoutePart> _parts;
 

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using AutoApiGen.Exceptions;
 
-namespace AutoApiGen.Wrappers;
+namespace AutoApiGen.Models;
 
 internal abstract record RoutePart
 {

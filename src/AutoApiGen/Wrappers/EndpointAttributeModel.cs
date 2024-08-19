@@ -1,8 +1,10 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using AutoApiGen.Models;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AutoApiGen.Wrappers;
 
-internal class EndpointAttributeSyntax
+internal readonly record struct EndpointAttributeModel
 {
     private readonly Route _route;
     private readonly string _name;
@@ -10,7 +12,7 @@ internal class EndpointAttributeSyntax
     public string? BaseRoute =>
         _route.BaseRoute;
 
-    public static EndpointAttributeSyntax Wrap(AttributeSyntax attribute) =>
+    public static EndpointAttributeModel Create(AttributeSyntax attribute) =>
         IsValid(attribute)
             ? new(
                 Route.Parse(
@@ -35,6 +37,6 @@ internal class EndpointAttributeSyntax
     public IEnumerable<RoutePart.ParameterRoutePart> GetRouteParameters() =>
         _route.GetParameters();
 
-    private EndpointAttributeSyntax(Route route, string name) =>
+    private EndpointAttributeModel(Route route, string name) =>
         (_route, _name) = (route, name);
 }

@@ -12,14 +12,17 @@ internal static class StaticData
         "PatchEndpoint",
         "OptionsEndpoint",
     };
-
-    public static string[] EndpointContractSuffixes { get; } =
-    [
-        "Request",
-        "Command",
-        "Query",
-        "Handler"
-    ];
+    
+    public static ISet<string> EndpointAttributeNamesWithSuffix { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "GetEndpointAttribute",
+        "PostEndpointAttribute",
+        "PutEndpointAttribute",
+        "DeleteEndpointAttribute",
+        "HeadEndpointAttribute",
+        "PatchEndpointAttribute",
+        "OptionsEndpointAttribute",
+    };
     
     public const string DefaultMediatorPackageName = "global::MediatR";
     public const string EmptyBaseRouteControllerName = "Root";
