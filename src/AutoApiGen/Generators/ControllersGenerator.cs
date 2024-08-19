@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
+using AutoApiGen.Models;
 using AutoApiGen.TemplatesProcessing;
-using AutoApiGen.Wrappers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -12,25 +12,24 @@ internal class ControllersGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var mediatorPackageNameProvider = context.SyntaxProvider.CreateMediatorPackageNameProvider();
-        var endpointsProvider = context.SyntaxProvider.CreateEndpointsProvider();
+        var endpointsProvider = context.SyntaxProvider.CreateEndpointsProvider().Collect();
 
-        var compilationDetails = context.CompilationProvider
-            .Combine(endpointsProvider)
-            .Combine(mediatorPackageNameProvider);
+        var compilationDetails = mediatorPackageNameProvider
+            .Combine(context.CompilationProvider)
+            .Combine(endpointsProvider);
 
         context.RegisterSourceOutput(compilationDetails, Execute);
     }
 
     private static void Execute(
         SourceProductionContext context,
-        ((Compilation, ImmutableArray<EndpointContractModel>), ImmutableArray<string?>) compilationDetails
+        ((string? MediatorPackageName, Compilation), ImmutableArray<EndpointContractModel>) compilationDetails
     )
     {
-        var ((compilation, endpoints), mediatorPackageNameContainer) = compilationDetails;
-        
+        var ((mediatorPackageName, compilation), endpoints) = compilationDetails;
+        mediatorPackageName ??= StaticData.DefaultMediatorPackageName;
+
         var rootNamespace = compilation.AssemblyName;
-        var mediatorPackageName = mediatorPackageNameContainer is [{} singleValue] 
-            ? singleValue : StaticData.DefaultMediatorPackageName;
 
         var templatesProvider = new EmbeddedResourceTemplatesProvider();
         var templatesRenderer = new TemplatesRenderer(templatesProvider);
@@ -38,12 +37,10 @@ internal class ControllersGenerator : IIncrementalGenerator
         var controllers = new ControllerDataBuilder(endpoints, rootNamespace, mediatorPackageName).Build();
 
         foreach (var controller in controllers)
-        {
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
                 Formatted(templatesRenderer.Render(controller))
             );
-        }
     }
 
     private static string Formatted(string code) =>

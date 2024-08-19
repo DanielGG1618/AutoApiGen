@@ -1,8 +1,7 @@
-﻿using AutoApiGen.Models;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace AutoApiGen.Wrappers;
+namespace AutoApiGen.Models;
 
 internal readonly record struct EndpointAttributeModel
 {
@@ -12,19 +11,16 @@ internal readonly record struct EndpointAttributeModel
     public string? BaseRoute =>
         _route.BaseRoute;
 
-    public static EndpointAttributeModel Create(AttributeSyntax attribute) =>
-        IsValid(attribute)
-            ? new(
-                Route.Parse(
-                    attribute.ArgumentList?.Arguments[0].Expression
-                        is LiteralExpressionSyntax literalExpression
-                        ? literalExpression.Token.ValueText
-                        : ""
-                ),
-                attribute.Name.ToString()
-            )
-            : throw new ArgumentException("Provided attribute is not valid Endpoint Attribute");
+    public static EndpointAttributeModel Create(AttributeData attribute) =>
+        !IsValid(attribute) ? throw new ArgumentException("Provided attribute is not valid Endpoint Attribute")
+            : new(
+                Route.Parse(attribute.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? ""),
+                attribute.AttributeClass!.Name
+            );
 
+    public static bool IsValid(AttributeData attribute) =>
+        StaticData.EndpointAttributeNames.Contains(attribute.AttributeClass?.Name ?? "");
+       
     public static bool IsValid(AttributeSyntax attribute) =>
         StaticData.EndpointAttributeNames.Contains(attribute.Name.ToString());
 

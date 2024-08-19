@@ -1,7 +1,5 @@
-﻿using AutoApiGen.Extensions;
-using AutoApiGen.Models;
-using AutoApiGen.Wrappers;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using AutoApiGen.Models;
+using Microsoft.CodeAnalysis;
 
 namespace AutoApiGen.Templates;
 
@@ -19,10 +17,10 @@ internal readonly record struct ParameterData(
         parameter.Default
     );
 
-    public static ParameterData FromSyntax(ParameterSyntax parameter) => new(
+    public static ParameterData FromSymbol(IParameterSymbol parameter) => new(
         Attributes: "",
-        parameter.Type?.ToFullString() ?? "string",
-        parameter.Name(),
-        parameter.Default?.Value.ToFullString()
+        parameter.Type.ToString(),
+        parameter.Name,
+        parameter.HasExplicitDefaultValue ? parameter.ExplicitDefaultValue as string : null
     );
 }

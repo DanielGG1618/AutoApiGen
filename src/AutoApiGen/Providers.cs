@@ -1,15 +1,13 @@
-﻿using System.Collections.Immutable;
-using AutoApiGen.Extensions;
-using AutoApiGen.Wrappers;
+﻿using AutoApiGen.Extensions;
+using AutoApiGen.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static AutoApiGen.StaticData;
 
 namespace AutoApiGen;
 
 internal static class Providers
 {
-    public static IncrementalValueProvider<ImmutableArray<string?>> CreateMediatorPackageNameProvider(
+    public static IncrementalValuesProvider<string?> CreateMediatorPackageNameProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
         predicate: static (node, _) =>
@@ -20,18 +18,19 @@ internal static class Providers
             syntaxContext.Node is AttributeSyntax attribute
             && attribute.ArgumentList?.Arguments[0].Expression is LiteralExpressionSyntax expression
                 ? expression.Token.ValueText : null
-    ).Collect();
-    
-    public static IncrementalValueProvider<ImmutableArray<EndpointContractModel>> CreateEndpointsProvider(
+    );
+
+    public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
         predicate: static (node, _) =>
             node is TypeDeclarationSyntax { AttributeLists.Count: > 0 } type
-            && type.HasAttributeWithNameFrom(EndpointAttributeNames, out var attribute)
+            && type.HasAttributeWithNameFrom(StaticData.EndpointAttributeNames, out var attribute)
             && EndpointAttributeModel.IsValid(attribute)
             && EndpointContractModel.IsValid(type),
 
-        transform: static (syntaxContext, _) =>
-            EndpointContractModel.Create((TypeDeclarationSyntax)syntaxContext.Node)
-    ).Collect();
+        transform: static (syntaxContext, _) => EndpointContractModel.Create(
+            (INamedTypeSymbol)syntaxContext.SemanticModel.GetDeclaredSymbol(syntaxContext.Node)!
+        )
+    );
 }

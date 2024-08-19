@@ -72,11 +72,10 @@ internal static class TypeDeclarationSyntaxExtensions
         return "global::" + string.Join(".", namespaces);
     }
 
-    public static IReadOnlyList<ParameterSyntax> GetConstructorParameters(this TypeDeclarationSyntax type) =>
+    public static IReadOnlyList<ParameterSyntax>? GetFirstConstructorParameters(this TypeDeclarationSyntax type) =>
         type switch
         {
             RecordDeclarationSyntax record => record.ParameterList?.Parameters,
             _ => type.Members.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.ParameterList.Parameters
-        }
-        ?? [];
+        };
 }
