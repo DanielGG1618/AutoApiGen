@@ -49,16 +49,16 @@ internal abstract record RoutePart
     [Pure]
     public static string Format(RoutePart part) => part switch
     {
-        LiteralRoutePart(var value) => value,
+        LiteralRoutePart(var value) => '"' + value + '"',
 
         RawParameterRoutePart(var name, var type, var @default) =>
-            $"{{{name}{FormatType(type)}{FormatDefault(@default)}}}",
+            "\"{" + name + FormatType(type) + FormatDefault(@default) + "}\"",
 
         OptionalParameterRoutePart(var name, var type) =>
-            $"{{{name}{FormatType(type)}}}",
+            "\"{" + name + FormatType(type) + "?}\"",
 
         CatchAllParameterRoutePart(var name, var type, var @default) =>
-            $"{{{name}{FormatType(type)}{FormatDefault(@default)}}}",
+            "\"{*" + name + FormatType(type) + FormatDefault(@default) + "}\"",
 
         _ => throw new ThisIsUnionException(nameof(RoutePart))
     };

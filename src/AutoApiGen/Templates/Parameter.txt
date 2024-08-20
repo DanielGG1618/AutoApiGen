@@ -1,1 +1,0 @@
-﻿{{ attributes }} {{ type }} {{ name }} {{ if default }}= {{ default }}{{ end }}

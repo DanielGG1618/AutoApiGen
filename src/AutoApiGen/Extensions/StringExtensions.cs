@@ -15,4 +15,7 @@ internal static class StringExtensions
         1 => str.ToLowerInvariant(),
         _ => char.ToLowerInvariant(str[0]) + str[1..]
     };
+
+    public static string ApplyIfNotNullOrEmpty(this string? str, Func<string, string> func) =>
+        str is null or "" ? "" : func(str);
 }
