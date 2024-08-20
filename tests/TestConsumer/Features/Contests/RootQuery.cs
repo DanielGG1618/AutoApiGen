@@ -7,12 +7,12 @@ namespace TestConsumer.Features.Contests;
 
 public static class RootQuery
 {
-    [GetEndpoint("{Name}")]
-    public record Query(string Name) : IQuery<string>;
+    [GetEndpoint]
+    public record Query : IQuery<string>;
 
     public class RootQueryHandler : IQueryHandler<Query, string>
     {
         public ValueTask<string> Handle(Query query, CancellationToken cancellationToken) => 
-            ValueTask.FromResult($"Welcome to AutoApiGen TempConsumer project, {query.Name}!");
+            ValueTask.FromResult("Welcome to AutoApiGen TempConsumer project!");
     }
 }

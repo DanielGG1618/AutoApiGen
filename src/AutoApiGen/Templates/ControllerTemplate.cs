@@ -27,12 +27,11 @@ internal static class ControllerTemplate
             stringBuilder.AppendLine()
                 .AppendLine(data.Requests.RenderAndJoin(renderRequest, separator: "\n\n"));
 
-        stringBuilder.AppendLine();
-        
-        if (data.BaseRoute is not (null or ""))
-            stringBuilder.AppendLine($"[global::Microsoft.AspNetCore.Mvc.Route(\"{data.BaseRoute}\")]");
-        
+        stringBuilder.AppendLine()
+            .AppendLine($"[global::Microsoft.AspNetCore.Mvc.Route(\"{data.BaseRoute}\")]");
+                
         stringBuilder.Append($$"""
+            [global::Microsoft.AspNetCore.Mvc.ApiController]
             public partial class {{data.Name}}Controller(
                 {{data.MediatorPackageName}}.IMediator mediator
             ) : global::Microsoft.AspNetCore.Mvc.ControllerBase
