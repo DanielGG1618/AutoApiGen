@@ -25,7 +25,7 @@ internal static class TemplatesRenderer
     private static string RenderDeconstruction(ImmutableArray<string>? names, string source) => names switch
     {
         null or [] => "",
-        [var single] => $"var {single} = {source}.{single};",
+        [var single] => $"{source}.Deconstruct(out var {single});",
         _ => $"var ({string.Join(", ", names)}) = {source};"
     };
 }

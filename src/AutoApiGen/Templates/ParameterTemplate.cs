@@ -17,7 +17,7 @@ internal static class ParameterTemplate
         public static Data FromRoute(RoutePart.ParameterRoutePart parameter) => new(
             Attributes: "[global::Microsoft.AspNetCore.Mvc.FromRoute] ",
             parameter.Type ?? "string",
-            parameter.Name,
+            parameter.Name.WithLowerFirstLetter(),
             parameter.Default
         );
 

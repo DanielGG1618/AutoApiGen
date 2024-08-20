@@ -29,7 +29,7 @@ internal class ControllersGenerator : IIncrementalGenerator
 
         var rootNamespace = compilation.AssemblyName;
 
-        var controllers = new ControllerDataBuilder(endpoints, rootNamespace, mediatorPackageName).Build();
+        var controllers = new ControllerTemplateDataBuilder(endpoints, rootNamespace, mediatorPackageName).Build();
 
         foreach (var controller in controllers)
             context.AddSource(

@@ -5,7 +5,7 @@ using AutoApiGen.Templates;
 
 namespace AutoApiGen;
 
-internal class ControllerDataBuilder(
+internal class ControllerTemplateDataBuilder(
     ImmutableArray<EndpointContractModel> endpoints,
     string? rootNamespace,
     string mediatorPackageName
@@ -34,11 +34,16 @@ internal class ControllerDataBuilder(
 
     private void IncludeRequestFrom(EndpointContractModel endpoint)
     {
-        var routeParameters = 
-            endpoint.Attribute.Route.Parameters.Select(ParameterTemplate.Data.FromRoute).ToImmutableArray();
+        var request = CreateRequestData(
+            endpoint,
+            routeParameterNames: endpoint.Attribute.Route.Parameters.Select(p => p.Name).ToImmutableHashSet()
+        );
 
-        var request = CreateRequestData(endpoint, routeParameters);
-        var method = CreateMethodData(endpoint, routeParameters, request);
+        var method = CreateMethodData(
+            endpoint,
+            routeParameters: [..endpoint.Attribute.Route.Parameters.Select(ParameterTemplate.Data.FromRoute)],
+            request
+        );
 
         AddRequestToCorrespondingController(endpoint.Attribute.Route.BaseRoute, request, method);
     }
@@ -90,19 +95,14 @@ internal class ControllerDataBuilder(
 
     private static RequestTemplate.Data? CreateRequestData(
         EndpointContractModel endpoint,
-        ImmutableArray<ParameterTemplate.Data> routeParameters
-    )
-    {
-        var routeParametersNames = routeParameters.Select(p => p.Name).ToImmutableHashSet();
-
-        return endpoint.Parameters
-                .Where(parameter => !routeParametersNames.Contains(parameter.Name))
-                .Select(ParameterTemplate.Data.FromSymbol).ToImmutableArray()
-            is { Length: > 0 } parameters
-            ? new RequestTemplate.Data(
-                endpoint.RequestName,
-                parameters
-            )
-            : null;
-    }
+        ISet<string> routeParameterNames
+    ) => endpoint.Parameters
+            .Where(parameter => !routeParameterNames.Contains(parameter.Name))
+            .Select(ParameterTemplate.Data.FromSymbol).ToImmutableArray()
+        is { Length: > 0 } parameters
+        ? new RequestTemplate.Data(
+            endpoint.RequestName,
+            parameters
+        )
+        : null;
 }

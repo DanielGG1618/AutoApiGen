@@ -53,7 +53,7 @@ file static class MethodIndentedTextWriterExtensions
         indentedWriter.WriteLine(")");
     }
 
-    public static void WriteParameters(
+    private static void WriteParameters(
         this IndentedTextWriter indentedWriter,
         string? requestType,
         ImmutableArray<ParameterTemplate.Data> parameters,
@@ -78,7 +78,13 @@ file static class MethodIndentedTextWriterExtensions
         indentedWriter.WriteLine('{');
         indentedWriter.Indent++;
         if (data.RequestParameterNames?.Length is > 0)
-            indentedWriter.WriteLines(renderDeconstruction(data.RequestParameterNames, "request"), "");
+            indentedWriter.WriteLines(
+                renderDeconstruction(
+                    [..data.RequestParameterNames.Value.Select(StringExtensions.WithLowerFirstLetter)],
+                    "request"
+                ),
+                ""
+            );
         indentedWriter.WriteContractCreation(data);
         indentedWriter.WriteLine();
         indentedWriter.WriteLines(
@@ -116,7 +122,7 @@ file static class MethodIndentedTextWriterExtensions
             string.Join(
                 separator: ",\n",
                 data.ContractParameterNames.Select(static parameterName =>
-                    $"{parameterName}: {parameterName}"
+                    $"{parameterName}: {parameterName.WithLowerFirstLetter()}"
                 )
             )
         );
