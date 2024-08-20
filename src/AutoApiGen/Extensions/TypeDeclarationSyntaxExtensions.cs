@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AutoApiGen.Extensions;
 
@@ -9,12 +10,12 @@ internal static class TypeDeclarationSyntaxExtensions
 
     public static bool HasAttributeWithNameFrom(
         this TypeDeclarationSyntax type,
-        ISet<string> names
+        IImmutableSet<string> names
     ) => type.GetAttributes().ContainsAttributeWithNameFrom(names);
 
     public static bool HasAttributeWithNameFrom(
         this TypeDeclarationSyntax type,
-        ISet<string> names,
+        IImmutableSet<string> names,
         out AttributeSyntax attribute
     ) => type.GetAttributes().ContainsAttributeWithNameFrom(names, out attribute);
 }

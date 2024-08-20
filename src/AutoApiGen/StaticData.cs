@@ -1,26 +1,19 @@
-﻿namespace AutoApiGen;
+﻿using System.Collections.Immutable;
+
+namespace AutoApiGen;
 
 internal static class StaticData
 {
-    public static ISet<string> EndpointAttributeNames { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    {
+    public static IImmutableSet<string> EndpointAttributeNames { get; } = new HashSet<string>{
         "GetEndpoint",
         "PostEndpoint",
         "PutEndpoint",
         "DeleteEndpoint",
         "HeadEndpoint",
         "PatchEndpoint",
-        "OptionsEndpoint",
-    };
-    
-    public static ISet<string> EndpointAttributeNamesWithSuffix { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    {
-        "GetEndpointAttribute",
-        "PostEndpointAttribute",
-        "PutEndpointAttribute",
-        "DeleteEndpointAttribute",
-        "HeadEndpointAttribute",
-        "PatchEndpointAttribute",
-        "OptionsEndpointAttribute",
-    };
+        "OptionsEndpoint"
+    }.ToImmutableHashSet();
+
+    public static IImmutableSet<string> EndpointAttributeNamesWithSuffix { get; } =
+        EndpointAttributeNames.Select(a => a + "Attribute").ToImmutableHashSet();
 }
