@@ -10,7 +10,7 @@ internal readonly record struct Route
 
     public static Route Parse(string value)
     {
-        var parts = value.Split('/')
+        var parts = value.Trim('/').Split('/')
             .Select(RoutePart.Parse)
             .ToArray();
 
