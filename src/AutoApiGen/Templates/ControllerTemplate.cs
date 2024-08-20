@@ -1,4 +1,4 @@
-﻿using AutoApiGen.Extensions;
+﻿using System.Text;
 
 namespace AutoApiGen.Templates;
 
@@ -19,16 +19,20 @@ internal static class ControllerTemplate
         Func<MethodTemplate.Data, string> renderMethod
     )
     {
-        return $$"""
-            {{StaticData.GeneratedDisclaimer}}
-            
-            namespace {{data.Namespace}};
+        var stringBuilder = new StringBuilder(StaticData.GeneratedDisclaimer);
+        stringBuilder.AppendLine();
+        stringBuilder.AppendLine($"namespace {data.Namespace};");
+        
+        if (data.Requests.Count > 0)
+            stringBuilder.AppendLine()
+                .AppendLine(data.Requests.RenderAndJoin(renderRequest, separator: "\n\n"));
 
-            {{data.Requests.RenderAndJoin(renderRequest, separator: "\n\n")}}
-
-            {{data.BaseRoute.ApplyIfNotNullOrEmpty(baseRoute =>
-                $"[global::Microsoft.AspNetCore.Mvc.Route(\"{baseRoute}\")]")
-            }}
+        stringBuilder.AppendLine();
+        
+        if (data.BaseRoute is not (null or ""))
+            stringBuilder.AppendLine($"[global::Microsoft.AspNetCore.Mvc.Route(\"{data.BaseRoute}\")]");
+        
+        stringBuilder.Append($$"""
             public partial class {{data.Name}}Controller(
                 {{data.MediatorPackageName}}.IMediator mediator
             ) : global::Microsoft.AspNetCore.Mvc.ControllerBase
@@ -37,6 +41,8 @@ internal static class ControllerTemplate
              
                 {{data.Methods.RenderAndJoin(renderMethod, separator: "\n\n")}}
             }
-            """;
+            """);
+
+        return stringBuilder.ToString();
     }
 }
