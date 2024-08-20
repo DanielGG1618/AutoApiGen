@@ -44,7 +44,9 @@ internal class ControllerDataBuilder(
 
     private void AddRequestToCorrespondingController(string? baseRoute, RequestTemplate.Data? request, MethodTemplate.Data method)
     {
-        var controllerName = baseRoute?.WithCapitalFirstLetter() ?? EmptyBaseRouteControllerName;
+        var controllerName = baseRoute is null or ""
+            ? EmptyBaseRouteControllerName
+            : baseRoute.WithCapitalFirstLetter();
 
         if (_controllers.TryGetValue(controllerName, out var controller))
         {
