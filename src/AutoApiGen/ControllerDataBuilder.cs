@@ -1,25 +1,27 @@
 ﻿using System.Collections.Immutable;
-using AutoApiGen.DataObjects;
 using AutoApiGen.Extensions;
-using AutoApiGen.Wrappers;
+using AutoApiGen.Models;
+using AutoApiGen.Templates;
 
 namespace AutoApiGen;
 
 internal class ControllerDataBuilder(
-    ImmutableArray<EndpointContractDeclarationSyntax> endpoints,
+    ImmutableArray<EndpointContractModel> endpoints,
     string? rootNamespace,
     string mediatorPackageName
 )
 {
-    private readonly ImmutableArray<EndpointContractDeclarationSyntax> _endpoints = endpoints;
+    private readonly ImmutableArray<EndpointContractModel> _endpoints = endpoints;
 
     private readonly string _controllersNamespace =
         rootNamespace is null
             ? "Controllers"
             : $"{rootNamespace}.Controllers";
-    
+
     private readonly string _mediatorPackageName = mediatorPackageName;
 
+    private const string EmptyBaseRouteControllerName = "Root";
+    
     private readonly Dictionary<string, ControllerData> _controllers = [];
 
     public ImmutableArray<ControllerData> Build()
@@ -30,20 +32,19 @@ internal class ControllerDataBuilder(
         return _controllers.Values.ToImmutableArray();
     }
 
-    private void IncludeRequestFrom(EndpointContractDeclarationSyntax endpoint)
+    private void IncludeRequestFrom(EndpointContractModel endpoint)
     {
-        var routeParameters = endpoint.GetRouteParameters().Select(ParameterData.FromRoute).ToImmutableArray();
-        var requestName = endpoint.GetRequestName();
+        var routeParameters = endpoint.Attribute.Route.Parameters.Select(ParameterData.FromRoute).ToImmutableArray();
 
-        var request = CreateRequestData(endpoint, routeParameters, requestName);
+        var request = CreateRequestData(endpoint, routeParameters);
         var method = CreateMethodData(endpoint, routeParameters, request);
 
-        AddRequestToCorrespondingController(endpoint.BaseRoute, request, method);
+        AddRequestToCorrespondingController(endpoint.Attribute.Route.BaseRoute, request, method);
     }
 
-    private void AddRequestToCorrespondingController(string baseRoute, RequestData? request, MethodData method)
+    private void AddRequestToCorrespondingController(string? baseRoute, RequestData? request, MethodData method)
     {
-        var controllerName = baseRoute.WithCapitalFirstLetter();
+        var controllerName = baseRoute?.WithCapitalFirstLetter() ?? EmptyBaseRouteControllerName;
 
         if (_controllers.TryGetValue(controllerName, out var controller))
         {
@@ -64,37 +65,37 @@ internal class ControllerDataBuilder(
         );
     }
 
+
     private static MethodData CreateMethodData(
-        EndpointContractDeclarationSyntax endpoint,
+        EndpointContractModel endpoint,
         ImmutableArray<ParameterData> routeParameters,
         RequestData? request
     ) => new(
-        endpoint.GetHttpMethod(),
-        endpoint.GetRelationalRoute(),
+        endpoint.Attribute.HttpMethod,
+        endpoint.Attribute.Route.RelationalRoute,
         Attributes: "",
-        Name: request?.Name ?? endpoint.GetRequestName(),
+        Name: endpoint.RequestName,
         Parameters: routeParameters,
         RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
         request?.Parameters.Select(p => p.Name).ToImmutableArray(),
-        endpoint.GetContractType(),
-        [..endpoint.GetParameters().Select(p => p.Name())],
-        endpoint.GetResponseType()
+        endpoint.ContractTypeFullName,
+        [..endpoint.Parameters.Select(p => p.Name)],
+        endpoint.ResponseTypeFullName
     );
 
     private static RequestData? CreateRequestData(
-        EndpointContractDeclarationSyntax endpoint,
-        ImmutableArray<ParameterData> routeParameters,
-        string requestName
+        EndpointContractModel endpoint,
+        ImmutableArray<ParameterData> routeParameters
     )
     {
         var routeParametersNames = routeParameters.Select(p => p.Name).ToImmutableHashSet();
 
-        return endpoint.GetParameters()
-                .Where(parameter => !routeParametersNames.Contains(parameter.Name()))
-                .Select(ParameterData.FromSyntax).ToImmutableArray()
+        return endpoint.Parameters
+                .Where(parameter => !routeParametersNames.Contains(parameter.Name))
+                .Select(ParameterData.FromSymbol).ToImmutableArray()
             is { Length: > 0 } parameters
             ? new RequestData(
-                requestName,
+                endpoint.RequestName,
                 parameters
             )
             : null;

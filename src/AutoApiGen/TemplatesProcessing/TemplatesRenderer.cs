@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using AutoApiGen.DataObjects;
+using AutoApiGen.Templates;
 using Scriban;
 using Scriban.Runtime;
 
@@ -34,6 +34,6 @@ internal class TemplatesRenderer(ITemplatesProvider templatesProvider)
     {
         null or [] => "",
         [var single] => $"var {single} = {source}.{single};",
-        _ => $"({string.Join(", ", names)}) = {source};"
+        _ => $"var ({string.Join(", ", names)}) = {source};"
     };
 }

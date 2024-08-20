@@ -50,5 +50,4 @@
     <ProjectReference Include="..\..\tests\Analyzer\Analyzer.csproj"
                       OutputItemType="Analyzer" />
   </ItemGroup>
-  
 </Project>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace TestConsumer.Features.Students;
 
@@ -11,4 +12,7 @@ public class StudentsRepo
 
     public Student? Get(string name) =>
         _students.GetValueOrDefault(name);
+
+    public List<Student> GetAll() =>
+        _students.Values.ToList();
 }

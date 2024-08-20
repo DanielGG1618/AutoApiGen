@@ -1,4 +1,4 @@
-﻿using AutoApiGen.DataObjects;
+﻿using AutoApiGen.Templates;
 using Scriban;
 
 namespace AutoApiGen.TemplatesProcessing;
@@ -13,5 +13,5 @@ internal class EmbeddedResourceTemplatesProvider : ITemplatesProvider
         );
 
     private static string GetTemplateNameFor<T>() where T : ITemplateData =>
-        typeof(T).Name.Remove(typeof(T).Name.Length - "Data".Length);
+        typeof(T).Name[..^"Data".Length];
 }

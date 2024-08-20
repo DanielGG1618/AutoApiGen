@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace AutoApiGen.DataObjects;
+namespace AutoApiGen.Templates;
 
 internal readonly record struct MethodData(
     string HttpMethod,

@@ -9,7 +9,7 @@ namespace {{ namespace }};
     {{ request | render_request }} 
 {{ end }}
 
-{{- if base_route != "" -}}
+{{- if base_route && base_route != "" -}}
     [global::Microsoft.AspNetCore.Mvc.Route("{{ base_route }}")]
 {{- end }}
 public class {{ name }}Controller({{ mediator_package_name }}.IMediator mediator) 
