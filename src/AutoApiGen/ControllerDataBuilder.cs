@@ -33,12 +33,12 @@ internal class ControllerDataBuilder(
     private void IncludeRequestFrom(EndpointContractModel endpoint)
     {
         var routeParameters =
-            endpoint.Attribute.GetRouteParameters().Select(ParameterData.FromRoute).ToImmutableArray();
+            endpoint.Attribute.Route.GetParameters().Select(ParameterData.FromRoute).ToImmutableArray();
 
         var request = CreateRequestData(endpoint, routeParameters);
         var method = CreateMethodData(endpoint, routeParameters, request);
 
-        AddRequestToCorrespondingController(endpoint.Attribute.BaseRoute, request, method);
+        AddRequestToCorrespondingController(endpoint.Attribute.Route.BaseRoute, request, method);
     }
 
     private void AddRequestToCorrespondingController(string? baseRoute, RequestData? request, MethodData method)
@@ -69,8 +69,8 @@ internal class ControllerDataBuilder(
         ImmutableArray<ParameterData> routeParameters,
         RequestData? request
     ) => new(
-        endpoint.Attribute.GetHttpMethod(),
-        endpoint.Attribute.GetRelationalRoute(),
+        endpoint.Attribute.HttpMethod,
+        endpoint.Attribute.Route.GetRelationalRoute(),
         Attributes: "",
         Name: endpoint.RequestName,
         Parameters: routeParameters,
