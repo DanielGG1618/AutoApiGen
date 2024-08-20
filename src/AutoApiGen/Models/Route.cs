@@ -4,23 +4,26 @@ namespace AutoApiGen.Models;
 
 internal readonly record struct Route
 {
-    private readonly ImmutableArray<RoutePart> _parts;
+    public string? BaseRoute { get; }
+    public string RelationalRoute { get; }
+    public ImmutableArray<RoutePart.ParameterRoutePart> Parameters { get; }
 
-    public static Route Parse(string value) => new
-    (
-        value.Split('/')
+    public static Route Parse(string value)
+    {
+        var parts = value.Split('/')
             .Select(RoutePart.Parse)
-            .ToImmutableArray()
-    );
+            .ToArray();
 
-    public string? BaseRoute => _parts[0] is RoutePart.LiteralRoutePart(var value) ? value : null;
+        var baseRoute = parts[0] is RoutePart.LiteralRoutePart(var literal) ? literal : null;
 
-    public string GetRelationalRoute() =>
-        string.Join(separator: "/", _parts.Skip(BaseRoute is null ? 0 : 1).Select(RoutePart.Format));
+        return new Route(
+            baseRoute,
+            string.Join(separator: "/", parts.Skip(baseRoute is null ? 0 : 1).Select(RoutePart.Format)),
+            parts.OfType<RoutePart.ParameterRoutePart>().ToImmutableArray()
+        );
+    }
 
-    public IEnumerable<RoutePart.ParameterRoutePart> GetParameters() =>
-        _parts.OfType<RoutePart.ParameterRoutePart>();
-
-    private Route(ImmutableArray<RoutePart> parts) =>
-        _parts = parts;
+    private Route(string? baseRoute, string relationalRoute, ImmutableArray<RoutePart.ParameterRoutePart> parameters) =>
+        (BaseRoute, RelationalRoute, Parameters) =
+        (baseRoute, relationalRoute, parameters);
 }
