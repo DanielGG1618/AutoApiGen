@@ -19,8 +19,6 @@
     <EmbeddedResource Include="Templates\Request.txt" />
     <None Remove="Templates\Parameter.txt" />
     <EmbeddedResource Include="Templates\Parameter.txt" />
-    <None Remove="Templates\ApiControllerBase.txt" />
-    <EmbeddedResource Include="Templates\ApiControllerBase.txt" />
     <None Remove="Templates\EndpointAttributes.txt" />
     <EmbeddedResource Include="Templates\EndpointAttributes.txt" />
   </ItemGroup>

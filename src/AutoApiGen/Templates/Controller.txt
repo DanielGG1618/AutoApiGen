@@ -12,9 +12,11 @@ namespace {{ namespace }};
 {{- if base_route && base_route != "" -}}
     [global::Microsoft.AspNetCore.Mvc.Route("{{ base_route }}")]
 {{- end }}
-public class {{ name }}Controller({{ mediator_package_name }}.IMediator mediator) 
-    : global::AutoApiGen.Models.ApiControllerBase(mediator)
-{    
+public class {{ name }}Controller({{ mediator_package_name }}.IMediator mediator)
+    : global::Microsoft.AspNetCore.Mvc.ControllerBase
+{   
+    private readonly {{ mediator_package_name }}.IMediator _mediator = mediator;
+ 
     {{ for method in methods }}
         {{ method | render_method }}
     {{ end }}

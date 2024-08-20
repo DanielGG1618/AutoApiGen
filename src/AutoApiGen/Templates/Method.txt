@@ -18,6 +18,6 @@ public async global::System.Threading.Tasks.Task<global::Microsoft.AspNetCore.Mv
             {{ parameter_name }}: {{ parameter_name }}{{ if !for.last }}, {{ end }} 
         {{- end -}}
     );
-    var result = await Mediator.Send(contract, cancellationToken);
+    var result = await _mediator.Send(contract, cancellationToken);
     return Ok(result);
 }
