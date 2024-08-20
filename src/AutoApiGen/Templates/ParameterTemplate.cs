@@ -1,4 +1,5 @@
-﻿using AutoApiGen.Extensions;
+﻿using System.Globalization;
+using AutoApiGen.Extensions;
 using AutoApiGen.Models;
 using Microsoft.CodeAnalysis;
 
@@ -24,7 +25,17 @@ internal static class ParameterTemplate
             Attributes: "",
             parameter.Type.ToString(),
             parameter.Name,
-            parameter.HasExplicitDefaultValue ? parameter.ExplicitDefaultValue as string : null
+            parameter.HasExplicitDefaultValue ? parameter.ExplicitDefaultValue switch
+            {
+                string str => $"\"{str}\"",
+                char ch => $"'{ch}'",
+                bool b => b ? "true" : "false",
+                float f => f.ToString(CultureInfo.InvariantCulture) + 'f',
+                double d => d.ToString(CultureInfo.InvariantCulture) + 'd',
+                decimal d => d.ToString(CultureInfo.InvariantCulture) + 'm',
+                null => "null!",
+                _ => parameter.ExplicitDefaultValue.ToString(),
+            } : null
         );
     }
 
