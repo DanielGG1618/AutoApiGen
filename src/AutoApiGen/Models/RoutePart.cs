@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics.Contracts;
 using AutoApiGen.Exceptions;
 
-namespace AutoApiGen.Wrappers;
+namespace AutoApiGen.Models;
 
-public abstract record RoutePart
+internal abstract record RoutePart
 {
     public sealed record LiteralRoutePart(string Value) : RoutePart;
 
@@ -52,13 +52,13 @@ public abstract record RoutePart
         LiteralRoutePart(var value) => value,
 
         RawParameterRoutePart(var name, var type, var @default) =>
-            $"{{{name}{FormatType(type)}{FormatDefault(@default)}}}",
+            "{" + name + FormatType(type) + FormatDefault(@default) + "}",
 
         OptionalParameterRoutePart(var name, var type) =>
-            $"{{{name}{FormatType(type)}}}",
+            "{" + name + FormatType(type) + "?}",
 
         CatchAllParameterRoutePart(var name, var type, var @default) =>
-            $"{{{name}{FormatType(type)}{FormatDefault(@default)}}}",
+            "{*" + name + FormatType(type) + FormatDefault(@default) + "",
 
         _ => throw new ThisIsUnionException(nameof(RoutePart))
     };

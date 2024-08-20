@@ -40,23 +40,41 @@ namespace System.Diagnostics.CodeAnalysis
 #nullable disable
 namespace System
 {
-    // ReSharper disable once UnusedType.Global
+    internal readonly struct Range
+    {
+        public Index Start { get; }
+        public Index End { get; }
+
+        public Range(Index start, Index end)
+        {
+            Start = start;
+            End = end;
+        }
+
+        public static Range StartAt(Index start) => new(start, Index.End);
+
+        public static Range EndAt(Index end) => new(Index.Start, end);
+
+        public static Range All => new(Index.Start, Index.End);
+
+        public override string ToString() => $"{Start}..{End}";
+    }
+
     internal readonly struct Index
     {
         private readonly int _value;
 
-        public Index(int value, bool fromEnd = false) =>
-            _value = value switch
-            {
-                < 0 => throw new ArgumentOutOfRangeException(nameof(value), "Index must be non-negative."),
-                _ => fromEnd ? ~value : value
-            };
+        public Index(int value, bool fromEnd = false) => 
+            _value = fromEnd ? ~value : value;
 
-        // ReSharper disable once MemberCanBePrivate.Global
+        public static Index Start => new(0);
+        public static Index End => new(~0);
+
         public int Value => _value < 0 ? ~_value : _value;
 
-        // ReSharper disable once MemberCanBePrivate.Global
         public bool IsFromEnd => _value < 0;
+
+        public override string ToString() => IsFromEnd ? $"^{Value}" : Value.ToString();
 
         public int GetOffset(int length) =>
             length < 0 ? throw new ArgumentOutOfRangeException(nameof(length), "Length must be non-negative.")
@@ -66,6 +84,5 @@ namespace System
 
         public override bool Equals(object obj) => obj is Index index && _value == index._value;
         public override int GetHashCode() => _value;
-        public override string ToString() => IsFromEnd ? $"^{Value}" : Value.ToString();
     }
 }

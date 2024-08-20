@@ -1,8 +1,0 @@
-﻿namespace AutoApiGen.Models;
-
-[global::Microsoft.AspNetCore.Mvc.ApiController]
-public abstract class ApiControllerBase({{ mediator_package_name }}.IMediator mediator) 
-    : global::Microsoft.AspNetCore.Mvc.ControllerBase
-{
-    protected readonly {{ mediator_package_name }}.IMediator Mediator = mediator;
-}

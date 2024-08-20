@@ -1,0 +1,22 @@
+﻿using System.Collections.Immutable;
+
+namespace AutoApiGen.Templates;
+
+internal interface ITemplateData;
+
+internal static class TemplateDataExtensions
+{
+    public static string RenderAndJoin<T>(
+        this List<T> datas,
+        Func<T, string> renderer,
+        string separator = "\n"
+    ) where T : ITemplateData => 
+        string.Join(separator, datas.Select(renderer));
+
+    public static string RenderAndJoin<T>(
+        this ImmutableArray<T> datas,
+        Func<T, string> renderer,
+        string separator = "\n"
+    ) where T : ITemplateData => 
+        string.Join(separator, datas.Select(renderer));
+}

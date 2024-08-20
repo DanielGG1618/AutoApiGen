@@ -1,6 +1,6 @@
 ﻿namespace AutoApiGen.Exceptions;
 
-public class ThisIsUnionException(string unionName) 
+internal class ThisIsUnionException(string unionName) 
     : Exception(
         $"{unionName} is a Union type. " +
         $"Waiting for discriminated unions in C# :). " +
