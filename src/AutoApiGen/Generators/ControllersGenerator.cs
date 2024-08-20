@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 using AutoApiGen.Models;
-using AutoApiGen.TemplatesProcessing;
+using AutoApiGen.Templates;
 using Microsoft.CodeAnalysis;
 
 namespace AutoApiGen.Generators;
