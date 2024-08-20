@@ -12,8 +12,8 @@ internal readonly record struct EndpointContractModel//TODO : IEquatable<Endpoin
     public EndpointAttributeModel Attribute { get; }
     public string ContractTypeFullName { get; }
     public string RequestName { get; }
-    public string ResponseTypeFullName { get; }
     public IReadOnlyList<IParameterSymbol> Parameters { get; }
+    public string? ResponseTypeFullName { get; }
 
     public static EndpointContractModel Create(INamedTypeSymbol type) =>
         !IsValid(type) ? throw new ArgumentException("Provided type is not valid Endpoint Contract")
@@ -21,7 +21,8 @@ internal readonly record struct EndpointContractModel//TODO : IEquatable<Endpoin
                 EndpointAttributeModel.Create(type.GetAttributes().Single(EndpointAttributeModel.IsValid)),
                 contractTypeFullName: type.ToString(),
                 GetRequestName(type),
-                responseTypeFullName: type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames)[0].ToString(),
+                responseTypeFullName: 
+                type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames).FirstOrDefault()?.ToString(),
                 parameters: type.InstanceConstructors
                                 .FirstOrDefault(c => c.DeclaredAccessibility is Accessibility.Public)?.Parameters
                             ?? []
@@ -42,13 +43,13 @@ internal readonly record struct EndpointContractModel//TODO : IEquatable<Endpoin
             : Suffixes.SingleOrDefault(suffix => type.Name.EndsWith(suffix)) is string matchingSuffix
                 ? type.Name.Remove(type.Name.Length - matchingSuffix.Length)
                 : type.Name;
-    
+
     private EndpointContractModel(
         EndpointAttributeModel attribute,
         string contractTypeFullName,
         string requestName,
-        string responseTypeFullName,
-        IReadOnlyList<IParameterSymbol> parameters
-    ) => (Attribute, ContractTypeFullName, RequestName, ResponseTypeFullName, Parameters) =
-        (attribute, contractTypeFullName, requestName, responseTypeFullName, parameters);
+        IReadOnlyList<IParameterSymbol> parameters,
+        string? responseTypeFullName
+    ) => (Attribute, ContractTypeFullName, RequestName, Parameters, ResponseTypeFullName) =
+        (attribute, contractTypeFullName, requestName, parameters, responseTypeFullName);
 }
