@@ -20,8 +20,8 @@ internal static class ControllerTemplate
     )
     {
         var stringBuilder = new StringBuilder(StaticData.GeneratedDisclaimer);
-        stringBuilder.AppendLine();
-        stringBuilder.AppendLine($"namespace {data.Namespace};");
+        stringBuilder.AppendLine()
+            .AppendLine($"namespace {data.Namespace};");
         
         if (data.Requests.Count > 0)
             stringBuilder.AppendLine()
