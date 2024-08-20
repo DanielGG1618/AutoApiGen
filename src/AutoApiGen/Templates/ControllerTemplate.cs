@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using System.CodeDom.Compiler;
 
 namespace AutoApiGen.Templates;
 
@@ -13,35 +13,56 @@ internal static class ControllerTemplate
         List<RequestTemplate.Data> Requests
     ) : ITemplateData;
 
-    public static string Render(
+    public static void RenderTo(
+        IndentedTextWriter indentedWriter,
         Data data,
         Func<RequestTemplate.Data, string> renderRequest,
-        Func<MethodTemplate.Data, string> renderMethod
+        Action<IndentedTextWriter, MethodTemplate.Data> renderMethodTo
     )
     {
-        var stringBuilder = new StringBuilder(StaticData.GeneratedDisclaimer);
-        stringBuilder.AppendLine()
-            .AppendLine($"namespace {data.Namespace};");
-        
-        if (data.Requests.Count > 0)
-            stringBuilder.AppendLine()
-                .AppendLine(data.Requests.RenderAndJoin(renderRequest, separator: "\n\n"));
+        indentedWriter.WriteLine(StaticData.GeneratedDisclaimer);
+        indentedWriter.WriteLine();
+        indentedWriter.WriteLine($"namespace {data.Namespace};");
 
-        stringBuilder.AppendLine()
-            .AppendLine($"[global::Microsoft.AspNetCore.Mvc.Route(\"{data.BaseRoute}\")]");
-                
-        stringBuilder.Append($$"""
+        if (data.Requests.Count > 0)
+        {
+            indentedWriter.WriteLine();
+            indentedWriter.WriteLine(data.Requests.RenderAndJoin(renderRequest, separator: "\n\n"));
+        }
+
+        indentedWriter.WriteLine();
+        indentedWriter.WriteLine($"[global::Microsoft.AspNetCore.Mvc.Route(\"{data.BaseRoute}\")]");
+
+        indentedWriter.WriteLines($$"""
             [global::Microsoft.AspNetCore.Mvc.ApiController]
             public partial class {{data.Name}}Controller(
                 {{data.MediatorPackageName}}.IMediator mediator
             ) : global::Microsoft.AspNetCore.Mvc.ControllerBase
             {   
                 private readonly {{data.MediatorPackageName}}.IMediator _mediator = mediator;
-             
-                {{data.Methods.RenderAndJoin(renderMethod, separator: "\n\n")}}
-            }
-            """);
+                
+            """
+        );
 
-        return stringBuilder.ToString();
+        indentedWriter.Indent++;
+        foreach (var method in data.Methods)
+        {
+            renderMethodTo(indentedWriter, method);
+            indentedWriter.WriteLine();
+        }
+
+        indentedWriter.Indent--;
+        indentedWriter.WriteLine('}');
+    }
+}
+
+file static class ControllerIndentedTextWriterExtensions
+{
+    public static void WriteLines(this IndentedTextWriter writer, string text)
+    {
+        foreach (var line in text.Split('\n'))
+        {
+            writer.WriteLine(line);
+        }
     }
 }

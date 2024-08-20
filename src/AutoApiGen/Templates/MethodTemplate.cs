@@ -1,5 +1,5 @@
-﻿using System.Collections.Immutable;
-using System.Text;
+﻿using System.CodeDom.Compiler;
+using System.Collections.Immutable;
 using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Templates;
@@ -17,43 +17,55 @@ internal static class MethodTemplate
         ImmutableArray<string> ContractParameterNames
     ) : ITemplateData;
 
-    public static string Render(
+    public static void RenderTo(
+        IndentedTextWriter indentedWriter,
         Data data,
         Func<ParameterTemplate.Data, string> renderParameter,
         Func<ImmutableArray<string>?, string, string> renderDeconstruction
     )
     {
-        var stringBuilder = new StringBuilder();
-        
-        stringBuilder.AppendLine(
+        indentedWriter.WriteLine(
             $"[global::Microsoft.AspNetCore.Mvc.Http{data.HttpMethod}{data.Route.ApplyIfNotNullOrEmpty(static route => $"(\"{route}\")")}]"
-        ).AppendLine(
+        );
+        indentedWriter.WriteLine(
             $"public async global::System.Threading.Tasks.Task<global::Microsoft.AspNetCore.Mvc.IActionResult> {data.Name}("
         );
+        indentedWriter.Indent++;
         if (data.RequestType is not (null or ""))
-            stringBuilder.AppendLine($"[global::Microsoft.AspNetCore.Mvc.FromBody] {data.RequestType} request,");
+            indentedWriter.WriteLine($"[global::Microsoft.AspNetCore.Mvc.FromBody] {data.RequestType} request,");
         if (data.Parameters.Length > 0)
-            stringBuilder.AppendLine(data.Parameters.RenderAndJoin(renderParameter, separator: ",\n") + ',');
-        stringBuilder.AppendLine("global::System.Threading.CancellationToken cancellationToken = default")
-            .AppendLine(")").AppendLine("{");
+            indentedWriter.WriteLine(data.Parameters.RenderAndJoin(renderParameter, separator: ",\n") + ',');
+        indentedWriter.WriteLine("global::System.Threading.CancellationToken cancellationToken = default");
+        indentedWriter.Indent--;
+        indentedWriter.WriteLine(")");
+        indentedWriter.WriteLine("{");
+        indentedWriter.Indent++;
         if (data.RequestParameterNames?.Length is > 0)
-            stringBuilder.AppendLine(renderDeconstruction(data.RequestParameterNames, "request"))
-                .AppendLine();
-        
-        stringBuilder.Append($$"""
-                var contract = new {{data.ContractType}}(
-                    {{string.Join(separator: ",\n",
-                        data.ContractParameterNames.Select(static parameterName => $"{parameterName}: {parameterName}"))
-                    }}
-                );
-                
-                var result = await _mediator.Send(contract, cancellationToken);
-                
-                return Ok(result);
-            }
-            """
-        );
+        {
+            indentedWriter.WriteLine(renderDeconstruction(data.RequestParameterNames, "request"));
+            indentedWriter.WriteLine();
+        }
 
-        return stringBuilder.ToString();
+        if (data.ContractParameterNames.Length > 0)
+        {
+            indentedWriter.WriteLine($"var contract = new {data.ContractType}(");
+            indentedWriter.Indent++;
+            indentedWriter.WriteLines(
+                string.Join(
+                    separator: ",\n",
+                    data.ContractParameterNames.Select(static parameterName => $"{parameterName}: {parameterName}")
+                )
+            );
+            indentedWriter.Indent--;
+            indentedWriter.WriteLine(");");
+        }
+        else indentedWriter.WriteLine($"var contract = new {data.ContractType}();");
+        
+        indentedWriter.WriteLine();
+        indentedWriter.WriteLine("var result = await _mediator.Send(contract, cancellationToken);");
+        indentedWriter.WriteLine();
+        indentedWriter.WriteLine("return Ok(result);");
+        indentedWriter.Indent--;
+        indentedWriter.WriteLine('}');
     }
 }

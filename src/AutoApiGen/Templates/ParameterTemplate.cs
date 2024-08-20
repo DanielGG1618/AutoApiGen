@@ -14,7 +14,7 @@ internal static class ParameterTemplate
     ) : ITemplateData
     {
         public static Data FromRoute(RoutePart.ParameterRoutePart parameter) => new(
-            Attributes: "[global::Microsoft.AspNetCore.Mvc.FromRoute]",
+            Attributes: "[global::Microsoft.AspNetCore.Mvc.FromRoute] ",
             parameter.Type ?? "string",
             parameter.Name,
             parameter.Default
@@ -29,5 +29,5 @@ internal static class ParameterTemplate
     }
 
     internal static string Render(Data data) =>
-        $"{data.Attributes} {data.Type} {data.Name} {data.Default.ApplyIfNotNullOrEmpty(static def => $"= {def}")}";
+        $"{data.Attributes}{data.Type} {data.Name}{data.Default.ApplyIfNotNullOrEmpty(static def => $" = {def}")}";
 }

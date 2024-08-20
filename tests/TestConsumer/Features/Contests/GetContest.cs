@@ -16,7 +16,7 @@ public static class GetContest
         {
             var id = query.Id;
 
-            return ValueTask.FromResult(new Contest(id, "Contest"));
+            return ValueTask.FromResult(new Contest(id, "Contest", true, [new Participant(25, "Daniel")]));
         }
     }
 }

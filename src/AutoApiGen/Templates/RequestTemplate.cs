@@ -11,7 +11,7 @@ internal static class RequestTemplate
 
     public static string Render(Data data, Func<ParameterTemplate.Data, string> renderParameter) => $"""
         public record {data.Name}Request(
-            {data.Parameters.RenderAndJoin(renderParameter, separator: "\n,")}
+            {data.Parameters.RenderAndJoin(renderParameter, separator: ",\n\t")}
         );
         """;
 }
