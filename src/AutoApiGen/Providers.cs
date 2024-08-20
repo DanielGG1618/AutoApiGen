@@ -7,7 +7,7 @@ namespace AutoApiGen;
 
 internal static class Providers
 {
-    public static IncrementalValuesProvider<string?> CreateMediatorPackageNameProvider(
+    public static IncrementalValuesProvider<string> CreateMediatorPackageNameProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
         predicate: static (node, _) =>
@@ -17,7 +17,7 @@ internal static class Providers
         transform: static (syntaxContext, _) =>
             syntaxContext.Node is AttributeSyntax attribute
             && attribute.ArgumentList?.Arguments[0].Expression is LiteralExpressionSyntax expression
-                ? expression.Token.ValueText : null
+                ? expression.Token.ValueText : "global::MediatR"
     );
 
     public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProvider(

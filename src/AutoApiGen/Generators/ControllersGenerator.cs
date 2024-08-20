@@ -23,11 +23,10 @@ internal class ControllersGenerator : IIncrementalGenerator
 
     private static void Execute(
         SourceProductionContext context,
-        ((string? MediatorPackageName, Compilation), ImmutableArray<EndpointContractModel>) compilationDetails
+        ((string MediatorPackageName, Compilation), ImmutableArray<EndpointContractModel>) compilationDetails
     )
     {
         var ((mediatorPackageName, compilation), endpoints) = compilationDetails;
-        mediatorPackageName ??= StaticData.DefaultMediatorPackageName;
 
         var rootNamespace = compilation.AssemblyName;
 

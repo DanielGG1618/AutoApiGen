@@ -20,6 +20,8 @@ internal class ControllerDataBuilder(
 
     private readonly string _mediatorPackageName = mediatorPackageName;
 
+    private const string EmptyBaseRouteControllerName = "Root";
+    
     private readonly Dictionary<string, ControllerData> _controllers = [];
 
     public ImmutableArray<ControllerData> Build()
@@ -42,7 +44,7 @@ internal class ControllerDataBuilder(
 
     private void AddRequestToCorrespondingController(string? baseRoute, RequestData? request, MethodData method)
     {
-        var controllerName = baseRoute?.WithCapitalFirstLetter() ?? StaticData.EmptyBaseRouteControllerName;
+        var controllerName = baseRoute?.WithCapitalFirstLetter() ?? EmptyBaseRouteControllerName;
 
         if (_controllers.TryGetValue(controllerName, out var controller))
         {
@@ -62,6 +64,7 @@ internal class ControllerDataBuilder(
             request.HasValue ? [request.Value] : []
         );
     }
+
 
     private static MethodData CreateMethodData(
         EndpointContractModel endpoint,

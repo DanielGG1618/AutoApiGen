@@ -9,21 +9,19 @@ internal class StaticCodeGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        context.RegisterPostInitializationOutput(AddAttributes);
+        context.RegisterPostInitializationOutput(AddEndpointAttributes);
         
         var mediatorPackageNameProvider = context.SyntaxProvider.CreateMediatorPackageNameProvider();
         context.RegisterSourceOutput(mediatorPackageNameProvider, Execute);
     }
 
-    private static void AddAttributes(IncrementalGeneratorPostInitializationContext context) =>
+    private static void AddEndpointAttributes(IncrementalGeneratorPostInitializationContext context) =>
         context.AddSource("EndpointAttributes.g.cs",
             EmbeddedResource.GetContent("Templates.EndpointAttributes.txt")
         );
 
-    private static void Execute(SourceProductionContext context, string? mediatorPackageName)
+    private static void Execute(SourceProductionContext context, string mediatorPackageName)
     {
-        mediatorPackageName ??= StaticData.DefaultMediatorPackageName;
-        
         var templatesProvider = new EmbeddedResourceTemplatesProvider();
         var templatesRenderer = new TemplatesRenderer(templatesProvider);
 
