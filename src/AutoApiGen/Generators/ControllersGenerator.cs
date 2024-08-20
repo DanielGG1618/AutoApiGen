@@ -2,7 +2,6 @@
 using AutoApiGen.Models;
 using AutoApiGen.TemplatesProcessing;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace AutoApiGen.Generators;
 
@@ -30,24 +29,12 @@ internal class ControllersGenerator : IIncrementalGenerator
 
         var rootNamespace = compilation.AssemblyName;
 
-        var templatesProvider = new EmbeddedResourceTemplatesProvider();
-        var templatesRenderer = new TemplatesRenderer(templatesProvider);
-
         var controllers = new ControllerDataBuilder(endpoints, rootNamespace, mediatorPackageName).Build();
 
         foreach (var controller in controllers)
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
-                Formatted(templatesRenderer.Render(controller))
+                TemplatesRenderer.Render(controller)
             );
     }
-
-    private static string Formatted(string code) =>
-        CSharpSyntaxTree
-            .ParseText(code)
-            .GetRoot()
-            .NormalizeWhitespace()
-            .SyntaxTree
-            .GetText()
-            .ToString();
 }

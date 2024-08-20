@@ -9,17 +9,6 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <None Remove="Templates\Controller.txt" />
-    <EmbeddedResource Include="Templates\Controller.txt" />
-    <None Remove="Templates\Method.txt" />
-    <EmbeddedResource Include="Templates\Method.txt" />
-    <None Remove="Templates\Request.txt" />
-    <EmbeddedResource Include="Templates\Request.txt" />
-    <None Remove="Templates\Parameter.txt" />
-    <EmbeddedResource Include="Templates\Parameter.txt" />
-  </ItemGroup>
 
   <PropertyGroup>
     <Title>AutoApiGen</Title>
@@ -39,7 +28,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0-beta1.24318.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
-    <PackageReference Include="Scriban" Version="5.10.0" IncludeAssets="Build" PrivateAssets="all" />
   </ItemGroup>
   
   <ItemGroup>
