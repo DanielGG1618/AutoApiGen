@@ -29,5 +29,5 @@ internal static class ParameterTemplate
     }
 
     internal static string Render(Data data) =>
-        $"{data.Attributes} {data.Type} {data.Name} {data.Default.ApplyIfNotNullOrEmpty(def => $"= {def}")}";
+        $"{data.Attributes} {data.Type} {data.Name} {data.Default.ApplyIfNotNullOrEmpty(static def => $"= {def}")}";
 }

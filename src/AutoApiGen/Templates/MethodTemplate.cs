@@ -25,7 +25,7 @@ internal static class MethodTemplate
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.AppendLine(
-            $"[global::Microsoft.AspNetCore.Mvc.Http{data.HttpMethod}{data.Route.ApplyIfNotNullOrEmpty(route => $"({route})")}]"
+            $"[global::Microsoft.AspNetCore.Mvc.Http{data.HttpMethod}{data.Route.ApplyIfNotNullOrEmpty(static route => $"({route})")}]"
         ).AppendLine(
             $"public async global::System.Threading.Tasks.Task<global::Microsoft.AspNetCore.Mvc.IActionResult> {data.Name}("
         );
@@ -42,7 +42,7 @@ internal static class MethodTemplate
         stringBuilder.Append($$"""
                 var contract = new {{data.ContractType}}(
                     {{string.Join(separator: ",\n",
-                        data.ContractParameterNames.Select(parameterName => $"{parameterName}: {parameterName}"))
+                        data.ContractParameterNames.Select(static parameterName => $"{parameterName}: {parameterName}"))
                     }}
                 );
                 

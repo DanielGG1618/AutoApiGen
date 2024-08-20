@@ -3,7 +3,7 @@ using AutoApiGen.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace AutoApiGen;
+namespace AutoApiGen.Generators;
 
 internal static class Providers
 {
