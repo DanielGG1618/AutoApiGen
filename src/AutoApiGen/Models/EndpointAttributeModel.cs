@@ -13,13 +13,12 @@ internal readonly record struct EndpointAttributeModel
             : new(
                 Route.Parse(attribute.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? ""),
                 attribute.AttributeClass!.Name is var name
-                && name.EndsWith("Endpoint")
-                    ? name[..^"Endpoint".Length]
-                    : name
+                && name.EndsWith("EndpointAttribute") 
+                    ? name[..^"EndpointAttribute".Length] : name
             );
 
     public static bool IsValid(AttributeData attribute) =>
-        StaticData.EndpointAttributeNames.Contains(attribute.AttributeClass?.Name ?? "");
+        StaticData.EndpointAttributeNamesWithSuffix.Contains(attribute.AttributeClass?.Name ?? "");
        
     public static bool IsValid(AttributeSyntax attribute) =>
         StaticData.EndpointAttributeNames.Contains(attribute.Name.ToString());
