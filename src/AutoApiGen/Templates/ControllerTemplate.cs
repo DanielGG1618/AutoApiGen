@@ -26,7 +26,7 @@ internal static class ControllerTemplate
         indentedWriter.WriteLine($"namespace {data.Namespace};");
         indentedWriter.WriteLine();
         indentedWriter.WriteRequestsIfAny(data.Requests, renderRequest);
-        indentedWriter.WriteControllerBody(data, renderMethodTo);
+        indentedWriter.WriteBody(data, renderMethodTo);
     }
 }
 
@@ -36,12 +36,16 @@ file static class ControllerIndentedTextWriterExtensions
         this IndentedTextWriter indentedWriter,
         List<RequestTemplate.Data> requests,
         Func<RequestTemplate.Data, string> renderRequest
-    ) => indentedWriter.WriteLinesIf(requests.Count > 0,
-        requests.RenderAndJoin(renderRequest, separator: "\n\n"),
-        ""
-    );
+    )
+    {
+        if (requests.Count > 0)
+            indentedWriter.WriteLines(
+                requests.RenderAndJoin(renderRequest, separator: "\n\n"),
+                ""
+            );
+    }
 
-    public static void WriteControllerBody(
+    public static void WriteBody(
         this IndentedTextWriter indentedWriter,
         ControllerTemplate.Data data,
         Action<IndentedTextWriter, MethodTemplate.Data> renderMethodTo
@@ -55,7 +59,6 @@ file static class ControllerIndentedTextWriterExtensions
             ) : global::Microsoft.AspNetCore.Mvc.ControllerBase
             {   
                 private readonly {{data.MediatorPackageName}}.IMediator _mediator = mediator;
-                
             """
         );
         indentedWriter.WriteMethods(data, renderMethodTo);
@@ -71,8 +74,8 @@ file static class ControllerIndentedTextWriterExtensions
         indentedWriter.Indent++;
         foreach (var method in data.Methods)
         {
-            renderMethodTo(indentedWriter, method);
             indentedWriter.WriteLine();
+            renderMethodTo(indentedWriter, method);
         }
         indentedWriter.Indent--;
     }

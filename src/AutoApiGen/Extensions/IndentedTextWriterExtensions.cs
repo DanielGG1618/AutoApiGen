@@ -21,16 +21,4 @@ internal static class IndentedTextWriterExtensions
         foreach (var line in lines)
             indentedWriter.WriteLine(line);
     }
-
-    public static void WriteLinesIf(this IndentedTextWriter indentedWriter, bool condition, params string[] lines)
-    {
-        if (condition)
-            indentedWriter.WriteLines(lines);
-    }
-
-    public static void WriteLineIf(this IndentedTextWriter indentedWriter, bool condition, string line)
-    {
-        if (condition)
-            indentedWriter.WriteLine(line);
-    }
 }

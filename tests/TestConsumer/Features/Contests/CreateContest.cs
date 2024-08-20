@@ -7,8 +7,8 @@ namespace TestConsumer.Features.Contests;
 
 public static class CreateContest
 {
-    [PostEndpoint("contests/{Id:int=52}")]
-    public record Command(string Name, bool Status, int Id = 52) : IRequest<Contest>;
+    [PostEndpoint("contests/{Id:int=56}")]
+    public record Command(string Name, bool Status, int Id = 56) : IRequest<Contest>;
     
     public class Handler : IRequestHandler<Command, Contest>
     {
