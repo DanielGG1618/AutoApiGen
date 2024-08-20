@@ -24,7 +24,8 @@ internal static class ControllerTemplate
         // </auto-generated>
         //--------------------------------------------------------------------------------
         namespace {{data.Namespace}};
-        {{data.Requests.RenderAndJoin(renderRequest)}}
+        
+        {{data.Requests.RenderAndJoin(renderRequest, separator: "\n\n")}}
 
         {{data.BaseRoute.ApplyIfNotNullOrEmpty(baseRoute =>
             $"[global::Microsoft.AspNetCore.Mvc.Route(\"{baseRoute}\")]")
