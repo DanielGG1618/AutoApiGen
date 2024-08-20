@@ -14,7 +14,8 @@ internal static class MethodTemplate
         string? RequestType,
         ImmutableArray<string>? RequestParameterNames,
         string ContractType,
-        ImmutableArray<string> ContractParameterNames
+        ImmutableArray<string> ContractParameterNames,
+        string? ResponseType
     ) : ITemplateData;
 
     public static void RenderTo(
@@ -45,11 +46,13 @@ file static class MethodIndentedTextWriterExtensions
         Func<ParameterTemplate.Data, string> renderParameter
     )
     {
-        indentedWriter.WriteLine($"public async global::System.Threading.Tasks.Task<global::Microsoft.AspNetCore.Mvc.IActionResult> {name}(");
+        indentedWriter.WriteLine(
+            $"public async global::System.Threading.Tasks.Task<global::Microsoft.AspNetCore.Mvc.IActionResult> {name}("
+        );
         indentedWriter.WriteParameters(requestType, parameters, renderParameter);
         indentedWriter.WriteLine(")");
     }
-    
+
     public static void WriteParameters(
         this IndentedTextWriter indentedWriter,
         string? requestType,
@@ -78,9 +81,19 @@ file static class MethodIndentedTextWriterExtensions
             indentedWriter.WriteLines(renderDeconstruction(data.RequestParameterNames, "request"), "");
         indentedWriter.WriteContractCreation(data);
         indentedWriter.WriteLine();
-        indentedWriter.WriteLine("var result = await _mediator.Send(contract, cancellationToken);");
-        indentedWriter.WriteLine();
-        indentedWriter.WriteLine("return Ok(result);");
+        indentedWriter.WriteLines(
+            data.ResponseType is null or ""
+                ? """
+                await _mediator.Send(contract, cancellationToken);
+
+                return NoContent();
+                """
+                : """
+                var result = await _mediator.Send(contract, cancellationToken);
+
+                return Ok(result);
+                """
+        );
         indentedWriter.Indent--;
         indentedWriter.WriteLine('}');
     }

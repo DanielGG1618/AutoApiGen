@@ -9,11 +9,11 @@ namespace TestConsumer.Features.Contests;
 public static class UpdateContest
 {
     [PutEndpoint("contests/{Id:int}")]
-    public record Command(int Id, string Name, List<Participant> Participants) : ICommand<Contest>;
+    public record Command(int Id, string Name, List<Participant> Participants) : ICommand;
     
-    public class Handler : ICommandHandler<Command, Contest>
+    public class Handler : ICommandHandler<Command>
     {
-        public ValueTask<Contest> Handle(Command request, CancellationToken cancellationToken) => 
-            ValueTask.FromResult(new Contest(request.Id, request.Name, true, request.Participants));
+        public ValueTask<Unit> Handle(Command request, CancellationToken cancellationToken) => 
+            Unit.ValueTask;
     }
 }

@@ -21,7 +21,7 @@ internal class ControllerDataBuilder(
     private readonly string _mediatorPackageName = mediatorPackageName;
 
     private const string EmptyBaseRouteControllerName = "Root";
-    
+
     private readonly Dictionary<string, ControllerTemplate.Data> _controllers = [];
 
     public ImmutableArray<ControllerTemplate.Data> Build()
@@ -34,7 +34,8 @@ internal class ControllerDataBuilder(
 
     private void IncludeRequestFrom(EndpointContractModel endpoint)
     {
-        var routeParameters = endpoint.Attribute.Route.Parameters.Select(ParameterTemplate.Data.FromRoute).ToImmutableArray();
+        var routeParameters = 
+            endpoint.Attribute.Route.Parameters.Select(ParameterTemplate.Data.FromRoute).ToImmutableArray();
 
         var request = CreateRequestData(endpoint, routeParameters);
         var method = CreateMethodData(endpoint, routeParameters, request);
@@ -42,7 +43,11 @@ internal class ControllerDataBuilder(
         AddRequestToCorrespondingController(endpoint.Attribute.Route.BaseRoute, request, method);
     }
 
-    private void AddRequestToCorrespondingController(string? baseRoute, RequestTemplate.Data? request, MethodTemplate.Data method)
+    private void AddRequestToCorrespondingController(
+        string? baseRoute,
+        RequestTemplate.Data? request,
+        MethodTemplate.Data method
+    )
     {
         var controllerName = baseRoute is null or ""
             ? EmptyBaseRouteControllerName
@@ -79,7 +84,8 @@ internal class ControllerDataBuilder(
         RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
         request?.Parameters.Select(p => p.Name).ToImmutableArray(),
         endpoint.ContractTypeFullName,
-        [..endpoint.Parameters.Select(p => p.Name)]
+        [..endpoint.Parameters.Select(p => p.Name)],
+        endpoint.ResponseTypeFullName
     );
 
     private static RequestTemplate.Data? CreateRequestData(
