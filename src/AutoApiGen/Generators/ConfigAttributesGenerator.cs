@@ -7,10 +7,14 @@ internal sealed class ConfigAttributesGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context) =>
         context.RegisterPostInitializationOutput(c =>
-            c.AddSource("ConfigAttributes.g.cs", """
+            c.AddSource("ConfigAttributes.g.cs", $$"""
+            {{StaticData.GeneratedDisclaimer}}
+            
+            #nullable enable
+            
             namespace AutoApiGen.ConfigAttributes;
             
-            [global::System.AttributeUsage(AttributeTargets.Assembly)]
+            [global::System.AttributeUsage(System.AttributeTargets.Assembly)]
             public sealed class ResultTypeConfigurationAttribute 
                 : global::System.Attribute
             {
@@ -21,7 +25,7 @@ internal sealed class ConfigAttributesGenerator : IIncrementalGenerator
             }
             
             #pragma warning disable CS9113 // Parameter is unread.
-            [global::System.AttributeUsage(AttributeTargets.Assembly)]
+            [global::System.AttributeUsage(System.AttributeTargets.Assembly)]
             public sealed class SetMediatorPackageAttribute(string mediatorPackage) 
                 : global::System.Attribute;
             #pragma warning restore CS9113 // Parameter is unread.
