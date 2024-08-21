@@ -4,7 +4,10 @@ namespace AutoApiGen;
 
 internal static class StaticData
 {
-    public static IImmutableSet<string> EndpointAttributeNames { get; } = new HashSet<string>{
+    public const string DefaultMediatorPackageName = "global::MediatR";
+    
+    public static IImmutableSet<string> EndpointAttributeNames { get; } = new HashSet<string>
+    {
         "GetEndpoint",
         "PostEndpoint",
         "PutEndpoint",
@@ -25,4 +28,5 @@ internal static class StaticData
         // </auto-generated>
         //--------------------------------------------------------------------------------
         """;
+
 }

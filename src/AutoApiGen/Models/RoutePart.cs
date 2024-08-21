@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using AutoApiGen.Exceptions;
+using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Models;
 
@@ -52,17 +53,18 @@ internal abstract record RoutePart
         LiteralRoutePart(var value) => value,
 
         RawParameterRoutePart(var name, var type, var @default) =>
-            "{" + name + FormatType(type) + FormatDefault(@default) + "}",
+            "{" + FormatName(name) + FormatType(type) + FormatDefault(@default) + "}",
 
         OptionalParameterRoutePart(var name, var type) =>
-            "{" + name + FormatType(type) + "?}",
+            "{" + FormatName(name) + FormatType(type) + "?}",
 
         CatchAllParameterRoutePart(var name, var type, var @default) =>
-            "{*" + name + FormatType(type) + FormatDefault(@default) + "",
+            "{*" + FormatName(name) + FormatType(type) + FormatDefault(@default) + "",
 
         _ => throw new ThisIsUnionException(nameof(RoutePart))
     };
 
+    private static string FormatName(string name) => name.WithLowerFirstLetter();
     private static string FormatType(string? type) => type is null ? "" : $":{type}";
     private static string FormatDefault(string? @default) => @default is null ? "" : $"={@default}";
 }
