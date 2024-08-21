@@ -16,43 +16,43 @@ internal static class ControllerTemplate
     ) : ITemplateData;
 
     public static void RenderTo(
-        IndentedTextWriter indentedWriter,
+        IndentedTextWriter writer,
         Data data,
         Func<RequestTemplate.Data, string> renderRequest,
         Action<IndentedTextWriter, MethodTemplate.Data> renderMethodTo
     )
     {
-        indentedWriter.WriteLine(StaticData.GeneratedDisclaimer);
-        indentedWriter.WriteLine();
-        indentedWriter.WriteLine($"namespace {data.Namespace};");
-        indentedWriter.WriteLine();
-        indentedWriter.WriteRequestsIfAny(data.Requests, renderRequest);
-        indentedWriter.WriteBody(data, renderMethodTo);
+        writer.WriteLine(StaticData.GeneratedDisclaimer);
+        writer.WriteLine();
+        writer.WriteLine($"namespace {data.Namespace};");
+        writer.WriteLine();
+        writer.WriteRequestsIfAny(data.Requests, renderRequest);
+        writer.WriteBody(data, renderMethodTo);
     }
 }
 
 file static class ControllerIndentedTextWriterExtensions
 {
     public static void WriteRequestsIfAny(
-        this IndentedTextWriter indentedWriter,
+        this IndentedTextWriter writer,
         List<RequestTemplate.Data> requests,
         Func<RequestTemplate.Data, string> renderRequest
     )
     {
         if (requests.Count > 0)
-            indentedWriter.WriteLines(
+            writer.WriteLines(
                 requests.RenderAndJoin(renderRequest, separator: "\n\n"),
                 ""
             );
     }
 
     public static void WriteBody(
-        this IndentedTextWriter indentedWriter,
+        this IndentedTextWriter writer,
         ControllerTemplate.Data data,
         Action<IndentedTextWriter, MethodTemplate.Data> renderMethodTo
     )
     {
-        indentedWriter.WriteLines($$"""
+        writer.WriteLines($$"""
             [global::Microsoft.AspNetCore.Mvc.Route("{{data.BaseRoute}}")]
             [global::Microsoft.AspNetCore.Mvc.ApiController]
             public partial class {{data.Name}}Controller(
@@ -62,22 +62,22 @@ file static class ControllerIndentedTextWriterExtensions
                 private readonly {{data.MediatorPackageName}}.IMediator _mediator = mediator;
             """
         );
-        indentedWriter.WriteMethods(data, renderMethodTo);
-        indentedWriter.WriteLine('}');
+        writer.WriteMethods(data, renderMethodTo);
+        writer.WriteLine('}');
     }
 
     private static void WriteMethods(
-        this IndentedTextWriter indentedWriter,
+        this IndentedTextWriter writer,
         ControllerTemplate.Data data,
         Action<IndentedTextWriter, MethodTemplate.Data> renderMethodTo
     )
     {
-        indentedWriter.Indent++;
+        writer.Indent++;
         foreach (var method in data.Methods)
         {
-            indentedWriter.WriteLine();
-            renderMethodTo(indentedWriter, method);
+            writer.WriteLine();
+            renderMethodTo(writer, method);
         }
-        indentedWriter.Indent--;
+        writer.Indent--;
     }
 }
