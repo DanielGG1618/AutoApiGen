@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using AutoApiGen.ConfigAttributes;
 using AutoApiGen.Extensions;
 using AutoApiGen.Models;
 using Microsoft.CodeAnalysis;
@@ -14,7 +13,7 @@ internal static class Providers
     ) => syntaxValueProvider.CreateSyntaxProvider(
         predicate: static (node, _) =>
             node is AttributeSyntax { ArgumentList.Arguments.Count: 1 } attribute
-            && attribute.Name.ToString().Contains(nameof(SetMediatorPackageAttribute)[..^"Attribute".Length]),
+            && attribute.Name.ToString().Contains("SetMediatorPackage"),
 
         transform: static (syntaxContext, _) =>
             syntaxContext.Node is AttributeSyntax attribute
@@ -27,7 +26,7 @@ internal static class Providers
     ) => syntaxValueProvider.CreateSyntaxProvider(
         predicate: static (node, _) =>
             node is AttributeSyntax { ArgumentList.Arguments.Count: >= 1 } attribute
-            && attribute.Name.ToString().Contains(nameof(ResultTypeConfigurationAttribute)[..^"Attribute".Length]),
+            && attribute.Name.ToString().Contains("ResultTypeConfiguration"),
 
         transform: static (syntaxContext, _) =>
             Method((AttributeSyntax)syntaxContext.Node)
@@ -46,16 +45,16 @@ internal static class Providers
         
         return arguments is null ? null
             : new ResultTypeConfig(
-                TypeName: arguments[nameof(ResultTypeConfigurationAttribute.TypeName)]
+                TypeName: arguments["TypeName"]
                           ?? throw new ArgumentException("TypeName is missing"),
-                MatchMethodName: arguments[nameof(ResultTypeConfigurationAttribute.MatchMethodName)]
+                MatchMethodName: arguments["MatchMethodName"]
                                  ?? "Match",
                 ErrorHandlerMethod(arguments)
             );
 
         (string Name, string Implementation)? ErrorHandlerMethod(ImmutableDictionary<string, string?> args) =>
-            args[nameof(ResultTypeConfigurationAttribute.ErrorHandlerMethodName)] is string name
-            && args[nameof(ResultTypeConfigurationAttribute.ErrorHandlerMethodImplementation)] is string implementation
+            args["ErrorHandlerMethodName"] is string name
+            && args["ErrorHandlerMethodImplementation"] is string implementation
                 ? (
                     name,
                     implementation
