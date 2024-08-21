@@ -1,4 +1,5 @@
-﻿using AutoApiGen.Extensions;
+﻿using AutoApiGen.ConfigAttributes;
+using AutoApiGen.Extensions;
 using AutoApiGen.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,14 +13,27 @@ internal static class Providers
     ) => syntaxValueProvider.CreateSyntaxProvider(
         predicate: static (node, _) =>
             node is AttributeSyntax { ArgumentList.Arguments.Count: 1 } attribute
-            && attribute.Name.ToString().Contains("SetMediatorPackage"),
+            && attribute.Name.ToString().Contains(nameof(SetMediatorPackageAttribute)[..^"Attribute".Length]),
 
         transform: static (syntaxContext, _) =>
             syntaxContext.Node is AttributeSyntax attribute
             && attribute.ArgumentList?.Arguments[0].Expression is LiteralExpressionSyntax expression
-                ? expression.Token.ValueText : "global::MediatR"
+                ? expression.Token.ValueText : StaticData.DefaultMediatorPackageName
     );
 
+    public static IncrementalValuesProvider<string?> CreateErrorOrPackageNameProvider(
+        this SyntaxValueProvider syntaxValueProvider    
+    ) => syntaxValueProvider.CreateSyntaxProvider(
+        predicate: static (node, _) =>
+            node is AttributeSyntax { ArgumentList.Arguments.Count: 1 } attribute
+            && attribute.Name.ToString().Contains(nameof(SetErrorOrPackageAttribute)[..^"Attribute".Length]),
+
+        transform: static (syntaxContext, _) =>
+            syntaxContext.Node is AttributeSyntax attribute
+            && attribute.ArgumentList?.Arguments[0].Expression is LiteralExpressionSyntax expression
+                ? expression.Token.ValueText : null
+    );
+    
     public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(

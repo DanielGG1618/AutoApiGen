@@ -6,15 +6,15 @@ using Microsoft.CodeAnalysis;
 namespace AutoApiGen.Generators;
 
 [Generator]
-internal class ControllersGenerator : IIncrementalGenerator
+internal sealed class ControllersGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var mediatorPackageNameProvider = context.SyntaxProvider.CreateMediatorPackageNameProvider();
+        var mediatorPackageNameProvider = context.SyntaxProvider.CreateMediatorPackageNameProvider().Collect();
         var endpointsProvider = context.SyntaxProvider.CreateEndpointsProvider().Collect();
 
-        var compilationDetails = mediatorPackageNameProvider
-            .Combine(context.CompilationProvider)
+        var compilationDetails = context.CompilationProvider
+            .Combine(mediatorPackageNameProvider)
             .Combine(endpointsProvider);
 
         context.RegisterSourceOutput(compilationDetails, Execute);
@@ -22,13 +22,15 @@ internal class ControllersGenerator : IIncrementalGenerator
 
     private static void Execute(
         SourceProductionContext context,
-        ((string MediatorPackageName, Compilation), ImmutableArray<EndpointContractModel>) compilationDetails
+        ((Compilation, ImmutableArray<string>), ImmutableArray<EndpointContractModel>) compilationDetails
     )
     {
-        var ((mediatorPackageName, compilation), endpoints) = compilationDetails;
+        var ((compilation, mediatorPackageNameContainer), endpoints) = compilationDetails;
 
         var rootNamespace = compilation.AssemblyName;
-
+        var mediatorPackageName = mediatorPackageNameContainer is [string single] ? single
+            : StaticData.DefaultMediatorPackageName;
+        
         var controllers = new ControllerTemplateDataBuilder(endpoints, rootNamespace, mediatorPackageName).Build();
 
         foreach (var controller in controllers)

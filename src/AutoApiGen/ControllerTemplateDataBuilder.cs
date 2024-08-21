@@ -5,7 +5,7 @@ using AutoApiGen.Templates;
 
 namespace AutoApiGen;
 
-internal class ControllerTemplateDataBuilder(
+internal sealed class ControllerTemplateDataBuilder(
     ImmutableArray<EndpointContractModel> endpoints,
     string? rootNamespace,
     string mediatorPackageName

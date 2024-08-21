@@ -1,1 +1,3 @@
-﻿[assembly: AutoApiGen.SetMediatorPackage("global::Mediator")]
+﻿using AutoApiGen.ConfigAttributes;
+
+[assembly: SetMediatorPackage("global::Mediator")]
