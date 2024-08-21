@@ -6,12 +6,13 @@ namespace AutoApiGen.Templates;
 internal static class ControllerTemplate
 {
     internal readonly record struct Data(
-        string MediatorPackageName,
         string Namespace,
         string? BaseRoute,
         string Name,
         List<MethodTemplate.Data> Methods,
-        List<RequestTemplate.Data> Requests
+        List<RequestTemplate.Data> Requests,
+        string MediatorPackageName,
+        string? ErrorOrPackageName
     ) : ITemplateData;
 
     public static void RenderTo(

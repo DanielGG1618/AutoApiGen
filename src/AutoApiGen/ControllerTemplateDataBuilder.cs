@@ -8,7 +8,8 @@ namespace AutoApiGen;
 internal sealed class ControllerTemplateDataBuilder(
     ImmutableArray<EndpointContractModel> endpoints,
     string? rootNamespace,
-    string mediatorPackageName
+    string mediatorPackageName,
+    string? errorOrPackageName
 )
 {
     private readonly ImmutableArray<EndpointContractModel> _endpoints = endpoints;
@@ -19,6 +20,7 @@ internal sealed class ControllerTemplateDataBuilder(
             : $"{rootNamespace}.Controllers";
 
     private readonly string _mediatorPackageName = mediatorPackageName;
+    private readonly string? _errorOrPackageName = errorOrPackageName;
 
     private const string EmptyBaseRouteControllerName = "Root";
 
@@ -68,12 +70,13 @@ internal sealed class ControllerTemplateDataBuilder(
         }
 
         _controllers[controllerName] = new ControllerTemplate.Data(
-            _mediatorPackageName,
             _controllersNamespace,
             baseRoute,
             controllerName,
             [method],
-            request.HasValue ? [request.Value] : []
+            request.HasValue ? [request.Value] : [],
+            _mediatorPackageName,
+            _errorOrPackageName
         );
     }
 
