@@ -5,10 +5,10 @@ namespace AutoApiGen.Templates;
 
 internal static class TemplatesRenderer
 {
-    public static string Render(ControllerTemplate.Data data)
+    public static string Render(ControllerTemplate.Data data, string? onErrorMethod)
     {
         using var writer = new IndentedTextWriter(new StringWriter());
-        ControllerTemplate.RenderTo(writer, data, Render, RenderTo);
+        ControllerTemplate.RenderTo(writer, data, onErrorMethod, Render, RenderTo);
 
         return writer.InnerWriter.ToString();
     }

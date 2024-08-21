@@ -6,35 +6,57 @@ using Microsoft.CodeAnalysis;
 namespace AutoApiGen.Generators;
 
 [Generator]
-internal class ControllersGenerator : IIncrementalGenerator
+internal sealed class ControllersGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var mediatorPackageNameProvider = context.SyntaxProvider.CreateMediatorPackageNameProvider();
+        var mediatorPackageNameProvider = context.SyntaxProvider.CreateMediatorPackageNameProvider().Collect();
+        var resultTypeConfigProvider = context.SyntaxProvider.CreateResultTypeConfigProvider().Collect();
         var endpointsProvider = context.SyntaxProvider.CreateEndpointsProvider().Collect();
 
-        var compilationDetails = mediatorPackageNameProvider
-            .Combine(context.CompilationProvider)
-            .Combine(endpointsProvider);
+        var compilationDetails = context.CompilationProvider
+            .Combine(mediatorPackageNameProvider)
+            .Combine(resultTypeConfigProvider)
+            .Combine(endpointsProvider)
+            .Select((combined, _) =>
+                new Configuration(
+                    RootNamespace: combined.Left.Left.Left.AssemblyName,
+                    MediatorPackageName: combined.Left.Left.Right.SingleOrDefault()
+                                         ?? StaticData.DefaultMediatorPackageName,
+                    ResultTypeConfiguration: combined.Left.Right.SingleOrDefault(),
+                    Endpoints: combined.Right
+                )
+            );
 
         context.RegisterSourceOutput(compilationDetails, Execute);
     }
 
     private static void Execute(
         SourceProductionContext context,
-        ((string MediatorPackageName, Compilation), ImmutableArray<EndpointContractModel>) compilationDetails
+        Configuration configuration
     )
     {
-        var ((mediatorPackageName, compilation), endpoints) = compilationDetails;
+        var (rootNamespace, mediatorPackageName, resultTypeConfiguration, endpoints) = configuration;
 
-        var rootNamespace = compilation.AssemblyName;
-
-        var controllers = new ControllerTemplateDataBuilder(endpoints, rootNamespace, mediatorPackageName).Build();
+        var controllers =
+            new ControllerTemplateDataBuilder(
+                endpoints,
+                rootNamespace,
+                mediatorPackageName,
+                resultTypeConfiguration
+            ).Build();
 
         foreach (var controller in controllers)
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
-                TemplatesRenderer.Render(controller)
+                TemplatesRenderer.Render(controller, resultTypeConfiguration?.ErrorHandlerMethod?.Implementation)
             );
     }
+
+    private sealed record Configuration(
+        string? RootNamespace,
+        string MediatorPackageName,
+        ResultTypeConfig? ResultTypeConfiguration,
+        ImmutableArray<EndpointContractModel> Endpoints
+    );
 }

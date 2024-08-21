@@ -4,21 +4,21 @@ namespace AutoApiGen.Extensions;
 
 internal static class IndentedTextWriterExtensions
 {
-    public static void WriteLines(this IndentedTextWriter indentedWriter, string lines, int indentation = 0)
+    public static void WriteLines(this IndentedTextWriter writer, string lines, int indentation = 0)
     {
         if (indentation is not 0)
-            indentedWriter.Indent += indentation;
+            writer.Indent += indentation;
 
         foreach (var line in lines.Split('\n'))
-            indentedWriter.WriteLine(line);
+            writer.WriteLine(line);
 
         if (indentation is not 0)
-            indentedWriter.Indent -= indentation;
+            writer.Indent -= indentation;
     }
 
-    public static void WriteLines(this IndentedTextWriter indentedWriter, params string[] lines)
+    public static void WriteLines(this IndentedTextWriter writer, params string[] lines)
     {
         foreach (var line in lines)
-            indentedWriter.WriteLine(line);
+            writer.WriteLine(line);
     }
 }

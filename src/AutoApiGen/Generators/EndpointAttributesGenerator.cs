@@ -3,7 +3,7 @@
 namespace AutoApiGen.Generators;
 
 [Generator]
-internal class EndpointAttributesGenerator : IIncrementalGenerator
+internal sealed class EndpointAttributesGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context) =>
         context.RegisterPostInitializationOutput(c =>
