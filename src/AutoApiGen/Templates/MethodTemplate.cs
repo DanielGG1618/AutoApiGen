@@ -1,8 +1,28 @@
 ﻿using System.CodeDom.Compiler;
 using System.Collections.Immutable;
+using AutoApiGen.Exceptions;
 using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Templates;
+
+internal abstract record ResponseConfiguration
+{
+    public sealed record Void : ResponseConfiguration
+    {
+        public static Void Instance { get; } = new();
+        private Void() {}
+    }
+
+    public sealed record RawNonVoid(string ToActionResultMethodName) : ResponseConfiguration;
+
+    public sealed record ResultType(
+        string ToActionResultMethodName,
+        string MatchMethodName,
+        string ErrorHandlerMethodName
+    ) : ResponseConfiguration;
+
+    private ResponseConfiguration() {}
+}
 
 internal static class MethodTemplate
 {
@@ -15,7 +35,7 @@ internal static class MethodTemplate
         ImmutableArray<string>? RequestParameterNames,
         string ContractType,
         ImmutableArray<string> ContractParameterNames,
-        string? ResponseType
+        ResponseConfiguration ResponseConfiguration
     ) : ITemplateData;
 
     public static void RenderTo(
@@ -87,20 +107,8 @@ file static class MethodIndentedTextWriterExtensions
             );
         writer.WriteContractCreation(data);
         writer.WriteLine();
-        writer.WriteLines(
-            data.ResponseType is null or ""
-                ?
-                """
-                await _mediator.Send(contract, cancellationToken);
-
-                return NoContent();
-                """
-                :
-                """
-                var result = await _mediator.Send(contract, cancellationToken);
-
-                return Ok(result);
-                """
+        writer.WriteRequestSendingAndResultReturing(
+            data.ResponseConfiguration
         );
         writer.Indent--;
         writer.WriteLine('}');
@@ -130,4 +138,38 @@ file static class MethodIndentedTextWriterExtensions
         );
         writer.Indent--;
     }
+
+    private static void WriteRequestSendingAndResultReturing(
+        this IndentedTextWriter writer,
+        ResponseConfiguration responseConfiguration
+    ) => writer.WriteLines(
+        responseConfiguration switch
+        {
+            ResponseConfiguration.Void =>
+                """
+                await _mediator.Send(contract, cancellationToken);
+
+                return NoContent();
+                """,
+
+            ResponseConfiguration.RawNonVoid(string toActionResult) =>
+                $"""
+                var result = await _mediator.Send(contract, cancellationToken);
+
+                return {toActionResult}(result);
+                """,
+
+            ResponseConfiguration.ResultType (string toActionResult, string match, string onError) =>
+                $"""
+                var result = await _mediator.Send(contract, cancellationToken);
+
+                return result.{match}(
+                    x => {toActionResult}(x),
+                    errors => {onError}(errors)
+                );
+                """,
+
+            _ => throw new ThisIsUnionException(nameof(responseConfiguration))
+        }
+    );
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using AutoApiGen.Extensions;
+using AutoApiGen.Generators;
 using AutoApiGen.Models;
 using AutoApiGen.Templates;
 
@@ -9,7 +10,7 @@ internal sealed class ControllerTemplateDataBuilder(
     ImmutableArray<EndpointContractModel> endpoints,
     string? rootNamespace,
     string mediatorPackageName,
-    string? errorOrPackageName
+    ResultTypeConfiguration? resultType
 )
 {
     private readonly ImmutableArray<EndpointContractModel> _endpoints = endpoints;
@@ -20,7 +21,18 @@ internal sealed class ControllerTemplateDataBuilder(
             : $"{rootNamespace}.Controllers";
 
     private readonly string _mediatorPackageName = mediatorPackageName;
-    private readonly string? _errorOrPackageName = errorOrPackageName;
+
+    private readonly string? _resultTypeName = resultType?.TypeName;
+
+    private readonly Lazy<ResponseConfiguration.ResultType> _resultTypeResponse = new(() =>
+        resultType is null ? throw new ArgumentException("Result type configuration is not set")
+            : new ResponseConfiguration.ResultType(
+                "Ok",
+                resultType.MatchMethodName,
+                resultType.ErrorHandlerMethod?.Name
+                ?? throw new ArgumentException("Error handler method is not set")
+            )
+    );
 
     private const string EmptyBaseRouteControllerName = "Root";
 
@@ -50,6 +62,46 @@ internal sealed class ControllerTemplateDataBuilder(
         AddRequestToCorrespondingController(endpoint.Attribute.Route.BaseRoute, request, method);
     }
 
+    private static RequestTemplate.Data? CreateRequestData(
+        EndpointContractModel endpoint,
+        ISet<string> routeParameterNames
+    ) => endpoint.Parameters
+            .Where(parameter => !routeParameterNames.Contains(parameter.Name))
+            .Select(ParameterTemplate.Data.FromSymbol).ToImmutableArray()
+        is { Length: > 0 } parameters
+        ? new RequestTemplate.Data(
+            endpoint.RequestName,
+            parameters
+        )
+        : null;
+
+    private MethodTemplate.Data CreateMethodData(
+        EndpointContractModel endpoint,
+        ImmutableArray<ParameterTemplate.Data> routeParameters,
+        RequestTemplate.Data? request
+    ) => new(
+        endpoint.Attribute.HttpMethod,
+        endpoint.Attribute.Route.RelationalRoute,
+        Name: endpoint.RequestName,
+        Parameters: routeParameters,
+        RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
+        request?.Parameters.Select(p => p.Name).ToImmutableArray(),
+        endpoint.ContractTypeFullName,
+        [..endpoint.Parameters.Select(p => p.Name)],
+        ResponseConfigurationFor(endpoint)
+    );
+
+    private ResponseConfiguration ResponseConfigurationFor(EndpointContractModel endpoint) =>
+        endpoint.ResponseTypeName switch
+        {
+            null => ResponseConfiguration.Void.Instance,
+
+            _ when endpoint.ResponseTypeName == _resultTypeName =>
+                _resultTypeResponse.Value with { ToActionResultMethodName = "Ok" },
+
+            _ => new ResponseConfiguration.RawNonVoid("Ok")
+        };
+
     private void AddRequestToCorrespondingController(
         string? baseRoute,
         RequestTemplate.Data? request,
@@ -75,37 +127,7 @@ internal sealed class ControllerTemplateDataBuilder(
             controllerName,
             [method],
             request.HasValue ? [request.Value] : [],
-            _mediatorPackageName,
-            _errorOrPackageName
+            _mediatorPackageName
         );
     }
-
-    private static MethodTemplate.Data CreateMethodData(
-        EndpointContractModel endpoint,
-        ImmutableArray<ParameterTemplate.Data> routeParameters,
-        RequestTemplate.Data? request
-    ) => new(
-        endpoint.Attribute.HttpMethod,
-        endpoint.Attribute.Route.RelationalRoute,
-        Name: endpoint.RequestName,
-        Parameters: routeParameters,
-        RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
-        request?.Parameters.Select(p => p.Name).ToImmutableArray(),
-        endpoint.ContractTypeFullName,
-        [..endpoint.Parameters.Select(p => p.Name)],
-        endpoint.ResponseTypeFullName
-    );
-
-    private static RequestTemplate.Data? CreateRequestData(
-        EndpointContractModel endpoint,
-        ISet<string> routeParameterNames
-    ) => endpoint.Parameters
-            .Where(parameter => !routeParameterNames.Contains(parameter.Name))
-            .Select(ParameterTemplate.Data.FromSymbol).ToImmutableArray()
-        is { Length: > 0 } parameters
-        ? new RequestTemplate.Data(
-            endpoint.RequestName,
-            parameters
-        )
-        : null;
 }

@@ -13,7 +13,7 @@ internal readonly record struct EndpointContractModel//TODO : IEquatable<Endpoin
     public string ContractTypeFullName { get; }
     public string RequestName { get; }
     public IReadOnlyList<IParameterSymbol> Parameters { get; }
-    public string? ResponseTypeFullName { get; }
+    public string? ResponseTypeName { get; }
 
     public static EndpointContractModel Create(INamedTypeSymbol type) =>
         !IsValid(type) ? throw new ArgumentException("Provided type is not valid Endpoint Contract")
@@ -21,11 +21,10 @@ internal readonly record struct EndpointContractModel//TODO : IEquatable<Endpoin
                 EndpointAttributeModel.Create(type.GetAttributes().Single(EndpointAttributeModel.IsValid)),
                 contractTypeFullName: type.ToString(),
                 GetRequestName(type),
-                responseTypeFullName: 
-                type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames).FirstOrDefault()?.ToString(),
                 parameters: type.InstanceConstructors
                                 .FirstOrDefault(c => c.DeclaredAccessibility is Accessibility.Public)?.Parameters
-                            ?? []
+                            ?? [],
+                responseTypeFullName: type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames).FirstOrDefault()?.Name
             );
 
     private static bool IsValid(ITypeSymbol type) =>
@@ -50,6 +49,6 @@ internal readonly record struct EndpointContractModel//TODO : IEquatable<Endpoin
         string requestName,
         IReadOnlyList<IParameterSymbol> parameters,
         string? responseTypeFullName
-    ) => (Attribute, ContractTypeFullName, RequestName, Parameters, ResponseTypeFullName) =
+    ) => (Attribute, ContractTypeFullName, RequestName, Parameters, ResponseTypeName) =
         (attribute, contractTypeFullName, requestName, parameters, responseTypeFullName);
 }
