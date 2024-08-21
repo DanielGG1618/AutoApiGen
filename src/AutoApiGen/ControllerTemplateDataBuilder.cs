@@ -10,7 +10,7 @@ internal sealed class ControllerTemplateDataBuilder(
     ImmutableArray<EndpointContractModel> endpoints,
     string? rootNamespace,
     string mediatorPackageName,
-    ResultTypeConfiguration? resultType
+    ResultTypeConfig? resultType
 )
 {
     private readonly ImmutableArray<EndpointContractModel> _endpoints = endpoints;

@@ -107,9 +107,7 @@ file static class MethodIndentedTextWriterExtensions
             );
         writer.WriteContractCreation(data);
         writer.WriteLine();
-        writer.WriteRequestSendingAndResultReturing(
-            data.ResponseConfiguration
-        );
+        writer.WriteRequestSendingAndResultReturing(data.ResponseConfiguration);
         writer.Indent--;
         writer.WriteLine('}');
     }
@@ -159,7 +157,7 @@ file static class MethodIndentedTextWriterExtensions
                 return {toActionResult}(result);
                 """,
 
-            ResponseConfiguration.ResultType (string toActionResult, string match, string onError) =>
+            ResponseConfiguration.ResultType(string toActionResult, string match, string onError) =>
                 $"""
                 var result = await _mediator.Send(contract, cancellationToken);
 

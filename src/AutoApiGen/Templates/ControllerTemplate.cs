@@ -56,7 +56,7 @@ file static class ControllerIndentedTextWriterExtensions
         writer.WriteLines($$"""
             [global::Microsoft.AspNetCore.Mvc.Route("{{data.BaseRoute}}")]
             [global::Microsoft.AspNetCore.Mvc.ApiController]
-            public partial class {{data.Name}}Controller(
+            public sealed partial class {{data.Name}}Controller(
                 {{data.MediatorPackageName}}.IMediator mediator
             ) : global::Microsoft.AspNetCore.Mvc.ControllerBase
             {   
