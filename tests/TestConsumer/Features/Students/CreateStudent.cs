@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using AutoApiGen.Attributes;
 using ErrorOr;
 using Mediator;
+using Microsoft.AspNetCore.Http;
 
 namespace TestConsumer.Features.Students;
 
-public record Student(string Name);
+public record Student(string Name, string Id);
 
-[PostEndpoint("students")] 
+[PostEndpoint("students",
+    SuccessCode = StatusCodes.Status201Created,
+    ErrorCode = StatusCodes.Status403Forbidden
+)] 
 public record CreateStudentCommand(string Name) : ICommand<OneOf<Student, Error>>;
 
 public class CreateStudentHandler(StudentsRepo repo) 
@@ -28,7 +32,7 @@ public class CreateStudentHandler(StudentsRepo repo)
         if (name.Equals("Badam", StringComparison.OrdinalIgnoreCase))
             return Error.Forbidden();
         
-        var student = new Student(name);
+        var student = new Student(name, Random.Shared.Next().ToString());
 
         repo.Add(student);
 

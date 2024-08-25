@@ -7,8 +7,8 @@ internal sealed class EndpointAttributesGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context) =>
         context.RegisterPostInitializationOutput(c =>
-            c.AddSource("EndpointAttributes.g.cs", $"""
-                {StaticData.GeneratedDisclaimer}
+            c.AddSource("EndpointAttributes.g.cs", $$"""
+                {{StaticData.GeneratedDisclaimer}}
 
                 namespace AutoApiGen.Attributes;
 
@@ -16,7 +16,12 @@ internal sealed class EndpointAttributesGenerator : IIncrementalGenerator
                 [global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
                 internal abstract class EndpointAttribute(
                     [global::System.Diagnostics.CodeAnalysis.StringSyntax("Route")] string route
-                ) : global::System.Attribute;
+                ) : global::System.Attribute
+                {
+                    public int SuccessCode { get; init; } = default!;
+                    public int ErrorCode { get; init; } = default!;
+                    public int[] ErrorCodes { get; init; } = default!;
+                }
                 #pragma warning restore CS9113 // Parameter is unread.
 
                 internal sealed class GetEndpointAttribute(

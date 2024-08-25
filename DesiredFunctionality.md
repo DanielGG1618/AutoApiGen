@@ -1,6 +1,8 @@
 ﻿## Given
 ```csharp
-[PostEndpoint("/students")]
+[PostEndpoint("/students",
+    SuccessCode = StatusCodes.Status201Created,
+)]
 public record CreateStudentCommand(string Name) : ICommand<Student>;
 
 public class CreateStudentHandler : ICommandHandler<CreateStudentCommand, Student>
@@ -13,14 +15,22 @@ public class CreateStudentHandler : ICommandHandler<CreateStudentCommand, Studen
     }
 }
 
-[GetEndpoint("/students/{Id}")]
+[GetEndpoint("/students/{Id}",
+    ErrorCode = StatusCode.Status404NotFound
+)]
 public record GetStudentQuery(string Id) : IQuery<Student>;
 
 public class GetStudentHandler : IQueryHandler<GetStudentQuery, Student>
 {
-    public async Task<Student> Handle(GetStudentQuery query, CancellationToken cancellationToken)
+    public async Task<Student?> Handle(GetStudentQuery query, CancellationToken cancellationToken)
     {
         var id = query.Id;
+        
+        if (id is 0)
+        {
+            //somehow return NotFound or throw exception
+        }
+             
         
         return new Student(id);
     }
@@ -36,6 +46,7 @@ public class StudentsController(IMediator mediator)
     : ApiController(mediator)
 {
     [HttpPost]
+    [ProducesResponseType(201)]
     public async Task<IActionResult> CreateStudent([FromBody] CreateStudentRequest request)
     {
         var command = new CreateStudentCommand(request.Name);
@@ -46,6 +57,8 @@ public class StudentsController(IMediator mediator)
     }
     
     [HttpGet("{id:string}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetStudent(string id)
     {
         var query = new GetStudentQuery(id);

@@ -3,6 +3,8 @@ using AutoApiGen.Extensions;
 using AutoApiGen.Generators;
 using AutoApiGen.Models;
 using AutoApiGen.Templates;
+using PostInitParameter = AutoApiGen.Templates.ToActionResultMethodTemplate.ParameterData.PostInit;
+using LiteralParameter = AutoApiGen.Templates.ToActionResultMethodTemplate.ParameterData.Literal;
 
 namespace AutoApiGen;
 
@@ -24,10 +26,10 @@ internal sealed class ControllerTemplateDataBuilder(
 
     private readonly string? _resultTypeName = resultType?.TypeName;
 
-    private readonly Lazy<ResponseConfiguration.ResultType> _resultTypeResponse = new(() =>
+    private readonly Lazy<ResponseKind.ResultType> _resultTypeResponse = new(() =>
         resultType is null ? throw new ArgumentException("Result type configuration is not set")
-            : new ResponseConfiguration.ResultType(
-                "Ok",
+            : new ResponseKind.ResultType(
+                ToActionResultMethod: default,
                 resultType.MatchMethodName,
                 resultType.ErrorHandlerMethod?.Name
                 ?? throw new ArgumentException("Error handler method is not set")
@@ -43,7 +45,62 @@ internal sealed class ControllerTemplateDataBuilder(
         foreach (var endpoint in _endpoints)
             IncludeRequestFrom(endpoint);
 
+        PostProcessDatas();
+
         return _controllers.Values.ToImmutableArray();
+    }
+
+    private void PostProcessDatas()
+    {
+        foreach (var controller in _controllers.Values)
+        {
+            string? getActionName = null;
+            List<ResponseKind.NonVoid>? responsesToModify = null;
+
+            foreach (var method in controller.Methods)
+                switch (method)
+                {
+                    case { HttpMethod: "Get", Parameters: [{ Name: "id" }] }:
+                        getActionName = method.Name;
+                        break;
+                    case { HttpMethod: "Post", ResponseKind: ResponseKind.NonVoid response }:
+                        if (getActionName is null)
+                        {
+                            responsesToModify ??= new List<ResponseKind.NonVoid>();
+                            responsesToModify.Add(response);
+                            break;
+                        }
+
+                        PostProcessPostMethodData(response, controller.Name, getActionName);
+                        break;
+                }
+
+            if (responsesToModify is null)
+                continue;
+
+            if (getActionName is null)
+                throw new InvalidOperationException("No Get Action found for CreatedAtAction response");
+
+            foreach (var response in responsesToModify)
+                PostProcessPostMethodData(response, controller.Name, getActionName);
+        }
+        return;
+
+        static void PostProcessPostMethodData(
+            ResponseKind.NonVoid response,
+            string controllerName,
+            string getMethodName
+        )
+        {
+            for (var i = 0; i < response.ToActionResultMethod.ExternalParameters.Length; i++)
+                response.ToActionResultMethod.ExternalParameters[i] =
+                    response.ToActionResultMethod.ExternalParameters[i] switch
+                    {
+                        PostInitParameter("ControllerName") => new LiteralParameter(controllerName),
+                        PostInitParameter("GetActionName") => new LiteralParameter(getMethodName),
+                        _ => response.ToActionResultMethod.ExternalParameters[i] // Do nothing
+                    };
+        }
     }
 
     private void IncludeRequestFrom(EndpointContractModel endpoint)
@@ -55,7 +112,7 @@ internal sealed class ControllerTemplateDataBuilder(
 
         var method = CreateMethodData(
             endpoint,
-            routeParameters: [..endpoint.Attribute.Route.Parameters.Select(ParameterTemplate.Data.FromRoute)],
+            endpoint.Attribute.Route.Parameters.Select(ParameterTemplate.Data.FromRoute).ToImmutableArray(),
             request
         );
 
@@ -82,24 +139,40 @@ internal sealed class ControllerTemplateDataBuilder(
     ) => new(
         endpoint.Attribute.HttpMethod,
         endpoint.Attribute.Route.RelationalRoute,
+        Attributes(endpoint.ResponseTypeFullName, endpoint.Attribute.SuccessCode, endpoint.Attribute.ErrorCodes),
         Name: endpoint.RequestName,
         Parameters: routeParameters,
         RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
         request?.Parameters.Select(p => p.Name).ToImmutableArray(),
         endpoint.ContractTypeFullName,
-        [..endpoint.Parameters.Select(p => p.Name)],
-        ResponseConfigurationFor(endpoint)
+        endpoint.Parameters.Select(p => p.Name).ToImmutableArray(),
+        ResponseKindFor(endpoint.ResponseTypeName, endpoint.Attribute.SuccessCode)
     );
 
-    private ResponseConfiguration ResponseConfigurationFor(EndpointContractModel endpoint) =>
-        endpoint.ResponseTypeName switch
+    // TODO this does not properly work for result type response kind
+    private static string Attributes(string? responseTypeFullName, int successCode, ImmutableArray<int> errorCodes) =>
+        string.Join("\n",
+            [
+                successCode is 204 || responseTypeFullName is null
+                    ? "[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(204)]"
+                    : $"[global::Microsoft.AspNetCore.Mvc.ProducesResponseType<{responseTypeFullName}>({successCode})]",
+                ..errorCodes.Select(code =>
+                    $"[global::Microsoft.AspNetCore.Mvc.ProducesResponseType({code})]"
+                )
+            ]
+        );
+
+    private ResponseKind ResponseKindFor(string? responseTypeName, int successCode) =>
+        responseTypeName switch
         {
-            null => ResponseConfiguration.Void.Instance,
+            null => ResponseKind.Void.Instance,
 
-            _ when endpoint.ResponseTypeName == _resultTypeName =>
-                _resultTypeResponse.Value with { ToActionResultMethodName = "Ok" },
+            _ when responseTypeName == _resultTypeName => _resultTypeResponse.Value with
+            {
+                ToActionResultMethod = ToActionResultMethodTemplate.For(successCode)
+            },
 
-            _ => new ResponseConfiguration.RawNonVoid("Ok")
+            _ => new ResponseKind.RawNonVoid(ToActionResultMethodTemplate.For(successCode))
         };
 
     private void AddRequestToCorrespondingController(
