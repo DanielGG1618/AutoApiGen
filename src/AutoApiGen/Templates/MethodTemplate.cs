@@ -1,27 +1,100 @@
 ﻿using System.CodeDom.Compiler;
 using System.Collections.Immutable;
+using System.Text;
 using AutoApiGen.Exceptions;
 using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Templates;
 
-internal abstract record ResponseConfiguration
+internal static class ToActionResultMethodTemplate
 {
-    public sealed record Void : ResponseConfiguration
+    private static Data Ok { get; } = new("Ok", [], IncludeInternalResult: true);
+
+    private static Data CreatedAt => new("CreatedAtAction",
+        [
+            new ParameterData.PostInit("GetActionName"),
+            new ParameterData.PostInit("ControllerName"),
+            new ParameterData.AnonymousObject([("id", new ParameterData.PropertyAccess("Id"))])
+        ],
+        IncludeInternalResult: true
+    );
+
+    private static Data NoContent { get; } = new("NoContent", [], IncludeInternalResult: false);
+
+    public static Data For(int statusCode) => statusCode switch
     {
-        public static Void Instance { get; } = new();
-        private Void() {}
+        200 => Ok,
+        201 => CreatedAt,
+        204 => NoContent,
+
+        _ => throw new ArgumentOutOfRangeException(nameof(statusCode), statusCode, "Unknown status code")
+    };
+
+    internal abstract record ParameterData
+    {
+        public sealed record Literal(string Value) : ParameterData;
+
+        public sealed record PostInit(string VariableName) : ParameterData;
+
+        public sealed record PropertyAccess(string PropertyName) : ParameterData;
+
+        public sealed record AnonymousObject(ImmutableArray<(string Name, ParameterData Parameter)> Properties)
+            : ParameterData;
+
+        private ParameterData() {}
     }
 
-    public sealed record RawNonVoid(string ToActionResultMethodName) : ResponseConfiguration;
+    internal readonly record struct Data(
+        string Name,
+        ParameterData[] ExternalParameters,
+        bool IncludeInternalResult
+    );
 
-    public sealed record ResultType(
-        string ToActionResultMethodName,
-        string MatchMethodName,
-        string ErrorHandlerMethodName
-    ) : ResponseConfiguration;
+    public static string Render(this Data data, string? internalResultName = null)
+    {
+        if (data.IncludeInternalResult && internalResultName is null)
+            throw new ArgumentNullException(nameof(internalResultName));
 
-    private ResponseConfiguration() {}
+        var builder = new StringBuilder(data.Name);
+
+        builder.Append('(');
+        builder.Append(
+            data.ExternalParameters.RenderAndJoin(
+                renderer: param => RenderParameterData(param, internalResultName),
+                separator: ", "
+            )
+        );
+        if (data.IncludeInternalResult)
+        {
+            if (data.ExternalParameters.Length > 0)
+                builder.Append(", ");
+            builder.Append(internalResultName);
+        }
+        builder.Append(')');
+
+        return builder.ToString();
+    }
+
+    private static string RenderParameterData(ParameterData parameter, string? internalResultName) => parameter switch
+    {
+        ParameterData.Literal literal =>
+            $"\"{literal.Value}\"",
+
+        ParameterData.PropertyAccess propAccess => $"{internalResultName}.{propAccess.PropertyName}",
+
+        ParameterData.AnonymousObject anonymous =>
+            $"new {{ {
+                anonymous.Properties.RenderAndJoin(
+                    renderer: param => $"{param.Name} = " + RenderParameterData(param.Parameter, internalResultName),
+                    separator: ", "
+                )
+            } }}",
+
+        ParameterData.PostInit =>
+            throw new InvalidOperationException("Parameter uninitialized"),
+        //I really do not like previous line of code
+        _ => throw new ThisIsUnionException(nameof(ParameterData))
+    };
 }
 
 internal static class MethodTemplate
@@ -35,12 +108,12 @@ internal static class MethodTemplate
         ImmutableArray<string>? RequestParameterNames,
         string ContractType,
         ImmutableArray<string> ContractParameterNames,
-        ResponseConfiguration ResponseConfiguration
-    ) : ITemplateData;
+        ResponseKind ResponseKind
+    );
 
     public static void RenderTo(
+        this Data data,
         IndentedTextWriter writer,
-        Data data,
         Func<ParameterTemplate.Data, string> renderParameter,
         Func<ImmutableArray<string>?, string, string> renderDeconstruction
     )
@@ -107,7 +180,7 @@ file static class MethodIndentedTextWriterExtensions
             );
         writer.WriteContractCreation(data);
         writer.WriteLine();
-        writer.WriteRequestSendingAndResultReturing(data.ResponseConfiguration);
+        writer.WriteRequestSendingAndResultReturing(data.ResponseKind);
         writer.Indent--;
         writer.WriteLine('}');
     }
@@ -139,35 +212,35 @@ file static class MethodIndentedTextWriterExtensions
 
     private static void WriteRequestSendingAndResultReturing(
         this IndentedTextWriter writer,
-        ResponseConfiguration responseConfiguration
+        ResponseKind responseKind
     ) => writer.WriteLines(
-        responseConfiguration switch
+        responseKind switch
         {
-            ResponseConfiguration.Void =>
+            ResponseKind.Void =>
                 """
                 await _mediator.Send(contract, cancellationToken);
 
                 return NoContent();
                 """,
 
-            ResponseConfiguration.RawNonVoid(string toActionResult) =>
+            ResponseKind.RawNonVoid(var toActionResult) =>
                 $"""
                 var result = await _mediator.Send(contract, cancellationToken);
 
-                return {toActionResult}(result);
+                return {toActionResult.Render("result")};
                 """,
 
-            ResponseConfiguration.ResultType(string toActionResult, string match, string onError) =>
+            ResponseKind.ResultType(var toActionResult, string match, string onError) =>
                 $"""
                 var result = await _mediator.Send(contract, cancellationToken);
 
                 return result.{match}(
-                    x => {toActionResult}(x),
+                    x => {toActionResult.Render("x")},
                     errors => {onError}(errors)
                 );
                 """,
 
-            _ => throw new ThisIsUnionException(nameof(responseConfiguration))
+            _ => throw new ThisIsUnionException(nameof(ResponseKind))
         }
     );
 }

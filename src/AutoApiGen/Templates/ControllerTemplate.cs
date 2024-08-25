@@ -12,7 +12,7 @@ internal static class ControllerTemplate
         List<MethodTemplate.Data> Methods,
         List<RequestTemplate.Data> Requests,
         string MediatorPackageName
-    ) : ITemplateData;
+    );
 
     public static void RenderTo(
         IndentedTextWriter writer,

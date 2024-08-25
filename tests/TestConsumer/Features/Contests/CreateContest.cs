@@ -2,12 +2,15 @@
 using System.Threading.Tasks;
 using AutoApiGen.Attributes;
 using Mediator;
+using static Microsoft.AspNetCore.Http.StatusCodes;
 
 namespace TestConsumer.Features.Contests;
 
 public static class CreateContest
 {
-    [PostEndpoint("contests/{Id:int=56}")]
+    [PostEndpoint("contests/{Id:int=56}",
+        SuccessCode = Status201Created
+    )]
     public record Command(
         string Name,
         bool Status = false,

@@ -8,13 +8,14 @@ internal static class TemplatesRenderer
     public static string Render(ControllerTemplate.Data data, string? onErrorMethod)
     {
         using var writer = new IndentedTextWriter(new StringWriter());
+        
         ControllerTemplate.RenderTo(writer, data, onErrorMethod, Render, RenderTo);
 
         return writer.InnerWriter.ToString();
     }
 
     private static void RenderTo(IndentedTextWriter writer, MethodTemplate.Data data) => 
-        MethodTemplate.RenderTo(writer, data, Render, RenderDeconstruction);
+        data.RenderTo(writer, Render, RenderDeconstruction);
     
     private static string Render(ParameterTemplate.Data data) =>
         ParameterTemplate.Render(data);

@@ -5,11 +5,11 @@ using Mediator;
 
 namespace TestConsumer.Features.Students;
 
-[GetEndpoint("students/{Name}")] 
-public record GetStudentQuery(string Name) : IQuery<Student?>;
+[GetEndpoint("students/{Id}")] 
+public record GetStudentQuery(string Id) : IQuery<Student?>;
 
 public class GetStudentHandler(StudentsRepo repo) : IQueryHandler<GetStudentQuery, Student?>
 {
     public ValueTask<Student?> Handle(GetStudentQuery query, CancellationToken cancellationToken) => 
-        ValueTask.FromResult(repo.Get(query.Name));
+        ValueTask.FromResult(repo.Get(query.Id));
 }
