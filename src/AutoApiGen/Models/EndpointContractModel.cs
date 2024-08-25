@@ -13,19 +13,27 @@ internal readonly record struct EndpointContractModel//TODO : IEquatable<Endpoin
     public string ContractTypeFullName { get; }
     public string RequestName { get; }
     public IReadOnlyList<IParameterSymbol> Parameters { get; }
+    public string? ResponseTypeFullName { get; }
     public string? ResponseTypeName { get; }
 
-    public static EndpointContractModel Create(INamedTypeSymbol type) =>
-        !IsValid(type) ? throw new ArgumentException("Provided type is not valid Endpoint Contract")
-            : new EndpointContractModel(
-                EndpointAttributeModel.Create(type.GetAttributes().Single(EndpointAttributeModel.IsValid)),
-                contractTypeFullName: type.ToString(),
-                GetRequestName(type),
-                parameters: type.InstanceConstructors
-                                .FirstOrDefault(c => c.DeclaredAccessibility is Accessibility.Public)?.Parameters
-                            ?? [],
-                responseTypeFullName: type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames).FirstOrDefault()?.Name
-            );
+    public static EndpointContractModel Create(INamedTypeSymbol type)
+    {
+        if (!IsValid(type))
+            throw new ArgumentException("Provided type is not valid Endpoint Contract");
+     
+        var responseTypeSymbol = type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames).FirstOrDefault();
+        
+        return new EndpointContractModel(
+            EndpointAttributeModel.Create(type.GetAttributes().Single(EndpointAttributeModel.IsValid)),
+            contractTypeFullName: type.ToString(),
+            GetRequestName(type),
+            parameters: type.InstanceConstructors
+                            .FirstOrDefault(c => c.DeclaredAccessibility is Accessibility.Public)?.Parameters
+                        ?? [],
+            responseTypeFullName: responseTypeSymbol?.ToString().TrimEnd('?'),
+            responseTypeName: responseTypeSymbol?.Name
+        );
+    }
 
     private static bool IsValid(ITypeSymbol type) =>
         type.Interfaces.Any(i => InterfaceNames.Contains(i.Name));
@@ -48,7 +56,12 @@ internal readonly record struct EndpointContractModel//TODO : IEquatable<Endpoin
         string contractTypeFullName,
         string requestName,
         IReadOnlyList<IParameterSymbol> parameters,
-        string? responseTypeFullName
-    ) => (Attribute, ContractTypeFullName, RequestName, Parameters, ResponseTypeName) =
-        (attribute, contractTypeFullName, requestName, parameters, responseTypeFullName);
+        string? responseTypeFullName,
+        string? responseTypeName
+    )
+    {
+        ResponseTypeName = responseTypeName;
+        (Attribute, ContractTypeFullName, RequestName, Parameters, ResponseTypeFullName) =
+            (attribute, contractTypeFullName, requestName, parameters, responseTypeFullName);
+    }
 }

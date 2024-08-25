@@ -12,7 +12,9 @@ namespace TestConsumer.Features.Students;
 public record Student(string Name, string Id);
 
 [PostEndpoint("students",
-    SuccessCode = StatusCodes.Status201Created)] 
+    SuccessCode = StatusCodes.Status201Created,
+    ErrorCode = StatusCodes.Status403Forbidden
+)] 
 public record CreateStudentCommand(string Name) : ICommand<OneOf<Student, Error>>;
 
 public class CreateStudentHandler(StudentsRepo repo) 

@@ -139,26 +139,40 @@ internal sealed class ControllerTemplateDataBuilder(
     ) => new(
         endpoint.Attribute.HttpMethod,
         endpoint.Attribute.Route.RelationalRoute,
+        Attributes(endpoint.ResponseTypeFullName, endpoint.Attribute.SuccessCode, endpoint.Attribute.ErrorCodes),
         Name: endpoint.RequestName,
         Parameters: routeParameters,
         RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
         request?.Parameters.Select(p => p.Name).ToImmutableArray(),
         endpoint.ContractTypeFullName,
         endpoint.Parameters.Select(p => p.Name).ToImmutableArray(),
-        ResponseKindFor(endpoint)
+        ResponseKindFor(endpoint.ResponseTypeName, endpoint.Attribute.SuccessCode)
     );
 
-    private ResponseKind ResponseKindFor(EndpointContractModel endpoint) =>
-        endpoint.ResponseTypeName switch
+    // TODO this does not properly work for result type response kind
+    private static string Attributes(string? responseTypeFullName, int successCode, ImmutableArray<int> errorCodes) =>
+        string.Join("\n",
+            [
+                successCode is 204 || responseTypeFullName is null
+                    ? "[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(204)]"
+                    : $"[global::Microsoft.AspNetCore.Mvc.ProducesResponseType<{responseTypeFullName}>({successCode})]",
+                ..errorCodes.Select(code =>
+                    $"[global::Microsoft.AspNetCore.Mvc.ProducesResponseType({code})]"
+                )
+            ]
+        );
+
+    private ResponseKind ResponseKindFor(string? responseTypeName, int successCode) =>
+        responseTypeName switch
         {
             null => ResponseKind.Void.Instance,
 
-            _ when endpoint.ResponseTypeName == _resultTypeName => _resultTypeResponse.Value with
+            _ when responseTypeName == _resultTypeName => _resultTypeResponse.Value with
             {
-                ToActionResultMethod = ToActionResultMethodTemplate.For(endpoint.Attribute.SuccessCode)
+                ToActionResultMethod = ToActionResultMethodTemplate.For(successCode)
             },
 
-            _ => new ResponseKind.RawNonVoid(ToActionResultMethodTemplate.For(endpoint.Attribute.SuccessCode))
+            _ => new ResponseKind.RawNonVoid(ToActionResultMethodTemplate.For(successCode))
         };
 
     private void AddRequestToCorrespondingController(

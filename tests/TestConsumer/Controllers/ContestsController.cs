@@ -13,4 +13,3 @@ public sealed partial class ContestsController
     public IActionResult TestEndpoint([FromQuery] string? text) =>
         text is null ? NotFound() : Ok(new NewResponse(text.Length, text));
 }
-
