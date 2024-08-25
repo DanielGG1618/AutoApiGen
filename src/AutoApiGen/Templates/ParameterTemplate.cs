@@ -12,7 +12,7 @@ internal static class ParameterTemplate
         string Type,
         string Name,
         string? Default
-    ) : ITemplateData
+    )
     {
         public static Data FromRoute(RoutePart.ParameterRoutePart parameter) => new(
             Attributes: "[global::Microsoft.AspNetCore.Mvc.FromRoute] ",
@@ -27,13 +27,13 @@ internal static class ParameterTemplate
             parameter.Name,
             parameter.HasExplicitDefaultValue ? parameter.ExplicitDefaultValue switch
             {
-                string str => $"\"{str}\"",
+                string s => $"\"{s}\"",
                 char ch => $"'{ch}'",
                 bool b => b ? "true" : "false",
                 float f => f.ToString(CultureInfo.InvariantCulture) + 'f',
                 double d => d.ToString(CultureInfo.InvariantCulture) + 'd',
                 decimal d => d.ToString(CultureInfo.InvariantCulture) + 'm',
-                null => "null!",
+                null => "default!",
                 _ => parameter.ExplicitDefaultValue.ToString(),
             } : null
         );

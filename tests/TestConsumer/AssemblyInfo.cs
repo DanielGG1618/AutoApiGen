@@ -9,13 +9,11 @@
     ) => Problem(
         statusCode: errors[0].Type switch
         {
-            global::ErrorOr.ErrorType.Conflict =>
-                global::Microsoft.AspNetCore.Http.StatusCodes.Status409Conflict,
-            global::ErrorOr.ErrorType.Validation =>
-                global::Microsoft.AspNetCore.Http.StatusCodes.Status400BadRequest,
-            global::ErrorOr.ErrorType.NotFound =>
-                global::Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound,
-            _ => global::Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError
+            global::ErrorOr.ErrorType.Conflict => 409,
+            global::ErrorOr.ErrorType.Validation => 400,
+            global::ErrorOr.ErrorType.NotFound => 404,
+            global::ErrorOr.ErrorType.Forbidden => 403,
+            _ => 500
         },
         title: errors[0].Description
     );
@@ -25,15 +23,11 @@
     ) => Problem(
         statusCode: error.Type switch
         {
-            global::ErrorOr.ErrorType.Conflict =>
-                global::Microsoft.AspNetCore.Http.StatusCodes.Status409Conflict,
-            global::ErrorOr.ErrorType.Validation =>
-                global::Microsoft.AspNetCore.Http.StatusCodes.Status400BadRequest,
-            global::ErrorOr.ErrorType.NotFound =>
-                global::Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound,
-            global::ErrorOr.ErrorType.Forbidden =>
-                global::Microsoft.AspNetCore.Http.StatusCodes.Status403Forbidden,
-            _ => global::Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError
+            global::ErrorOr.ErrorType.Conflict => 409,
+            global::ErrorOr.ErrorType.Validation => 400,
+            global::ErrorOr.ErrorType.NotFound => 404,
+            global::ErrorOr.ErrorType.Forbidden => 403,
+            _ => 500
         },
         title: error.Description
     );
