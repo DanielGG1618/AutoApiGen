@@ -139,28 +139,36 @@ internal sealed class ControllerTemplateDataBuilder(
     ) => new(
         endpoint.Attribute.HttpMethod,
         endpoint.Attribute.Route.RelationalRoute,
-        Attributes(endpoint.ResponseTypeFullName, endpoint.Attribute.SuccessCode, endpoint.Attribute.ErrorCodes),
+        Attributes(endpoint.ResponseType, endpoint.Attribute.SuccessCode, endpoint.Attribute.ErrorCodes),
         Name: endpoint.RequestName,
         Parameters: routeParameters,
         RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
         request?.Parameters.Select(p => p.Name).ToImmutableArray(),
         endpoint.ContractTypeFullName,
         endpoint.Parameters.Select(p => p.Name).ToImmutableArray(),
-        ResponseKindFor(endpoint.ResponseTypeName, endpoint.Attribute.SuccessCode)
+        ResponseKindFor(endpoint.ResponseType?.Name, endpoint.Attribute.SuccessCode)
     );
 
-    // TODO this does not properly work for result type response kind
-    private static string Attributes(string? responseTypeFullName, int successCode, ImmutableArray<int> errorCodes) =>
-        string.Join("\n",
-            [
-                successCode is 204 || responseTypeFullName is null
-                    ? "[global::Microsoft.AspNetCore.Mvc.ProducesResponseType(204)]"
-                    : $"[global::Microsoft.AspNetCore.Mvc.ProducesResponseType<{responseTypeFullName}>({successCode})]",
-                ..errorCodes.Select(code =>
-                    $"[global::Microsoft.AspNetCore.Mvc.ProducesResponseType({code})]"
-                )
-            ]
-        );
+    private string Attributes(
+        TypeModel? responseType,
+        int successCode,
+        ImmutableArray<int> errorCodes
+    ) => string.Join("\n",
+        [
+            "[global::Microsoft.AspNetCore.Mvc.ProducesResponseType"
+            + (successCode is 204 || responseType is null
+                ? "(204)" 
+                : $"<{(
+                    responseType.Value.Name == _resultTypeName 
+                        ? responseType.Value.TypeArguments!.Value[0].FullName
+                        : responseType.Value.FullName
+                )}>({successCode})")
+            + ']',
+            ..errorCodes.Select(code =>
+                $"[global::Microsoft.AspNetCore.Mvc.ProducesResponseType({code})]"
+            )
+        ]
+    );
 
     private ResponseKind ResponseKindFor(string? responseTypeName, int successCode) =>
         responseTypeName switch
