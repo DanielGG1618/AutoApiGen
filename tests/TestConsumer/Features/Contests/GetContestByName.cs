@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 using AutoApiGen.Attributes;
 using Mediator;
 using ErrorOr;
+using Microsoft.AspNetCore.Http;
 
 namespace TestConsumer.Features.Contests;
 
 public static class GetContestByName
 {
-    [GetEndpoint("contests/{Name}")]
+    [GetEndpoint("contests/{Name}",
+        ErrorCode = StatusCodes.Status400BadRequest
+    )]
     public sealed record Query(string Name) : IQuery<ErrorOr<Contest>>;
     
     public sealed class Handler : IQueryHandler<Query, ErrorOr<Contest>>
