@@ -1,7 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Text;
-using AutoApiGen.Exceptions;
-using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Templates;
 
@@ -9,44 +7,23 @@ internal static class ToActionResultMethodTemplate
 {
     private static Data Ok { get; } = new("Ok", [], IncludeInternalResult: true);
 
-    private static Data CreatedAt => new("CreatedAtAction",
-        [
-            new ParameterData.PostInit("GetActionName"),
-            new ParameterData.PostInit("ControllerName"),
-            // TODO пизда
-            new ParameterData.AnonymousObject([("id", new ParameterData.PropertyAccess("Id"))])
-        ],
+    private static Data NoContent { get; } = new("NoContent", [], IncludeInternalResult: false);
+
+    private static Data StatusCode(int code) => new("StatusCode",
+        [code.ToString()],
         IncludeInternalResult: true
     );
-
-    private static Data NoContent { get; } = new("NoContent", [], IncludeInternalResult: false);
 
     public static Data For(int statusCode) => statusCode switch
     {
         200 => Ok,
-        201 => CreatedAt,
         204 => NoContent,
-
-        _ => throw new ArgumentOutOfRangeException(nameof(statusCode), statusCode, "Unknown status code")
+        _ => StatusCode(statusCode),
     };
-
-    internal abstract record ParameterData
-    {
-        public sealed record Literal(string Value) : ParameterData;
-
-        public sealed record PostInit(string VariableName) : ParameterData;
-
-        public sealed record PropertyAccess(string PropertyName) : ParameterData;
-
-        public sealed record AnonymousObject(ImmutableArray<(string Name, ParameterData Parameter)> Properties)
-            : ParameterData;
-
-        private ParameterData() {}
-    }
 
     internal readonly record struct Data(
         string Name,
-        ParameterData[] ExternalParameters,
+        ImmutableArray<string> ExternalParameters,
         bool IncludeInternalResult
     );
 
@@ -58,12 +35,7 @@ internal static class ToActionResultMethodTemplate
         var builder = new StringBuilder(data.Name);
 
         builder.Append('(');
-        builder.Append(
-            data.ExternalParameters.RenderAndJoin(
-                renderer: param => RenderParameterData(param, internalResultName),
-                separator: ", "
-            )
-        );
+        builder.Append(string.Join(separator: ", ", data.ExternalParameters));
         if (data.IncludeInternalResult)
         {
             if (data.ExternalParameters.Length > 0)
@@ -74,25 +46,4 @@ internal static class ToActionResultMethodTemplate
 
         return builder.ToString();
     }
-
-    private static string RenderParameterData(ParameterData parameter, string? internalResultName) => parameter switch
-    {
-        ParameterData.Literal literal =>
-            $"\"{literal.Value}\"",
-
-        ParameterData.PropertyAccess propAccess => $"{internalResultName}.{propAccess.PropertyName}",
-
-        ParameterData.AnonymousObject anonymous =>
-            $"new {{ {
-                anonymous.Properties.RenderAndJoin(
-                    renderer: param => $"{param.Name} = " + RenderParameterData(param.Parameter, internalResultName),
-                    separator: ", "
-                )
-            } }}",
-
-        ParameterData.PostInit =>
-            throw new InvalidOperationException("Parameter uninitialized"),
-        //I really do not like previous line of code
-        _ => throw new ThisIsUnionException(nameof(ParameterData))
-    };
 }
