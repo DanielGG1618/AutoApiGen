@@ -3,8 +3,6 @@ using AutoApiGen.Extensions;
 using AutoApiGen.Generators;
 using AutoApiGen.Models;
 using AutoApiGen.Templates;
-using PostInitParameter = AutoApiGen.Templates.ToActionResultMethodTemplate.ParameterData.PostInit;
-using LiteralParameter = AutoApiGen.Templates.ToActionResultMethodTemplate.ParameterData.Literal;
 
 namespace AutoApiGen;
 
@@ -45,62 +43,7 @@ internal sealed class ControllerTemplateDataBuilder(
         foreach (var endpoint in _endpoints)
             IncludeRequestFrom(endpoint);
 
-        PostProcessDatas();
-
         return _controllers.Values.ToImmutableArray();
-    }
-
-    private void PostProcessDatas()
-    {
-        foreach (var controller in _controllers.Values)
-        {
-            string? getActionName = null;
-            List<ResponseKind.NonVoid>? responsesToModify = null;
-
-            foreach (var method in controller.Methods)
-                switch (method)
-                {
-                    case { HttpMethod: "Get", Parameters: [{ Name: "id" }] }:
-                        getActionName = method.Name;
-                        break;
-                    case { HttpMethod: "Post", ResponseKind: ResponseKind.NonVoid response }:
-                        if (getActionName is null)
-                        {
-                            responsesToModify ??= new List<ResponseKind.NonVoid>();
-                            responsesToModify.Add(response);
-                            break;
-                        }
-
-                        PostProcessPostMethodData(response, controller.Name, getActionName);
-                        break;
-                }
-
-            if (responsesToModify is null)
-                continue;
-
-            if (getActionName is null)
-                throw new InvalidOperationException("No Get Action found for CreatedAtAction response");
-
-            foreach (var response in responsesToModify)
-                PostProcessPostMethodData(response, controller.Name, getActionName);
-        }
-        return;
-
-        static void PostProcessPostMethodData(
-            ResponseKind.NonVoid response,
-            string controllerName,
-            string getMethodName
-        )
-        {
-            for (var i = 0; i < response.ToActionResultMethod.ExternalParameters.Length; i++)
-                response.ToActionResultMethod.ExternalParameters[i] =
-                    response.ToActionResultMethod.ExternalParameters[i] switch
-                    {
-                        PostInitParameter("ControllerName") => new LiteralParameter(controllerName),
-                        PostInitParameter("GetActionName") => new LiteralParameter(getMethodName),
-                        _ => response.ToActionResultMethod.ExternalParameters[i] // Do nothing
-                    };
-        }
     }
 
     private void IncludeRequestFrom(EndpointContractModel endpoint)
