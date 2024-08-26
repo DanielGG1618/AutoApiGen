@@ -13,6 +13,7 @@ internal static class ToActionResultMethodTemplate
         [
             new ParameterData.PostInit("GetActionName"),
             new ParameterData.PostInit("ControllerName"),
+            // TODO пизда
             new ParameterData.AnonymousObject([("id", new ParameterData.PropertyAccess("Id"))])
         ],
         IncludeInternalResult: true
