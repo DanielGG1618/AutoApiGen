@@ -1,4 +1,5 @@
-﻿using AutoApiGen.Extensions;
+﻿using System.Collections.Immutable;
+using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -6,13 +7,13 @@ namespace AutoApiGen.Models;
 
 internal readonly record struct EndpointContractModel //TODO : IEquatable<EndpointContractModel>
 {
-    private static ISet<string> InterfaceNames { get; } = new HashSet<string> { "IRequest", "ICommand", "IQuery" };
-    private static string[] Suffixes { get; } = ["Request", "Command", "Query"];
+    private static ImmutableArray<string> InterfaceNames { get; } = ["IRequest", "ICommand", "IQuery"];
+    private static ImmutableArray<string> Suffixes { get; } = ["Request", "Command", "Query"];
 
     public EndpointAttributeModel Attribute { get; }
     public string ContractTypeFullName { get; }
     public string RequestName { get; }
-    public IReadOnlyList<IParameterSymbol> Parameters { get; }
+    public ImmutableArray<ParameterModel> Parameters { get; } 
     public TypeModel? ResponseType { get; }
 
     public static EndpointContractModel Create(INamedTypeSymbol type) =>
@@ -24,6 +25,8 @@ internal readonly record struct EndpointContractModel //TODO : IEquatable<Endpoi
                 parameters: type.InstanceConstructors
                                 .FirstOrDefault(c => c.DeclaredAccessibility is Accessibility.Public)
                                 ?.Parameters
+                                .Select(ParameterModel.FromSymbol)
+                                .ToImmutableArray()
                             ?? [],
                 responseType: type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames)
                     .FirstOrDefault() is ITypeSymbol responseTypeSymbol
@@ -50,7 +53,7 @@ internal readonly record struct EndpointContractModel //TODO : IEquatable<Endpoi
         EndpointAttributeModel attribute,
         string contractTypeFullName,
         string requestName,
-        IReadOnlyList<IParameterSymbol> parameters,
+        ImmutableArray<ParameterModel> parameters,
         TypeModel? responseType
     ) => (Attribute, ContractTypeFullName, RequestName, Parameters, ResponseType) =
         (attribute, contractTypeFullName, requestName, parameters, responseType);

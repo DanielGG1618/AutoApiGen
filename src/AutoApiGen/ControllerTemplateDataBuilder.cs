@@ -28,8 +28,8 @@ internal sealed class ControllerTemplateDataBuilder(
         resultType is null ? throw new ArgumentException("Result type configuration is not set")
             : new ResponseKind.ResultType(
                 ToActionResultMethod: default,
-                resultType.MatchMethodName,
-                resultType.ErrorHandlerMethod?.Name
+                resultType.Value.MatchMethodName,
+                resultType.Value.ErrorHandlerMethod?.Name
                 ?? throw new ArgumentException("Error handler method is not set")
             )
     );
@@ -46,16 +46,15 @@ internal sealed class ControllerTemplateDataBuilder(
         return _controllers.Values.ToImmutableArray();
     }
 
-    private void IncludeRequestFrom(EndpointContractModel endpoint)
+    private void IncludeRequestFrom(in EndpointContractModel endpoint)
     {
         var request = CreateRequestData(
             endpoint,
-            routeParameterNames: endpoint.Attribute.Route.Parameters.Select(p => p.Name).ToImmutableHashSet()
+            routeParameterNames: [..endpoint.Attribute.Route.Parameters.Select(p => p.Name)]
         );
 
         var method = CreateMethodData(
             endpoint,
-            endpoint.Attribute.Route.Parameters.Select(ParameterTemplate.Data.FromRoute).ToImmutableArray(),
             request
         );
 
@@ -63,11 +62,11 @@ internal sealed class ControllerTemplateDataBuilder(
     }
 
     private static RequestTemplate.Data? CreateRequestData(
-        EndpointContractModel endpoint,
-        ISet<string> routeParameterNames
+        in EndpointContractModel endpoint,
+        ImmutableArray<string> routeParameterNames
     ) => endpoint.Parameters
-            .Where(parameter => !routeParameterNames.Contains(parameter.Name))
-            .Select(ParameterTemplate.Data.FromSymbol).ToImmutableArray()
+            .Where(parameter => !routeParameterNames.Contains(parameter.Name, StringComparer.OrdinalIgnoreCase))
+            .Select(ParameterTemplate.Data.FromModel).ToImmutableArray()
         is { Length: > 0 } parameters
         ? new RequestTemplate.Data(
             endpoint.RequestName,
@@ -76,15 +75,14 @@ internal sealed class ControllerTemplateDataBuilder(
         : null;
 
     private MethodTemplate.Data CreateMethodData(
-        EndpointContractModel endpoint,
-        ImmutableArray<ParameterTemplate.Data> routeParameters,
-        RequestTemplate.Data? request
+        in EndpointContractModel endpoint,
+        in RequestTemplate.Data? request
     ) => new(
         endpoint.Attribute.HttpMethod,
         endpoint.Attribute.Route.RelationalRoute,
         Attributes(endpoint.ResponseType, endpoint.Attribute.SuccessCode, endpoint.Attribute.ErrorCodes),
         Name: endpoint.RequestName,
-        Parameters: routeParameters,
+        Parameters: [..endpoint.Attribute.Route.Parameters.Select(ParameterTemplate.Data.FromRoute)],
         RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
         request?.Parameters.Select(p => p.Name).ToImmutableArray(),
         endpoint.ContractTypeFullName,
@@ -93,7 +91,7 @@ internal sealed class ControllerTemplateDataBuilder(
     );
 
     private string Attributes(
-        TypeModel? responseType,
+        in TypeModel? responseType,
         int successCode,
         ImmutableArray<int> errorCodes
     ) => string.Join("\n",
@@ -128,8 +126,8 @@ internal sealed class ControllerTemplateDataBuilder(
 
     private void AddRequestToCorrespondingController(
         string? baseRoute,
-        RequestTemplate.Data? request,
-        MethodTemplate.Data method
+        in RequestTemplate.Data? request,
+        in MethodTemplate.Data method
     )
     {
         var controllerName = baseRoute is null or ""

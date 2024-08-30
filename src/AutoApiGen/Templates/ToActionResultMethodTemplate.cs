@@ -27,7 +27,7 @@ internal static class ToActionResultMethodTemplate
         bool IncludeInternalResult
     );
 
-    public static string Render(this Data data, string? internalResultName = null)
+    public static string Render(in this Data data, string? internalResultName = null)
     {
         if (data.IncludeInternalResult && internalResultName is null)
             throw new ArgumentNullException(nameof(internalResultName));

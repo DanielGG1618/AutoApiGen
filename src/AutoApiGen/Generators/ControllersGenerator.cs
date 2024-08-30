@@ -53,10 +53,10 @@ internal sealed class ControllersGenerator : IIncrementalGenerator
             );
     }
 
-    private sealed record Configuration(
+    private readonly record struct Configuration(
         string? RootNamespace,
         string MediatorPackageName,
-        ResultTypeConfig? ResultTypeConfiguration,
+        in ResultTypeConfig? ResultTypeConfiguration,
         ImmutableArray<EndpointContractModel> Endpoints
     );
 }

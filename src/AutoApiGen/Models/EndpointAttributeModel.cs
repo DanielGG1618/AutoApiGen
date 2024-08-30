@@ -16,7 +16,7 @@ internal readonly record struct EndpointAttributeModel
         if (!IsValid(attribute))
             throw new ArgumentException("Provided attribute is not valid Endpoint Attribute");
 
-        var (successCode, errorCodes) = GetStatusCodes(attribute);
+        var (successCode, errorCodes) = GetStatusCodes(attribute.NamedArguments);
         
         return new EndpointAttributeModel(
             Route.Parse(attribute.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? ""),
@@ -34,12 +34,14 @@ internal readonly record struct EndpointAttributeModel
     public static bool IsValid(AttributeSyntax attribute) =>
         StaticData.EndpointAttributeNames.Contains(attribute.Name.ToString());
 
-    private static (int Success, ImmutableArray<int> Error) GetStatusCodes(AttributeData attribute)
+    private static (int Success, ImmutableArray<int> Error) GetStatusCodes(
+        ImmutableArray<KeyValuePair<string,TypedConstant>> attributeNamedArguments
+    )
     {
         var success = 200;
         var errors = new List<int>();
 
-        foreach (var argument in attribute.NamedArguments)
+        foreach (var argument in attributeNamedArguments)
             switch (argument.Key)
             {
                 case "SuccessCode":
@@ -56,6 +58,11 @@ internal readonly record struct EndpointAttributeModel
         return (success, [..errors]);
     }
 
-    private EndpointAttributeModel(Route route, string httpMethod, int successCode, ImmutableArray<int> errorCodes) =>
-        (Route, HttpMethod, SuccessCode, ErrorCodes) = (route, httpMethod, successCode, errorCodes);
+    private EndpointAttributeModel(
+        Route route,
+        string httpMethod,
+        int successCode,
+        ImmutableArray<int> errorCodes
+    ) => (Route, HttpMethod, SuccessCode, ErrorCodes) =
+        (route, httpMethod, successCode, errorCodes);
 }

@@ -29,11 +29,8 @@ internal static class ControllerTemplate
         writer.WriteRequestsIfAny(data.Requests, renderRequest);
         writer.WriteBody(data, onErrorMethod, renderMethodTo);
     }
-}
 
-file static class ControllerIndentedTextWriterExtensions
-{
-    public static void WriteRequestsIfAny(
+    private static void WriteRequestsIfAny(
         this IndentedTextWriter writer,
         List<RequestTemplate.Data> requests,
         Func<RequestTemplate.Data, string> renderRequest
@@ -46,9 +43,9 @@ file static class ControllerIndentedTextWriterExtensions
             );
     }
 
-    public static void WriteBody(
+    private static void WriteBody(
         this IndentedTextWriter writer,
-        ControllerTemplate.Data data,
+        Data data,
         string? onErrorMethod,
         Action<IndentedTextWriter, MethodTemplate.Data> renderMethodTo
     )

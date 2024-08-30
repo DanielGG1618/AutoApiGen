@@ -8,16 +8,12 @@ internal abstract record ResponseKind
         private Void() {}
     }
 
-    public record NonVoid(ToActionResultMethodTemplate.Data ToActionResultMethod) : ResponseKind;
-
-    public sealed record RawNonVoid(ToActionResultMethodTemplate.Data ToActionResultMethod)
-        : NonVoid(ToActionResultMethod);
-
+    public sealed record RawNonVoid(in ToActionResultMethodTemplate.Data ToActionResultMethod) : ResponseKind;
     public sealed record ResultType(
-        ToActionResultMethodTemplate.Data ToActionResultMethod,
+        in ToActionResultMethodTemplate.Data ToActionResultMethod,
         string MatchMethodName,
         string ErrorHandlerMethodName
-    ) : NonVoid(ToActionResultMethod);
+    ) : ResponseKind;
 
     private ResponseKind() {}
 }

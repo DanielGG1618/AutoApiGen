@@ -1,6 +1,6 @@
 ﻿namespace AutoApiGen.Generators;
 
-internal sealed record ResultTypeConfig(
+internal readonly record struct ResultTypeConfig(
     string TypeName,
     string MatchMethodName,
     (string Name, string Implementation)? ErrorHandlerMethod

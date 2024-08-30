@@ -32,19 +32,16 @@ internal static class MethodTemplate
         writer.WriteSignatureDefinition(data.Name, data.RequestType, data.Parameters, renderParameter);
         writer.WriteBody(data, renderDeconstruction);
     }
-}
 
-file static class MethodIndentedTextWriterExtensions
-{
-    public static void WriteHttpAttribute(this IndentedTextWriter writer, string httpMethod, string route) =>
+    private static void WriteHttpAttribute(this IndentedTextWriter writer, string httpMethod, string route) =>
         writer.WriteLine(
             $"[global::Microsoft.AspNetCore.Mvc.Http{httpMethod}{route.ApplyIfNotNullOrEmpty(static route => $"(\"{route}\")")}]"
         );
 
-    public static void WriteOtherAttributes(this IndentedTextWriter writer, string attributes) =>
+    private static void WriteOtherAttributes(this IndentedTextWriter writer, string attributes) =>
         writer.WriteLines(attributes);
 
-    public static void WriteSignatureDefinition(
+    private static void WriteSignatureDefinition(
         this IndentedTextWriter writer,
         string name,
         string? requestType,
@@ -75,9 +72,9 @@ file static class MethodIndentedTextWriterExtensions
         writer.Indent--;
     }
 
-    public static void WriteBody(
+    private static void WriteBody(
         this IndentedTextWriter writer,
-        MethodTemplate.Data data,
+        Data data,
         Func<ImmutableArray<string>?, string, string> renderDeconstruction
     )
     {
@@ -98,7 +95,7 @@ file static class MethodIndentedTextWriterExtensions
         writer.WriteLine('}');
     }
 
-    private static void WriteContractCreation(this IndentedTextWriter writer, MethodTemplate.Data data)
+    private static void WriteContractCreation(this IndentedTextWriter writer, in Data data)
     {
         if (data.ContractParameterNames.Length > 0)
         {
@@ -109,7 +106,7 @@ file static class MethodIndentedTextWriterExtensions
         else writer.WriteLine($"var contract = new {data.ContractType}();");
     }
 
-    private static void WriteContractArguments(this IndentedTextWriter writer, MethodTemplate.Data data)
+    private static void WriteContractArguments(this IndentedTextWriter writer, Data data)
     {
         writer.Indent++;
         writer.WriteLines(

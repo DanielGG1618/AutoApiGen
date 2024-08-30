@@ -10,12 +10,12 @@ internal static class TypeDeclarationSyntaxExtensions
 
     public static bool HasAttributeWithNameFrom(
         this TypeDeclarationSyntax type,
-        IImmutableSet<string> names
+        ImmutableArray<string> names
     ) => type.GetAttributes().ContainsAttributeWithNameFrom(names);
 
     public static bool HasAttributeWithNameFrom(
         this TypeDeclarationSyntax type,
-        IImmutableSet<string> names,
+        ImmutableArray<string> names,
         out AttributeSyntax attribute
     ) => type.GetAttributes().ContainsAttributeWithNameFrom(names, out attribute);
 }

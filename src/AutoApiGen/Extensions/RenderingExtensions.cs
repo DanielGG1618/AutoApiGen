@@ -11,12 +11,6 @@ internal static class RenderingExtensions
     ) => string.Join(separator, datas.Select(renderer));
 
     public static string RenderAndJoin<T>(
-        this T[] datas,
-        Func<T, string> renderer,
-        string separator = "\n"
-    ) => string.Join(separator, datas.Select(renderer));
-    
-    public static string RenderAndJoin<T>(
         this ImmutableArray<T> datas,
         Func<T, string> renderer,
         string separator = "\n"
