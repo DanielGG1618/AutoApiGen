@@ -7,7 +7,7 @@ public static class TypeSymbolExtensions
 {
     public static ImmutableArray<ITypeSymbol> GetTypeArgumentsOfInterfaceNamed(
         this ITypeSymbol type,
-        ISet<string> interfaceNames
+        ImmutableArray<string> interfaceNames
     ) => type.Interfaces
              .FirstOrDefault(@interface => interfaceNames.Contains(@interface.Name))?
              .TypeArguments

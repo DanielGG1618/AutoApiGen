@@ -3,64 +3,56 @@ using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Templates;
 
-internal static class ControllerTemplate
+internal readonly record struct ControllerTemplate(
+    string Namespace,
+    string? BaseRoute,
+    string Name,
+    List<MethodTemplate> Methods,
+    List<RequestTemplate> Requests,
+    string MediatorPackageName
+)
 {
-    internal readonly record struct Data(
-        string Namespace,
-        string? BaseRoute,
-        string Name,
-        List<MethodTemplate.Data> Methods,
-        List<RequestTemplate.Data> Requests,
-        string MediatorPackageName
-    );
-
-    public static void RenderTo(
+    public void RenderTo(
         IndentedTextWriter writer,
-        Data data,
         string? onErrorMethod,
-        Func<RequestTemplate.Data, string> renderRequest,
-        Action<IndentedTextWriter, MethodTemplate.Data> renderMethodTo
+        Action<IndentedTextWriter, RequestTemplate> renderRequestTo,
+        Action<IndentedTextWriter, MethodTemplate> renderMethodTo
     )
     {
         writer.WriteLine(StaticData.GeneratedDisclaimer);
         writer.WriteLine();
-        writer.WriteLine($"namespace {data.Namespace};");
+        writer.WriteLine($"namespace {Namespace};");
         writer.WriteLine();
-        writer.WriteRequestsIfAny(data.Requests, renderRequest);
-        writer.WriteBody(data, onErrorMethod, renderMethodTo);
+        RenderRequestsTo(writer, renderRequestTo);
+        RenderBodyTo(writer, onErrorMethod, renderMethodTo);
     }
-}
 
-file static class ControllerIndentedTextWriterExtensions
-{
-    public static void WriteRequestsIfAny(
-        this IndentedTextWriter writer,
-        List<RequestTemplate.Data> requests,
-        Func<RequestTemplate.Data, string> renderRequest
+    private void RenderRequestsTo(
+        IndentedTextWriter writer,
+        Action<IndentedTextWriter, RequestTemplate> renderRequestTo
     )
     {
-        if (requests.Count > 0)
-            writer.WriteLines(
-                requests.RenderAndJoin(renderRequest, separator: "\n\n"),
-                ""
-            );
+        foreach (var request in Requests)
+        {
+            renderRequestTo(writer, request);
+            writer.WriteLine();
+        }
     }
 
-    public static void WriteBody(
-        this IndentedTextWriter writer,
-        ControllerTemplate.Data data,
+    private void RenderBodyTo(
+        IndentedTextWriter writer,
         string? onErrorMethod,
-        Action<IndentedTextWriter, MethodTemplate.Data> renderMethodTo
+        Action<IndentedTextWriter, MethodTemplate> renderMethodTo
     )
     {
         writer.WriteLines($$"""
-            [global::Microsoft.AspNetCore.Mvc.Route("{{data.BaseRoute}}")]
+            [global::Microsoft.AspNetCore.Mvc.Route("{{BaseRoute}}")]
             [global::Microsoft.AspNetCore.Mvc.ApiController]
-            public sealed partial class {{data.Name}}Controller(
-                {{data.MediatorPackageName}}.IMediator mediator
+            public sealed partial class {{Name}}Controller(
+                {{MediatorPackageName}}.IMediator mediator
             ) : global::Microsoft.AspNetCore.Mvc.ControllerBase
             {   
-                private readonly {{data.MediatorPackageName}}.IMediator _mediator = mediator;
+                private readonly {{MediatorPackageName}}.IMediator _mediator = mediator;
                 
             """
         );
@@ -70,18 +62,17 @@ file static class ControllerIndentedTextWriterExtensions
             writer.WriteLines(onErrorMethod);
             writer.Indent--;
         }
-        writer.WriteMethods(renderMethodTo, data.Methods);
+        WriteMethodsTo(writer, renderMethodTo);
         writer.WriteLine('}');
     }
 
-    private static void WriteMethods(
-        this IndentedTextWriter writer,
-        Action<IndentedTextWriter, MethodTemplate.Data> renderMethodTo,
-        List<MethodTemplate.Data> methods
+    private void WriteMethodsTo(
+        IndentedTextWriter writer,
+        Action<IndentedTextWriter, MethodTemplate> renderMethodTo
     )
     {
         writer.Indent++;
-        foreach (var method in methods)
+        foreach (var method in Methods)
         {
             writer.WriteLine();
             renderMethodTo(writer, method);

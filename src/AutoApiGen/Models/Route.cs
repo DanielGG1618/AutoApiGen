@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Models;
 
@@ -6,7 +7,7 @@ internal readonly record struct Route
 {
     public string? BaseRoute { get; }
     public string RelationalRoute { get; }
-    public ImmutableArray<RoutePart.ParameterRoutePart> Parameters { get; }
+    public ImmutableArray<ParameterModel> Parameters { get; }
 
     public static Route Parse(string value)
     {
@@ -19,11 +20,29 @@ internal readonly record struct Route
         return new Route(
             baseRoute,
             string.Join(separator: "/", parts.Skip(baseRoute is null ? 0 : 1).Select(RoutePart.Format)),
-            parts.OfType<RoutePart.ParameterRoutePart>().ToImmutableArray()
+            parts.OfType<RoutePart.ParameterRoutePart>()
+                .Select(ParameterModel.FromRoute)
+                .ToImmutableArray()
         );
     }
 
-    private Route(string? baseRoute, string relationalRoute, ImmutableArray<RoutePart.ParameterRoutePart> parameters) =>
+    public bool Equals(Route other) =>
+        BaseRoute == other.BaseRoute
+        && RelationalRoute == other.RelationalRoute
+        && Parameters.EqualsSequentially(other.Parameters);
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hashCode = BaseRoute != null ? BaseRoute.GetHashCode() : 0;
+            hashCode = (hashCode * 397) ^ RelationalRoute.GetHashCode();
+            hashCode = (hashCode * 397) ^ Parameters.GetHashCode();
+            return hashCode;
+        }
+    }
+
+    private Route(string? baseRoute, string relationalRoute, ImmutableArray<ParameterModel> parameters) =>
         (BaseRoute, RelationalRoute, Parameters) =
         (baseRoute, relationalRoute, parameters);
 }

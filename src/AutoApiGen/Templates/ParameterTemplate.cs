@@ -1,44 +1,30 @@
-﻿using System.Globalization;
+﻿using System.CodeDom.Compiler;
 using AutoApiGen.Extensions;
 using AutoApiGen.Models;
-using Microsoft.CodeAnalysis;
 
 namespace AutoApiGen.Templates;
 
-internal static class ParameterTemplate
+internal readonly record struct ParameterTemplate(
+    string Attributes,
+    string Type,
+    string Name,
+    string? Default
+)
 {
-    internal readonly record struct Data(
-        string Attributes,
-        string Type,
-        string Name,
-        string? Default
-    )
-    {
-        public static Data FromRoute(RoutePart.ParameterRoutePart parameter) => new(
-            Attributes: "[global::Microsoft.AspNetCore.Mvc.FromRoute] ",
-            parameter.Type ?? "string",
-            parameter.Name.WithLowerFirstLetter(),
-            parameter.Default
-        );
+    public void RenderTo(IndentedTextWriter writer) =>
+        writer.Write($"{Attributes}{Type} {Name}{Default.ApplyIfNotNullOrEmpty(static def => $" = {def}")}");
 
-        public static Data FromSymbol(IParameterSymbol parameter) => new(
-            Attributes: "",
-            parameter.Type.ToString(),
-            parameter.Name,
-            parameter.HasExplicitDefaultValue ? parameter.ExplicitDefaultValue switch
-            {
-                string s => $"\"{s}\"",
-                char ch => $"'{ch}'",
-                bool b => b ? "true" : "false",
-                float f => f.ToString(CultureInfo.InvariantCulture) + 'f',
-                double d => d.ToString(CultureInfo.InvariantCulture) + 'd',
-                decimal d => d.ToString(CultureInfo.InvariantCulture) + 'm',
-                null => "default!",
-                _ => parameter.ExplicitDefaultValue.ToString(),
-            } : null
-        );
-    }
+    public static ParameterTemplate FromRoute(ParameterModel parameter) => new(
+        Attributes: "[global::Microsoft.AspNetCore.Mvc.FromRoute] ",
+        parameter.Type,
+        parameter.Name.WithLowerFirstLetter(),
+        parameter.Default
+    );
 
-    internal static string Render(Data data) =>
-        $"{data.Attributes}{data.Type} {data.Name}{data.Default.ApplyIfNotNullOrEmpty(static def => $" = {def}")}";
+    public static ParameterTemplate FromModel(ParameterModel parameter) => new(
+        Attributes: "",
+        parameter.Type,
+        parameter.Name,
+        parameter.Default
+    );
 }

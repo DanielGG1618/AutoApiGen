@@ -5,9 +5,9 @@ namespace AutoApiGen;
 internal static class StaticData
 {
     public const string DefaultMediatorPackageName = "global::MediatR";
-    
-    public static IImmutableSet<string> EndpointAttributeNames { get; } = new HashSet<string>
-    {
+
+    public static ImmutableArray<string> EndpointAttributeNames { get; } =
+    [
         "GetEndpoint",
         "PostEndpoint",
         "PutEndpoint",
@@ -15,10 +15,18 @@ internal static class StaticData
         "HeadEndpoint",
         "PatchEndpoint",
         "OptionsEndpoint"
-    }.ToImmutableHashSet();
+    ];
 
-    public static IImmutableSet<string> EndpointAttributeNamesWithSuffix { get; } =
-        EndpointAttributeNames.Select(a => a + "Attribute").ToImmutableHashSet();
+    public static ImmutableArray<string> EndpointAttributeNamesWithSuffix { get; } =
+    [
+        "GetEndpointAttribute",
+        "PostEndpointAttribute",
+        "PutEndpointAttribute",
+        "DeleteEndpointAttribute",
+        "HeadEndpointAttribute",
+        "PatchEndpointAttribute",
+        "OptionsEndpointAttribute"
+    ];
 
     public const string GeneratedDisclaimer =
         """

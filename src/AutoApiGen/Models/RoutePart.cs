@@ -64,7 +64,12 @@ internal abstract record RoutePart
         _ => throw new ThisIsUnionException(nameof(RoutePart))
     };
 
+    [Pure]
     private static string FormatName(string name) => name.WithLowerFirstLetter();
+
+    [Pure]
     private static string FormatType(string? type) => type is null ? "" : $":{type}";
+
+    [Pure]
     private static string FormatDefault(string? @default) => @default is null ? "" : $"={@default}";
 }

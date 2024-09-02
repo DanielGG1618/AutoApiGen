@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using AutoApiGen.Extensions;
+﻿using AutoApiGen.Extensions;
 using AutoApiGen.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,50 +28,29 @@ internal static class Providers
             && attribute.Name.ToString().Contains("ResultTypeConfiguration"),
 
         transform: static (syntaxContext, _) =>
-            Method((AttributeSyntax)syntaxContext.Node)
+            ResultTypeConfig.TryCreate((AttributeSyntax)syntaxContext.Node)
     );
-
-    private static ResultTypeConfig? Method(AttributeSyntax attribute)
-    {
-        var arguments = attribute.ArgumentList?.Arguments
-            .Where(arg => arg.NameEquals is not null)
-            .ToImmutableDictionary(
-                keySelector: arg =>
-                    arg.NameEquals!.Name.Identifier.Text,
-                elementSelector: arg =>
-                    arg.Expression is LiteralExpressionSyntax literal ? literal.Token.ValueText : null
-            );
-        
-        return arguments is null ? null
-            : new ResultTypeConfig(
-                TypeName: arguments["TypeName"]
-                          ?? throw new ArgumentException("TypeName is missing"),
-                MatchMethodName: arguments["MatchMethodName"]
-                                 ?? "Match",
-                ErrorHandlerMethod(arguments)
-            );
-
-        (string Name, string Implementation)? ErrorHandlerMethod(ImmutableDictionary<string, string?> args) =>
-            args["ErrorHandlerMethodName"] is string name
-            && args["ErrorHandlerMethodImplementation"] is string implementation
-                ? (
-                    name,
-                    implementation
-                ) 
-                : null;
-    }
-
-    public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProvider(
+    
+    public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProvider( //510 26.69 35.8
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
         predicate: static (node, _) =>
             node is TypeDeclarationSyntax { AttributeLists.Count: > 0 } type
-            && type.HasAttributeWithNameFrom(StaticData.EndpointAttributeNames, out var attribute)
-            && EndpointAttributeModel.IsValid(attribute)
+            && type.HasAttributeWithNameFrom(StaticData.EndpointAttributeNames)
             && EndpointContractModel.IsValid(type),
 
         transform: static (syntaxContext, _) => EndpointContractModel.Create(
             (INamedTypeSymbol)syntaxContext.SemanticModel.GetDeclaredSymbol(syntaxContext.Node)!
         )
+    );
+
+    public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProviderFast( //171.8 15.48 21.58
+        this SyntaxValueProvider syntaxValueProvider
+    ) => syntaxValueProvider.ForAttributeWithMetadataName("AutoApiGen.Attributes.EndpointAttribute",
+        predicate: static (node, _) =>
+            node is TypeDeclarationSyntax type && EndpointContractModel.IsValid(type),
+
+        transform: static (syntaxContext, _) =>
+            EndpointContractModel.Create((INamedTypeSymbol)syntaxContext.TargetSymbol)
     );
 }
