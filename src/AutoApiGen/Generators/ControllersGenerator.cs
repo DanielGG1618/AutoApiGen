@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using AutoApiGen.Extensions;
 using AutoApiGen.Models;
 using AutoApiGen.Templates;
 using Microsoft.CodeAnalysis;
@@ -26,7 +27,7 @@ internal sealed class ControllersGenerator : IIncrementalGenerator
                     ResultTypeConfiguration: combined.Left.Right.SingleOrDefault(),
                     Endpoints: combined.Right
                 )
-            );
+            ).WithComparer(Configuration.Comparer);
 
         context.RegisterSourceOutput(compilationDetails, Execute);
     }
@@ -46,17 +47,41 @@ internal sealed class ControllersGenerator : IIncrementalGenerator
                 resultTypeConfiguration
             ).Build();
 
-        foreach (var controller in controllers)
+        foreach (var controller in controllers.AsSpan())
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
                 TemplatesRenderer.Render(controller, resultTypeConfiguration?.ErrorHandlerMethod?.Implementation)
             );
     }
 
-    private sealed record Configuration(
+    private readonly record struct Configuration(
         string? RootNamespace,
         string MediatorPackageName,
         ResultTypeConfig? ResultTypeConfiguration,
         ImmutableArray<EndpointContractModel> Endpoints
-    );
+    )
+    {
+        public static IEqualityComparer<Configuration> Comparer { get; } = new ConfigurationComparer();
+        
+        private class ConfigurationComparer : IEqualityComparer<Configuration>
+        {
+            public bool Equals(Configuration obj, Configuration other) =>
+                obj.RootNamespace == other.RootNamespace
+                && obj.MediatorPackageName == other.MediatorPackageName 
+                && obj.Endpoints.EqualsSequentially(other.Endpoints)
+                && Nullable.Equals(obj.ResultTypeConfiguration, other.ResultTypeConfiguration); 
+
+            public int GetHashCode(Configuration obj)
+            {
+                unchecked
+                {
+                    int hashCode = obj.RootNamespace != null ? obj.RootNamespace.GetHashCode() : 0;
+                    hashCode = (hashCode * 397) ^ obj.MediatorPackageName.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.ResultTypeConfiguration.GetHashCode();
+                    hashCode = (hashCode * 397) ^ obj.Endpoints.GetHashCode();
+                    return hashCode;
+                }
+            }
+        }
+    }
 }

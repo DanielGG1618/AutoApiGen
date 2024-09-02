@@ -1,18 +1,19 @@
-﻿using AutoApiGen.Extensions;
+﻿using System.Collections.Immutable;
+using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AutoApiGen.Models;
 
-internal readonly record struct EndpointContractModel //TODO : IEquatable<EndpointContractModel>
+internal readonly record struct EndpointContractModel
 {
-    private static ISet<string> InterfaceNames { get; } = new HashSet<string> { "IRequest", "ICommand", "IQuery" };
-    private static string[] Suffixes { get; } = ["Request", "Command", "Query"];
+    private static ImmutableArray<string> InterfaceNames { get; } = ["IRequest", "ICommand", "IQuery"];
+    private static ImmutableArray<string> Suffixes { get; } = ["Request", "Command", "Query"];
 
     public EndpointAttributeModel Attribute { get; }
     public string ContractTypeFullName { get; }
     public string RequestName { get; }
-    public IReadOnlyList<IParameterSymbol> Parameters { get; }
+    public ImmutableArray<ParameterModel> Parameters { get; } 
     public TypeModel? ResponseType { get; }
 
     public static EndpointContractModel Create(INamedTypeSymbol type) =>
@@ -23,7 +24,8 @@ internal readonly record struct EndpointContractModel //TODO : IEquatable<Endpoi
                 GetRequestName(type),
                 parameters: type.InstanceConstructors
                                 .FirstOrDefault(c => c.DeclaredAccessibility is Accessibility.Public)
-                                ?.Parameters
+                                ?.Parameters.Select(ParameterModel.FromSymbol)
+                                .ToImmutableArray()
                             ?? [],
                 responseType: type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames)
                     .FirstOrDefault() is ITypeSymbol responseTypeSymbol
@@ -46,11 +48,31 @@ internal readonly record struct EndpointContractModel //TODO : IEquatable<Endpoi
                 ? type.Name.Remove(type.Name.Length - matchingSuffix.Length)
                 : type.Name;
 
+    public bool Equals(EndpointContractModel other) =>
+        Attribute.Equals(other.Attribute)
+        && ContractTypeFullName == other.ContractTypeFullName
+        && RequestName == other.RequestName
+        && Parameters.EqualsSequentially(other.Parameters)
+        && Nullable.Equals(ResponseType, other.ResponseType);
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hashCode = Attribute.GetHashCode();
+            hashCode = (hashCode * 397) ^ ContractTypeFullName.GetHashCode();
+            hashCode = (hashCode * 397) ^ RequestName.GetHashCode();
+            hashCode = (hashCode * 397) ^ Parameters.GetHashCode();
+            hashCode = (hashCode * 397) ^ ResponseType.GetHashCode();
+            return hashCode;
+        }
+    }
+
     private EndpointContractModel(
         EndpointAttributeModel attribute,
         string contractTypeFullName,
         string requestName,
-        IReadOnlyList<IParameterSymbol> parameters,
+        ImmutableArray<ParameterModel> parameters,
         TypeModel? responseType
     ) => (Attribute, ContractTypeFullName, RequestName, Parameters, ResponseType) =
         (attribute, contractTypeFullName, requestName, parameters, responseType);
