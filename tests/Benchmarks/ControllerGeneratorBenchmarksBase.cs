@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Benchmarks;
 
-//[Config(typeof(ShortRunConfig))]
+[Config(typeof(ShortRunConfig))]
 [MemoryDiagnoser]
 public abstract class ControllerGeneratorBenchmarksBase<TCodeProvider> 
     where TCodeProvider : ICodeProvider

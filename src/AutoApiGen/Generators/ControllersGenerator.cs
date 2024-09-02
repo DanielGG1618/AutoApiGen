@@ -47,7 +47,7 @@ internal sealed class ControllersGenerator : IIncrementalGenerator
                 resultTypeConfiguration
             ).Build();
 
-        foreach (var controller in controllers)
+        foreach (var controller in controllers.AsSpan())
             context.AddSource(
                 $"{controller.Name}Controller.g.cs",
                 TemplatesRenderer.Render(controller, resultTypeConfiguration?.ErrorHandlerMethod?.Implementation)

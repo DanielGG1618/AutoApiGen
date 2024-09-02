@@ -8,15 +8,9 @@ internal static class IndentedTextWriterExtensions
     {
         writer.Indent += indentation;
 
-        foreach (var line in lines.Split('\n'))
+        foreach (var line in lines.Split('\n').AsSpan())
             writer.WriteLine(line);
 
         writer.Indent -= indentation;
-    }
-
-    public static void WriteLines(this IndentedTextWriter writer, params string[] lines)
-    {
-        foreach (var line in lines)
-            writer.WriteLine(line);
     }
 }

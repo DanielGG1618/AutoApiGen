@@ -42,7 +42,7 @@ internal readonly record struct EndpointAttributeModel
         var success = 200;
         var errors = new List<int>();
 
-        foreach (var argument in attributeNamedArguments)
+        foreach (var argument in attributeNamedArguments.AsSpan())
             switch (argument.Key)
             {
                 case "SuccessCode":
