@@ -32,9 +32,6 @@ internal readonly record struct EndpointAttributeModel
     public static bool IsValid(AttributeData attribute) =>
         StaticData.EndpointAttributeNamesWithSuffix.Contains(attribute.AttributeClass?.Name ?? "");
 
-    public static bool IsValid(AttributeSyntax attribute) =>
-        StaticData.EndpointAttributeNames.Contains(attribute.Name.ToString());
-
     private static (int Success, ImmutableArray<int> Error) GetStatusCodes(
         ImmutableArray<KeyValuePair<string,TypedConstant>> attributeNamedArguments
     )
