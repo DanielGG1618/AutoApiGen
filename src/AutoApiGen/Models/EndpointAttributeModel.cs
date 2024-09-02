@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -58,6 +59,24 @@ internal readonly record struct EndpointAttributeModel
         return (success, [..errors]);
     }
 
+    public bool Equals(EndpointAttributeModel other) =>
+        Route.Equals(other.Route)
+        && HttpMethod == other.HttpMethod
+        && SuccessCode == other.SuccessCode
+        && ErrorCodes.EqualsSequentially(other.ErrorCodes);
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hashCode = Route.GetHashCode();
+            hashCode = (hashCode * 397) ^ HttpMethod.GetHashCode();
+            hashCode = (hashCode * 397) ^ SuccessCode;
+            hashCode = (hashCode * 397) ^ ErrorCodes.GetHashCode();
+            return hashCode;
+        }
+    }
+    
     private EndpointAttributeModel(
         Route route,
         string httpMethod,

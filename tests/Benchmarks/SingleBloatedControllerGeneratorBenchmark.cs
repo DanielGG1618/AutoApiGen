@@ -1,16 +1,11 @@
-﻿// First run:
-// | Method                            | Mean     | Error   | StdDev  | Gen0   | Allocated |
-// |---------------------------------- |---------:|--------:|--------:|-------:|----------:|
-// | RunGeneratorsAndUpdateCompilation | 327.6 us | 2.63 us | 2.33 us | 3.9063 |  37.67 KB |
-
-namespace Benchmarks;
+﻿namespace Benchmarks;
 
 public class SingleBloatedControllerGeneratorBenchmark
     : ControllerGeneratorBenchmarksBase<SingleBloatedControllerGeneratorBenchmark.CodeProvider>
 {
     public class CodeProvider : ICodeProvider
     {
-        public static string Code => """
+        public static string Code => """"
             using System.Threading;
             using System.Threading.Tasks;
             using AutoApiGen.Attributes;
@@ -160,7 +155,43 @@ public class SingleBloatedControllerGeneratorBenchmark
                         ValueTask.FromResult(new[] { "Logged in", "Updated profile" });
                 }
             }
-            """;
+            
+            [assembly: AutoApiGen.ConfigAttributes.SetMediatorPackage("global::Mediator")]
+            [assembly: AutoApiGen.ConfigAttributes.ResultTypeConfiguration(
+                TypeName = "OneOf",
+                MatchMethodName = "Match",
+                ErrorHandlerMethodName = "Problem",
+                ErrorHandlerMethodImplementation = """
+                private global::Microsoft.AspNetCore.Mvc.IActionResult Problem(
+                    global::System.Collections.Generic.List<global::ErrorOr.Error> errors
+                ) => Problem(
+                    statusCode: errors[0].Type switch
+                    {
+                        global::ErrorOr.ErrorType.Conflict => 409,
+                        global::ErrorOr.ErrorType.Validation => 400,
+                        global::ErrorOr.ErrorType.NotFound => 404,
+                        global::ErrorOr.ErrorType.Forbidden => 403,
+                        _ => 500
+                    },
+                    title: errors[0].Description
+                );
+                
+                private global::Microsoft.AspNetCore.Mvc.IActionResult Problem(
+                    global::ErrorOr.Error error
+                ) => Problem(
+                    statusCode: error.Type switch
+                    {
+                        global::ErrorOr.ErrorType.Conflict => 409,
+                        global::ErrorOr.ErrorType.Validation => 400,
+                        global::ErrorOr.ErrorType.NotFound => 404,
+                        global::ErrorOr.ErrorType.Forbidden => 403,
+                        _ => 500
+                    },
+                    title: error.Description
+                );
+                """
+            )]
+            """";
     }
 }
 

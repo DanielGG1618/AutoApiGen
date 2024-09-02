@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Models;
 
@@ -23,6 +24,22 @@ internal readonly record struct Route
                 .Select(ParameterModel.FromRoute)
                 .ToImmutableArray()
         );
+    }
+
+    public bool Equals(Route other) =>
+        BaseRoute == other.BaseRoute
+        && RelationalRoute == other.RelationalRoute
+        && Parameters.EqualsSequentially(other.Parameters);
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hashCode = BaseRoute != null ? BaseRoute.GetHashCode() : 0;
+            hashCode = (hashCode * 397) ^ RelationalRoute.GetHashCode();
+            hashCode = (hashCode * 397) ^ Parameters.GetHashCode();
+            return hashCode;
+        }
     }
 
     private Route(string? baseRoute, string relationalRoute, ImmutableArray<ParameterModel> parameters) =>
