@@ -30,10 +30,22 @@ public class GetStudentHandler : IQueryHandler<GetStudentQuery, Student>
         {
             //somehow return NotFound or throw exception
         }
-             
         
         return new Student(id);
     }
+}
+
+[PutEndpoint("/students/file")]
+public record UpdateStudentsFromFileCommand([FromForm] IFormFile File) : ICommand;
+
+public class UpdateStudentsFromFileHandler : ICommandHandler<UpdateStudentsFromFileCommand>
+{
+    public async Task<Unit> Handle(UpdateStudentsFromFileCommand command, CancellationToken cancellationToken)
+    {
+        var file = command.File;
+        
+        ...
+    }        
 }
 ```
 
@@ -42,15 +54,16 @@ public class GetStudentHandler : IQueryHandler<GetStudentQuery, Student>
 record CreateStudentRequest(string Name); 
 
 [Route("students")]
-public class StudentsController(IMediator mediator) 
-    : ApiController(mediator)
+public class StudentsController(IMediator mediator)
 {
+    private readonly IMediator _mediator = mediator;
+    
     [HttpPost]
     [ProducesResponseType(201)]
     public async Task<IActionResult> CreateStudent([FromBody] CreateStudentRequest request)
     {
         var command = new CreateStudentCommand(request.Name);
-        var result = await Mediator.Send(command);
+        var result = await _mediator.Send(command);
         
         return Created(result);
         //return CreatedAtAction("GetStudent", "Students", result.Id, result);
@@ -62,12 +75,22 @@ public class StudentsController(IMediator mediator)
     public async Task<IActionResult> GetStudent(string id)
     {
         var query = new GetStudentQuery(id);
-        var result = await Mediator.Send(query);
+        var result = await _mediator.Send(query);
         
         return Ok(result);
     }
+    
+    [HttpPut("file")]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> UpdateStudentsFromFile(IFormFile file)
+    {
+        var command = new UpdateStudentsFromFileCommand(
+            File: file
+        );
+        
+        await _mediator.Send(query);
+        
+        return NoContent();
+    }
 }
 ```
-
-## For Future Thought 
-- Generating custom types in case of mix of route, query, and body parameters
