@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using System.Diagnostics.Contracts;
 using AutoApiGen.Extensions;
 using AutoApiGen.Models;
 
@@ -14,17 +15,23 @@ internal readonly record struct ParameterTemplate(
     public void RenderTo(IndentedTextWriter writer) =>
         writer.Write($"{Attributes}{Type} {Name}{Default.ApplyIfNotNullOrEmpty(static def => $" = {def}")}");
 
-    public static ParameterTemplate FromRoute(ParameterModel parameter) => new(
-        Attributes: "[global::Microsoft.AspNetCore.Mvc.FromRoute] ",
+    [Pure]
+    public static ParameterTemplate FromModel(ParameterModel parameter) => new(
+        AttributesFor(parameter),
         parameter.Type,
         parameter.Name.WithLowerFirstLetter(),
         parameter.Default
     );
 
-    public static ParameterTemplate FromModel(ParameterModel parameter) => new(
-        Attributes: "",
-        parameter.Type,
-        parameter.Name,
-        parameter.Default
-    );
+    [Pure]
+    private static string AttributesFor(in ParameterModel parameter) => parameter.Source switch
+    {
+        From.Route => "[global::Microsoft.AspNetCore.Mvc.FromRoute] ",
+        From.Query => "[global::Microsoft.AspNetCore.Mvc.FromQuery] ",
+        From.Body => "[global::Microsoft.AspNetCore.Mvc.FromBody] ",
+        From.Form => parameter.Type.EndsWith("IFileForm")
+            ? "[global::Microsoft.AspNetCore.Mvc.FromForm] "
+            : "",
+        _ => throw new ArgumentOutOfRangeException(nameof(parameter.Source))
+    };
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AutoApiGen.Models;
 
@@ -12,26 +12,28 @@ internal readonly record struct EndpointAttributeModel
     public int SuccessCode { get; }
     public ImmutableArray<int> ErrorCodes { get; }
 
+    [Pure]
     public static EndpointAttributeModel Create(AttributeData attribute)
     {
         if (!IsValid(attribute))
             throw new ArgumentException("Provided attribute is not valid Endpoint Attribute");
 
+        var name = attribute.AttributeClass!.Name;
         var (successCode, errorCodes) = GetStatusCodes(attribute.NamedArguments);
         
         return new EndpointAttributeModel(
-            Route.Parse(attribute.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? ""),
-            attribute.AttributeClass!.Name is var name
-            && name.EndsWith("EndpointAttribute")
-                ? name[..^"EndpointAttribute".Length] : name,
+            Route.Parse(attribute.ConstructorArguments is [{ Value: {} arg }, ..] ? arg.ToString() : ""),
+            httpMethod: name.EndsWith("EndpointAttribute") ? name[..^"EndpointAttribute".Length] : name,
             successCode,
             errorCodes
         );
     }
 
+    [Pure]
     public static bool IsValid(AttributeData attribute) =>
         StaticData.EndpointAttributeNamesWithSuffix.Contains(attribute.AttributeClass?.Name ?? "");
 
+    [Pure]
     private static (int Success, ImmutableArray<int> Error) GetStatusCodes(
         ImmutableArray<KeyValuePair<string,TypedConstant>> attributeNamedArguments
     )
