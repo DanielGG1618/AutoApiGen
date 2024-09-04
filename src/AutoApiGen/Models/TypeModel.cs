@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -10,6 +11,7 @@ internal readonly record struct TypeModel
     public string FullName { get; }
     public ImmutableArray<TypeModel>? TypeArguments { get; }
     
+    [Pure]
     public static TypeModel FromSymbol(ITypeSymbol symbol) => new(
         symbol.Name,
         fullName: symbol.ToString().TrimEnd('?'),
@@ -34,5 +36,6 @@ internal readonly record struct TypeModel
     }
 
     private TypeModel(string name, string fullName, ImmutableArray<TypeModel>? typeArguments) =>
-        (Name, FullName, TypeArguments) = (name, fullName, typeArguments);
+        (Name, FullName, TypeArguments) = 
+        (name, fullName, typeArguments);
 }

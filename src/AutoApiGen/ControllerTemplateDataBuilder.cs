@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using AutoApiGen.Extensions;
 using AutoApiGen.Generators;
 using AutoApiGen.Models;
@@ -48,31 +49,23 @@ internal sealed class ControllerTemplateDataBuilder(
 
     private void IncludeRequestFrom(in EndpointContractModel endpoint)
     {
-        var request = CreateRequestData(
-            endpoint,
-            routeParameterNames: [..endpoint.Attribute.Route.Parameters.Select(p => p.Name)]
-        );
-
-        var method = CreateMethodData(
-            endpoint,
-            request
-        );
+        var request = CreateRequestData(endpoint);
+        var method = CreateMethodData(endpoint, request);
 
         AddRequestToCorrespondingController(endpoint.Attribute.Route.BaseRoute, request, method);
     }
 
+    [Pure]
     private static RequestTemplate? CreateRequestData(
-        in EndpointContractModel endpoint,
-        ImmutableArray<string> routeParameterNames
+        in EndpointContractModel endpoint
     ) => endpoint.Parameters
-            .Where(parameter => !routeParameterNames.Contains(parameter.Name, StringComparer.OrdinalIgnoreCase))
+            .Where(parameter => parameter.Source is From.Body)
             .Select(ParameterTemplate.FromModel).ToImmutableArray()
-        is { Length: > 0 } parameters
-        ? new RequestTemplate(
+        is not { Length: > 0 } parameters ? null
+        : new RequestTemplate(
             endpoint.RequestName,
             parameters
-        )
-        : null;
+        );
 
     private MethodTemplate CreateMethodData(
         in EndpointContractModel endpoint,
@@ -82,7 +75,7 @@ internal sealed class ControllerTemplateDataBuilder(
         endpoint.Attribute.Route.RelationalRoute,
         Attributes(endpoint.ResponseType, endpoint.Attribute.SuccessCode, endpoint.Attribute.ErrorCodes),
         Name: endpoint.RequestName,
-        Parameters: [..endpoint.Attribute.Route.Parameters.Select(ParameterTemplate.FromRoute)],
+        [..endpoint.Parameters.Where(p => p.Source is not From.Body).Select(ParameterTemplate.FromModel)],
         RequestType: request.HasValue ? $"{request.Value.Name}Request" : null,
         request?.Parameters.Select(p => p.Name).ToImmutableArray(),
         endpoint.ContractTypeFullName,
