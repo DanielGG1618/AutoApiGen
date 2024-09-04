@@ -1,4 +1,5 @@
-﻿using AutoApiGen.Extensions;
+﻿using System.Diagnostics.Contracts;
+using AutoApiGen.Extensions;
 using AutoApiGen.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,6 +8,7 @@ namespace AutoApiGen.Generators;
 
 internal static class Providers
 {
+    [Pure]
     public static IncrementalValuesProvider<string> CreateMediatorPackageNameProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
@@ -20,6 +22,7 @@ internal static class Providers
                 ? expression.Token.ValueText : StaticData.DefaultMediatorPackageName
     );
 
+    [Pure]
     public static IncrementalValuesProvider<ResultTypeConfig?> CreateResultTypeConfigProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
@@ -31,7 +34,8 @@ internal static class Providers
             ResultTypeConfig.TryCreate((AttributeSyntax)syntaxContext.Node)
     );
     
-    public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProvider( //510 26.69 35.8
+    [Pure]
+    public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
         predicate: static (node, _) =>
@@ -42,15 +46,5 @@ internal static class Providers
         transform: static (syntaxContext, _) => EndpointContractModel.Create(
             (INamedTypeSymbol)syntaxContext.SemanticModel.GetDeclaredSymbol(syntaxContext.Node)!
         )
-    );
-
-    public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProviderFast( //171.8 15.48 21.58
-        this SyntaxValueProvider syntaxValueProvider
-    ) => syntaxValueProvider.ForAttributeWithMetadataName("AutoApiGen.Attributes.EndpointAttribute",
-        predicate: static (node, _) =>
-            node is TypeDeclarationSyntax type && EndpointContractModel.IsValid(type),
-
-        transform: static (syntaxContext, _) =>
-            EndpointContractModel.Create((INamedTypeSymbol)syntaxContext.TargetSymbol)
     );
 }

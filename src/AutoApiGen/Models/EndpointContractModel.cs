@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,32 +17,48 @@ internal readonly record struct EndpointContractModel
     public ImmutableArray<ParameterModel> Parameters { get; } 
     public TypeModel? ResponseType { get; }
 
-    public static EndpointContractModel Create(INamedTypeSymbol type) =>
-        !IsValid(type) ? throw new ArgumentException("Provided type is not valid Endpoint Contract")
-            : new EndpointContractModel(
-                EndpointAttributeModel.Create(type.GetAttributes().Single(EndpointAttributeModel.IsValid)),
-                contractTypeFullName: type.ToString(),
-                GetRequestName(type),
-                parameters: type.InstanceConstructors
-                                .FirstOrDefault(c => c.DeclaredAccessibility is Accessibility.Public)
-                                ?.Parameters.Select(ParameterModel.FromSymbol)
-                                .ToImmutableArray()
-                            ?? [],
-                responseType: type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames)
-                    .FirstOrDefault() is ITypeSymbol responseTypeSymbol
-                    ? TypeModel.FromSymbol(responseTypeSymbol) : null
-            );
+    [Pure]
+    public static EndpointContractModel Create(INamedTypeSymbol type)
+    {
+        if (!IsValid(type)) 
+            throw new ArgumentException("Provided type is not valid Endpoint Contract");
 
+        var attribute = EndpointAttributeModel.Create(type.GetAttributes().Single(EndpointAttributeModel.IsValid));
+        var constructorParameters = type.InstanceConstructors
+            .FirstOrDefault(c => c.DeclaredAccessibility is Accessibility.Public)
+            ?.Parameters ?? [];
+        
+        var parameters = ImmutableArray.CreateBuilder<ParameterModel>(constructorParameters.Length);
+        parameters.AddRange(attribute.Route.Parameters);
+        parameters.AddRange(constructorParameters
+            .Where(ctorParam => attribute.Route.Parameters.All(routeParameter => ctorParam.Name != routeParameter.Name))
+            .Select(ParameterModel.FromSymbol)
+        );
+        
+        return new EndpointContractModel(
+            attribute,
+            contractTypeFullName: type.ToString(),
+            RequestNameFor(type),
+            parameters.ToImmutable(),
+            responseType: type.GetTypeArgumentsOfInterfaceNamed(InterfaceNames)
+                .FirstOrDefault() is ITypeSymbol responseTypeSymbol
+                ? TypeModel.FromSymbol(responseTypeSymbol) : null
+        );
+    }
+    
+    [Pure]
     private static bool IsValid(ITypeSymbol type) =>
         type.Interfaces.Any(i => InterfaceNames.Contains(i.Name));
 
+    [Pure]
     public static bool IsValid(TypeDeclarationSyntax type) =>
         type.BaseList?.Types.Any(baseType =>
             baseType.Type is SimpleNameSyntax name
             && InterfaceNames.Contains(name.Identifier.Text)
         ) is true;
 
-    private static string GetRequestName(INamedTypeSymbol type) =>
+    [Pure]
+    private static string RequestNameFor(INamedTypeSymbol type) =>
         type.ContainingSymbol is INamedTypeSymbol parent
             ? parent.Name
             : Suffixes.SingleOrDefault(suffix => type.Name.EndsWith(suffix)) is string matchingSuffix
