@@ -1,11 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 
 namespace AutoApiGen.Extensions;
 
 internal static class ImmutableArrayExtensions
 {
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static bool EqualsSequentially<T>(this ImmutableArray<T>? array, ImmutableArray<T>? other)
         where T : IEquatable<T> => (array, other) switch
     {
@@ -14,13 +15,13 @@ internal static class ImmutableArrayExtensions
         _ => false
     };
     
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static bool EqualsSequentially<T>(this ImmutableArray<T> array, ImmutableArray<T>? other)
         where T : IEquatable<T> =>
         other.HasValue
         && array.AsSpan().SequenceEqual(other.Value.AsSpan());
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static bool EqualsSequentially<T>(this ImmutableArray<T> array, ImmutableArray<T> other)
         where T : IEquatable<T> =>
         array.AsSpan().SequenceEqual(other.AsSpan());

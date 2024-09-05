@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace AutoApiGen.Templates;
@@ -14,13 +15,13 @@ internal readonly record struct ToActionResultMethodTemplate(
 
     private static ToActionResultMethodTemplate NoContent { get; } = new("NoContent", [], IncludeInternalResult: false);
     
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static ToActionResultMethodTemplate StatusCode(int code) => new("StatusCode",
         [code.ToString()],
         IncludeInternalResult: true
     );
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static ToActionResultMethodTemplate For(int statusCode) => statusCode switch
     {
         200 => Ok,
@@ -28,7 +29,6 @@ internal readonly record struct ToActionResultMethodTemplate(
         _ => StatusCode(statusCode),
     };
 
-    [Pure]
     public string Render(string? internalResultName = null)
     {
         if (IncludeInternalResult && internalResultName is null)

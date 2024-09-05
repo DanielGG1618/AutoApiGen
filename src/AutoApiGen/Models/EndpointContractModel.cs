@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,7 +18,7 @@ internal readonly record struct EndpointContractModel
     public ImmutableArray<ParameterModel> Parameters { get; } 
     public TypeModel? ResponseType { get; }
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static EndpointContractModel Create(INamedTypeSymbol type)
     {
         if (!IsValid(type)) 
@@ -46,18 +47,18 @@ internal readonly record struct EndpointContractModel
         );
     }
     
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static bool IsValid(ITypeSymbol type) =>
         type.Interfaces.Any(i => InterfaceNames.Contains(i.Name));
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static bool IsValid(TypeDeclarationSyntax type) =>
         type.BaseList?.Types.Any(baseType =>
             baseType.Type is SimpleNameSyntax name
             && InterfaceNames.Contains(name.Identifier.Text)
         ) is true;
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static string RequestNameFor(INamedTypeSymbol type) =>
         type.ContainingSymbol is INamedTypeSymbol parent
             ? parent.Name

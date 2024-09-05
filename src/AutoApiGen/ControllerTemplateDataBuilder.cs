@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Extensions;
 using AutoApiGen.Generators;
 using AutoApiGen.Models;
@@ -47,6 +48,7 @@ internal sealed class ControllerTemplateDataBuilder(
         return _controllers.Values.ToImmutableArray();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void IncludeRequestFrom(in EndpointContractModel endpoint)
     {
         var request = CreateRequestData(endpoint);
@@ -55,7 +57,7 @@ internal sealed class ControllerTemplateDataBuilder(
         AddRequestToCorrespondingController(endpoint.Attribute.Route.BaseRoute, request, method);
     }
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static RequestTemplate? CreateRequestData(
         in EndpointContractModel endpoint
     ) => endpoint.Parameters
@@ -67,6 +69,7 @@ internal sealed class ControllerTemplateDataBuilder(
             parameters
         );
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private MethodTemplate CreateMethodData(
         in EndpointContractModel endpoint,
         in RequestTemplate? request
@@ -83,6 +86,7 @@ internal sealed class ControllerTemplateDataBuilder(
         ResponseReturnTemplateFor(endpoint.ResponseType?.Name, endpoint.Attribute.SuccessCode)
     );
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private string Attributes(
         in TypeModel? responseType,
         int successCode,
@@ -104,6 +108,7 @@ internal sealed class ControllerTemplateDataBuilder(
         ]
     );
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private ResponseReturnTemplate ResponseReturnTemplateFor(string? responseTypeName, int successCode) =>
         responseTypeName switch
         {
@@ -115,6 +120,7 @@ internal sealed class ControllerTemplateDataBuilder(
             _ => new ResponseReturnTemplate.RawNonVoid(ToActionResultMethodTemplate.For(successCode))
         };
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void AddRequestToCorrespondingController(
         string? baseRoute,
         in RequestTemplate? request,

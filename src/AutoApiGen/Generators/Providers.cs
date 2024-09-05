@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Extensions;
 using AutoApiGen.Models;
 using Microsoft.CodeAnalysis;
@@ -8,7 +9,7 @@ namespace AutoApiGen.Generators;
 
 internal static class Providers
 {
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static IncrementalValuesProvider<string> CreateMediatorPackageNameProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
@@ -22,7 +23,7 @@ internal static class Providers
                 ? expression.Token.ValueText : StaticData.DefaultMediatorPackageName
     );
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static IncrementalValuesProvider<ResultTypeConfig?> CreateResultTypeConfigProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(
@@ -34,7 +35,7 @@ internal static class Providers
             ResultTypeConfig.TryCreate((AttributeSyntax)syntaxContext.Node)
     );
     
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static IncrementalValuesProvider<EndpointContractModel> CreateEndpointsProvider(
         this SyntaxValueProvider syntaxValueProvider
     ) => syntaxValueProvider.CreateSyntaxProvider(

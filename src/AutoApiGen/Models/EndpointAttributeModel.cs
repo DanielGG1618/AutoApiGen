@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -12,7 +13,7 @@ internal readonly record struct EndpointAttributeModel
     public int SuccessCode { get; }
     public ImmutableArray<int> ErrorCodes { get; }
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static EndpointAttributeModel Create(AttributeData attribute)
     {
         if (!IsValid(attribute))
@@ -29,11 +30,11 @@ internal readonly record struct EndpointAttributeModel
         );
     }
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static bool IsValid(AttributeData attribute) =>
         StaticData.EndpointAttributeNamesWithSuffix.Contains(attribute.AttributeClass?.Name ?? "");
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static (int Success, ImmutableArray<int> Error) GetStatusCodes(
         ImmutableArray<KeyValuePair<string,TypedConstant>> attributeNamedArguments
     )

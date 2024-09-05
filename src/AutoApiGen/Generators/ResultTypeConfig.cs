@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AutoApiGen.Generators;
@@ -10,7 +11,7 @@ internal readonly record struct ResultTypeConfig(
     (string Name, string Implementation)? ErrorHandlerMethod
 )
 {
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static ResultTypeConfig? TryCreate(AttributeSyntax attribute)
     {
         var arguments = attribute.ArgumentList?.Arguments

@@ -1,5 +1,6 @@
 ﻿using System.CodeDom.Compiler;
 using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Templates;
@@ -29,11 +30,13 @@ internal readonly record struct MethodTemplate(
         RenderBodyTo(writer, renderDeconstructionTo);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void RenderHttpAttributeTo(IndentedTextWriter writer) =>
         writer.WriteLine(
             $"[global::Microsoft.AspNetCore.Mvc.Http{HttpMethod}{Route.ApplyIfNotNullOrEmpty(static route => $"(\"{route}\")")}]"
         );
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void RenderSignatureDefinitionTo(
         IndentedTextWriter writer,
         Action<IndentedTextWriter, ParameterTemplate> renderParameterTo
@@ -46,6 +49,7 @@ internal readonly record struct MethodTemplate(
         writer.WriteLine(")");
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void RenderParametersTo(
         IndentedTextWriter writer,
         Action<IndentedTextWriter, ParameterTemplate> renderParameterTo
@@ -66,6 +70,7 @@ internal readonly record struct MethodTemplate(
         writer.Indent--;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void RenderBodyTo(
         IndentedTextWriter writer,
         Action<IndentedTextWriter, ImmutableArray<string>?, string> renderDeconstructionTo
@@ -88,6 +93,7 @@ internal readonly record struct MethodTemplate(
         writer.WriteLine('}');
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void RenderContractCreationTo(IndentedTextWriter writer)
     {
         if (ContractParameterNames.Length > 0)
@@ -99,6 +105,7 @@ internal readonly record struct MethodTemplate(
         else writer.WriteLine($"var contract = new {ContractType}();");
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void RenderContractArgumentsTo(
         IndentedTextWriter writer
     )
