@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 
 namespace AutoApiGen.Models;
@@ -11,7 +12,7 @@ internal readonly record struct ParameterModel(
     string? Default
 )
 {
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static ParameterModel FromRoute(RoutePart.ParameterRoutePart parameter) => new(
         Source: From.Route,
         parameter.Type ?? "string",
@@ -19,7 +20,7 @@ internal readonly record struct ParameterModel(
         parameter.Default
     );
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static ParameterModel FromSymbol(IParameterSymbol parameter) => new(
         SourceOf(parameter),
         parameter.Type.ToString(),
@@ -37,7 +38,7 @@ internal readonly record struct ParameterModel(
         } : null
     );
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static From SourceOf(IParameterSymbol parameter)
     {
         if (parameter.Type.ToString().Contains("IFormFile"))

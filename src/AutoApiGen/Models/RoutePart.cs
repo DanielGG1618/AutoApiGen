@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Exceptions;
 using AutoApiGen.Extensions;
 
@@ -19,7 +20,7 @@ internal abstract record RoutePart
     public sealed record CatchAllParameterRoutePart(string Name, string? Type = null, string? Default = null)
         : ParameterRoutePart(Name, Type, Default);
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static RoutePart Parse(string part) => part switch
     {
         not ['{', .., '}'] => new LiteralRoutePart(part),
@@ -47,7 +48,7 @@ internal abstract record RoutePart
         _ => throw new ArgumentException("Invalid route part syntax", nameof(part))
     };
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static string Format(RoutePart part) => part switch
     {
         LiteralRoutePart(var value) => value,
@@ -64,12 +65,12 @@ internal abstract record RoutePart
         _ => throw new ThisIsUnionException(nameof(RoutePart))
     };
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static string FormatName(string name) => name.WithLowerFirstLetter();
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static string FormatType(string? type) => type is null ? "" : $":{type}";
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static string FormatDefault(string? @default) => @default is null ? "" : $"={@default}";
 }

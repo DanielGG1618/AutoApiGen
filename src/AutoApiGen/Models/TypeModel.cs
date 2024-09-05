@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -11,7 +12,7 @@ internal readonly record struct TypeModel
     public string FullName { get; }
     public ImmutableArray<TypeModel>? TypeArguments { get; }
     
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static TypeModel FromSymbol(ITypeSymbol symbol) => new(
         symbol.Name,
         fullName: symbol.ToString().TrimEnd('?'),

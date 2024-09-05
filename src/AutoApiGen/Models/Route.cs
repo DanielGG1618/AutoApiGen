@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Models;
@@ -10,7 +11,7 @@ internal readonly record struct Route
     public string RelationalRoute { get; }
     public ImmutableArray<ParameterModel> Parameters { get; }
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static Route Parse(string value)
     {
         var parts = value.Trim('/').Split('/')

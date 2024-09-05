@@ -1,5 +1,6 @@
 ﻿using System.CodeDom.Compiler;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Extensions;
 using AutoApiGen.Models;
 
@@ -15,7 +16,7 @@ internal readonly record struct ParameterTemplate(
     public void RenderTo(IndentedTextWriter writer) =>
         writer.Write($"{Attributes}{Type} {Name}{Default.ApplyIfNotNullOrEmpty(static def => $" = {def}")}");
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     public static ParameterTemplate FromModel(ParameterModel parameter) => new(
         AttributesFor(parameter),
         parameter.Type,
@@ -23,7 +24,7 @@ internal readonly record struct ParameterTemplate(
         parameter.Default
     );
 
-    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining), Pure]
     private static string AttributesFor(in ParameterModel parameter) => parameter.Source switch
     {
         From.Route => "[global::Microsoft.AspNetCore.Mvc.FromRoute] ",

@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using System.Runtime.CompilerServices;
 using AutoApiGen.Extensions;
 
 namespace AutoApiGen.Templates;
@@ -27,6 +28,7 @@ internal readonly record struct ControllerTemplate(
         RenderBodyTo(writer, onErrorMethod, renderMethodTo);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void RenderRequestsTo(
         IndentedTextWriter writer,
         Action<IndentedTextWriter, RequestTemplate> renderRequestTo
@@ -39,6 +41,7 @@ internal readonly record struct ControllerTemplate(
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void RenderBodyTo(
         IndentedTextWriter writer,
         string? onErrorMethod,
@@ -66,6 +69,7 @@ internal readonly record struct ControllerTemplate(
         writer.WriteLine('}');
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void WriteMethodsTo(
         IndentedTextWriter writer,
         Action<IndentedTextWriter, MethodTemplate> renderMethodTo
